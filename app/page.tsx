@@ -112,10 +112,10 @@ export default function Home() {
           {/* Centered Nav */}
           <nav className="hidden lg:flex items-center gap-10 absolute left-1/2 -translate-x-1/2">
             <Link
-              href="/products"
+              href="#catalog"
               className="text-[17px] font-normal text-[#2d3227] hover:text-[#525f48] transition-colors"
             >
-              Products
+              Catalog
             </Link>
             <Link
               href="#pricing"
@@ -398,12 +398,13 @@ export default function Home() {
                     }}
                   />
                   <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                    <button
-                      className="hover-vibrate-trigger rounded-md px-10 h-14 text-[17px] font-extrabold font-sans w-full sm:w-auto"
+                    <Link
+                      href="/products"
+                      className="hover-vibrate-trigger rounded-md px-10 h-14 text-[17px] font-extrabold font-sans w-full sm:w-auto flex items-center justify-center"
                       style={{ backgroundColor: "#9DF542", color: "#1B2412" }}
                     >
                       Get started for free
-                    </button>
+                    </Link>
                     <button className="rounded-md px-10 h-14 text-[17px] font-extrabold font-sans border-[3px] border-[#2B3220] text-[#2B3220] transition-colors hover:bg-[#2B3220] hover:text-[#9DF542] w-full sm:w-auto flex items-center justify-center">
                       How it works
                     </button>
@@ -651,31 +652,31 @@ export default function Home() {
                     </div>
 
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-60 z-10 pointer-events-none"></div>
-                  </div>
 
-                  {/* Design Now — outside overflow-hidden so it's always clickable */}
-                  <Link
-                    href="/products?type=t-shirts"
-                    className="absolute bottom-6 left-6 flex items-center gap-3 z-30 cursor-pointer"
-                  >
-                    <span className="text-white text-[15px] font-medium tracking-wide drop-shadow-md">
-                      Design Now
-                    </span>
-                    <div className="w-7 h-7 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-[#111] shadow-lg group-hover:bg-white transition-colors">
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M5 12h14M12 5l7 7-7 7" />
-                      </svg>
-                    </div>
-                  </Link>
+                    {/* Read More button overlay */}
+                    <Link
+                      href="/products/tshirt"
+                      className="absolute bottom-6 left-6 flex items-center gap-3 z-20 cursor-pointer pointer-events-auto"
+                    >
+                      <span className="text-white text-[15px] font-medium tracking-wide drop-shadow-md">
+                        Design Now
+                      </span>
+                      <div className="w-7 h-7 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-[#111] shadow-lg group-hover:bg-white transition-colors">
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </Link>
+                  </div>
                 </div>
               </div>
 
@@ -742,31 +743,30 @@ export default function Home() {
                       </div>
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-60 z-10 pointer-events-none"></div>
+                    {/* Read More button overlay */}
+                    <Link
+                      href="/products/bags"
+                      className="absolute bottom-6 left-6 flex items-center gap-3 z-20 cursor-pointer pointer-events-auto"
+                    >
+                      <span className="text-white text-[15px] font-medium tracking-wide drop-shadow-md">
+                        Design Now
+                      </span>
+                      <div className="w-7 h-7 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-[#111] shadow-lg group-hover:bg-white transition-colors">
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </Link>
                   </div>
-
-                  {/* Design Now — outside overflow-hidden so it's always clickable */}
-                  <Link
-                    href="/products?type=bags"
-                    className="absolute bottom-6 left-6 flex items-center gap-3 z-30 cursor-pointer"
-                  >
-                    <span className="text-white text-[15px] font-medium tracking-wide drop-shadow-md">
-                      Design Now
-                    </span>
-                    <div className="w-7 h-7 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-[#111] shadow-lg group-hover:bg-white transition-colors">
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M5 12h14M12 5l7 7-7 7" />
-                      </svg>
-                    </div>
-                  </Link>
                 </div>
               </div>
 
@@ -833,31 +833,30 @@ export default function Home() {
                       </div>
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-60 z-10 pointer-events-none"></div>
+                    {/* Read More button overlay */}
+                    <Link
+                      href="/products/mugs"
+                      className="absolute bottom-6 left-6 flex items-center gap-3 z-20 cursor-pointer pointer-events-auto"
+                    >
+                      <span className="text-white text-[15px] font-medium tracking-wide drop-shadow-md">
+                        Design Now
+                      </span>
+                      <div className="w-7 h-7 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-[#111] shadow-lg group-hover:bg-white transition-colors">
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </Link>
                   </div>
-
-                  {/* Design Now — outside overflow-hidden so it's always clickable */}
-                  <Link
-                    href="/products?type=mugs"
-                    className="absolute bottom-6 left-6 flex items-center gap-3 z-30 cursor-pointer"
-                  >
-                    <span className="text-white text-[15px] font-medium tracking-wide drop-shadow-md">
-                      Design Now
-                    </span>
-                    <div className="w-7 h-7 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-[#111] shadow-lg group-hover:bg-white transition-colors">
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M5 12h14M12 5l7 7-7 7" />
-                      </svg>
-                    </div>
-                  </Link>
                 </div>
               </div>
 
@@ -921,31 +920,30 @@ export default function Home() {
                       </div>
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-60 z-10 pointer-events-none"></div>
+                    {/* Read More button overlay */}
+                    <Link
+                      href="/products/posters"
+                      className="absolute bottom-6 left-6 flex items-center gap-3 z-20 cursor-pointer pointer-events-auto"
+                    >
+                      <span className="text-white text-[15px] font-medium tracking-wide drop-shadow-md">
+                        Design Now
+                      </span>
+                      <div className="w-7 h-7 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-[#111] shadow-lg group-hover:bg-white transition-colors">
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </Link>
                   </div>
-
-                  {/* Design Now — outside overflow-hidden so it's always clickable */}
-                  <Link
-                    href="/products?type=posters"
-                    className="absolute bottom-6 left-6 flex items-center gap-3 z-30 cursor-pointer"
-                  >
-                    <span className="text-white text-[15px] font-medium tracking-wide drop-shadow-md">
-                      Design Now
-                    </span>
-                    <div className="w-7 h-7 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-[#111] shadow-lg group-hover:bg-white transition-colors">
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M5 12h14M12 5l7 7-7 7" />
-                      </svg>
-                    </div>
-                  </Link>
                 </div>
               </div>
 
@@ -1012,31 +1010,30 @@ export default function Home() {
                       </div>
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-60 z-10 pointer-events-none"></div>
+                    {/* Read More button overlay */}
+                    <Link
+                      href="/products/hats"
+                      className="absolute bottom-6 left-6 flex items-center gap-3 z-20 cursor-pointer pointer-events-auto"
+                    >
+                      <span className="text-white text-[15px] font-medium tracking-wide drop-shadow-md">
+                        Design Now
+                      </span>
+                      <div className="w-7 h-7 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-[#111] shadow-lg group-hover:bg-white transition-colors">
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </Link>
                   </div>
-
-                  {/* Design Now — outside overflow-hidden so it's always clickable */}
-                  <Link
-                    href="/products?type=hats"
-                    className="absolute bottom-6 left-6 flex items-center gap-3 z-30 cursor-pointer"
-                  >
-                    <span className="text-white text-[15px] font-medium tracking-wide drop-shadow-md">
-                      Design Now
-                    </span>
-                    <div className="w-7 h-7 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-[#111] shadow-lg group-hover:bg-white transition-colors">
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M5 12h14M12 5l7 7-7 7" />
-                      </svg>
-                    </div>
-                  </Link>
                 </div>
               </div>
             </div>
@@ -1157,7 +1154,10 @@ export default function Home() {
                 house, design your product, and place your order.
               </p>
               <div>
-                <button className="bg-white text-[#111] px-10 py-4 rounded-full font-bold text-[17px] hover-vibrate-trigger flex items-center justify-center gap-2 shadow-sm transition-all border border-gray-200/50">
+                <Link
+                  href="/products"
+                  className="bg-white text-[#111] px-10 py-4 rounded-full font-bold text-[17px] hover-vibrate-trigger flex items-center justify-center gap-2 shadow-sm transition-all border border-gray-200/50"
+                >
                   Start designing
                   <svg
                     width="18"
@@ -1172,7 +1172,7 @@ export default function Home() {
                   >
                     <path d="M5 12h14M12 5l7 7-7 7" />
                   </svg>
-                </button>
+                </Link>
               </div>
             </div>
 
@@ -1205,7 +1205,7 @@ export default function Home() {
               </div>
               <div>
                 <Link
-                  href="#"
+                  href="/products"
                   className="text-[#111] text-[13px] md:text-[14px] font-semibold hover:opacity-75 transition-opacity underline decoration-1 underline-offset-4"
                 >
                   Browse catalog
@@ -1241,7 +1241,7 @@ export default function Home() {
               </div>
               <div>
                 <Link
-                  href="#"
+                  href="/supplier"
                   className="text-[#111] text-[13px] md:text-[14px] font-semibold hover:opacity-75 transition-opacity"
                 >
                   Find sellers
@@ -1279,7 +1279,7 @@ export default function Home() {
               </div>
               <div>
                 <Link
-                  href="#"
+                  href="/editor"
                   className="text-[#111] text-[13px] md:text-[14px] font-semibold hover:opacity-75 transition-opacity"
                 >
                   Open designer
@@ -1361,7 +1361,133 @@ export default function Home() {
           </div>
         </section>
 
+        {/* ====== SUPPLIER PRODUCTS CATALOG SECTION ====== */}
+        {supplierProducts.length > 0 && (
+          <section className="bg-[#fafafa] py-16 px-6 lg:px-16">
+            <div className="max-w-[1400px] mx-auto">
+              {/* Header */}
+              <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+                <div>
+                  <p className="text-[12px] font-black uppercase tracking-[0.15em] text-[#A1FF4D] mb-2">
+                    Verified Suppliers
+                  </p>
+                  <h2 className="text-[36px] md:text-[48px] font-black text-[#111] leading-tight tracking-tight">
+                    Browse Supplier Products
+                  </h2>
+                  <p className="text-gray-500 font-medium text-sm mt-2">
+                    Pick a product from one of our verified suppliers, then
+                    design it yourself.
+                  </p>
+                </div>
+              </div>
 
+              {/* Product Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {supplierProducts.map((product) => (
+                  <div
+                    key={product.id}
+                    className="group bg-white rounded-[2rem] overflow-hidden border border-gray-100 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
+                  >
+                    {/* Image */}
+                    <div className="h-52 bg-gray-50 overflow-hidden relative">
+                      {product.image_url ? (
+                        <img
+                          src={product.image_url}
+                          alt={product.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-200">
+                          <svg
+                            width="48"
+                            height="48"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                          >
+                            <rect x="3" y="3" width="18" height="18" rx="2" />
+                            <path d="M3 9h18M9 21V9" />
+                          </svg>
+                        </div>
+                      )}
+                      {/* Tags */}
+                      <div className="absolute top-3 left-3 flex gap-1.5 flex-wrap">
+                        {(product.tags || []).slice(0, 2).map((tag: string) => (
+                          <span
+                            key={tag}
+                            className="bg-white/90 backdrop-blur-sm text-[#111] text-[9px] font-black px-2 py-1 rounded-full shadow-sm uppercase tracking-wide"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Info */}
+                    <div className="p-5">
+                      {/* Supplier badge */}
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="w-5 h-5 rounded-full bg-[#A1FF4D] flex items-center justify-center text-[9px] font-black text-[#1B2412]">
+                          {product.supplier?.full_name?.[0]?.toUpperCase() ||
+                            "S"}
+                        </div>
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest truncate">
+                          {product.supplier?.full_name}
+                        </span>
+                      </div>
+
+                      <h3 className="font-black text-[#111] text-base mb-1 leading-tight">
+                        {product.name}
+                      </h3>
+                      <p className="text-xs text-gray-400 mb-3 line-clamp-2 font-medium">
+                        {product.description}
+                      </p>
+
+                      {/* Colors */}
+                      {product.available_colors?.length > 0 && (
+                        <div className="flex gap-1.5 mb-4 flex-wrap">
+                          {product.available_colors
+                            .slice(0, 8)
+                            .map((c: any) => (
+                              <div
+                                key={c.hex}
+                                title={c.name}
+                                className="w-4 h-4 rounded-full border-2 border-white shadow-sm cursor-pointer hover:scale-125 transition-transform"
+                                style={{ backgroundColor: c.hex }}
+                              />
+                            ))}
+                          {product.available_colors.length > 8 && (
+                            <span className="text-[9px] font-bold text-gray-400">
+                              +{product.available_colors.length - 8}
+                            </span>
+                          )}
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                            {product.product_type}
+                          </span>
+                          <p className="text-lg font-black text-[#111]">
+                            ${product.price}
+                          </p>
+                        </div>
+                        <Link
+                          href="/editor"
+                          className="bg-[#111] text-white px-4 py-2.5 rounded-xl font-black text-xs hover:bg-[#A1FF4D] hover:text-[#1B2412] transition-all active:scale-95"
+                        >
+                          Design →
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Modern Bento Box Section */}
         <section className="bg-[#1e1e1e] w-full py-16 md:py-24 px-4 md:px-8 flex justify-center font-sans tracking-tight">

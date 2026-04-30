@@ -80,6 +80,16 @@ const categories = [
   },
 ];
 
+const PRODUCT_TYPE_ALIASES = {
+  tshirt: "t-shirts",
+  "t-shirt": "t-shirts",
+  tshirts: "t-shirts",
+  hoodie: "hoodies",
+  cap: "hats",
+  phone: "phone-cases",
+  poster: "posters",
+};
+
 const starterEssentials = [
   { title: "White Ceramic Mug", image: resolveImg(imgStarterMug) },
   { title: "Unisex Jersey Tee", image: resolveImg(imgStarterTee) },
@@ -137,8 +147,12 @@ const newCollectionItems = [
   },
 ];
 
-const ProductsPage = ({ searchParams }) => {
-  const selectedType = searchParams?.type || null;
+const ProductsPage = async ({ searchParams }) => {
+  const resolvedSearchParams = await searchParams;
+  const selectedTypeRaw = resolvedSearchParams?.type || null;
+  const selectedType = selectedTypeRaw
+    ? PRODUCT_TYPE_ALIASES[selectedTypeRaw] || selectedTypeRaw
+    : null;
   const filteredCategories = selectedType
     ? categories.filter((c) => c.path?.split("/").pop() === selectedType)
     : categories;
@@ -243,12 +257,12 @@ const ProductsPage = ({ searchParams }) => {
           {selectedType ? (
             (() => {
               const productsByType = {
-                't-shirts': [
+                "t-shirts": [
                   {
                     id: 101,
-                    slug: 'classic-blank-tee',
-                    title: 'Classic Blank Tee',
-                    brand: 'Stenvio • Essentials',
+                    slug: "classic-blank-tee",
+                    title: "Classic Blank Tee",
+                    brand: "Stenvio • Essentials",
                     price: 1550,
                     premiumPrice: 1100,
                     image: resolveImg(imgNewTee),
@@ -257,20 +271,20 @@ const ProductsPage = ({ searchParams }) => {
                 hoodies: [
                   {
                     id: 102,
-                    slug: 'premium-hoodie-collection',
-                    title: 'Premium Hoodie',
-                    brand: 'Stenvio • Premium',
+                    slug: "premium-hoodie-collection",
+                    title: "Premium Hoodie",
+                    brand: "Stenvio • Premium",
                     price: 3200,
                     premiumPrice: 2450,
                     image: resolveImg(imgNewHoodie),
                   },
                 ],
-                'long-sleeves': [
+                "long-sleeves": [
                   {
                     id: 103,
-                    slug: 'crewneck-sweatshirt',
-                    title: 'Crewneck Sweatshirt',
-                    brand: 'Stenvio • Comfort',
+                    slug: "crewneck-sweatshirt",
+                    title: "Crewneck Sweatshirt",
+                    brand: "Stenvio • Comfort",
                     price: 2400,
                     premiumPrice: 1800,
                     image: resolveImg(imgNewSweatshirt),
@@ -279,18 +293,18 @@ const ProductsPage = ({ searchParams }) => {
                 bags: [
                   {
                     id: 201,
-                    slug: 'eco-tote-bag',
-                    title: 'Eco Tote Bag',
-                    brand: 'Stenvio • Goods',
+                    slug: "eco-tote-bag",
+                    title: "Eco Tote Bag",
+                    brand: "Stenvio • Goods",
                     price: 1200,
                     premiumPrice: 900,
                     image: resolveImg(imgBag1),
                   },
                   {
                     id: 202,
-                    slug: 'city-market-bag',
-                    title: 'City Market Bag',
-                    brand: 'Stenvio • Goods',
+                    slug: "city-market-bag",
+                    title: "City Market Bag",
+                    brand: "Stenvio • Goods",
                     price: 1400,
                     premiumPrice: 1000,
                     image: resolveImg(imgBag2),
@@ -299,20 +313,42 @@ const ProductsPage = ({ searchParams }) => {
                 mugs: [
                   {
                     id: 301,
-                    slug: 'white-ceramic-mug',
-                    title: 'White Ceramic Mug',
-                    brand: 'Stenvio • Kitchen',
+                    slug: "white-ceramic-mug",
+                    title: "White Ceramic Mug",
+                    brand: "Stenvio • Kitchen",
                     price: 800,
                     premiumPrice: 600,
                     image: resolveImg(imgStarterMug),
                   },
                 ],
-                'phone-cases': [
+                posters: [
+                  {
+                    id: 601,
+                    slug: "wall-poster-print",
+                    title: "Wall Poster Print",
+                    brand: "Stenvio • Stationery",
+                    price: 1300,
+                    premiumPrice: 950,
+                    image: resolveImg(imgMug1),
+                  },
+                ],
+                hats: [
+                  {
+                    id: 501,
+                    slug: "panel-cap-v2",
+                    title: "Panel Cap",
+                    brand: "Stenvio • Headwear",
+                    price: 1850,
+                    premiumPrice: 1350,
+                    image: resolveImg(imgNewCap),
+                  },
+                ],
+                "phone-cases": [
                   {
                     id: 401,
-                    slug: 'tough-phone-case',
-                    title: 'Tough Phone Case',
-                    brand: 'Stenvio • Protection',
+                    slug: "tough-phone-case",
+                    title: "Tough Phone Case",
+                    brand: "Stenvio • Protection",
                     price: 2000,
                     premiumPrice: 1500,
                     image: resolveImg(imgPhoneCase1),
@@ -325,8 +361,12 @@ const ProductsPage = ({ searchParams }) => {
               return (
                 <div>
                   <div className="mb-8 text-center">
-                    <h2 className="text-4xl font-black">{(selectedType || '').replace(/-/g, ' ')}</h2>
-                    <p className="text-gray-500">Showing products for this category.</p>
+                    <h2 className="text-4xl font-black">
+                      {(selectedType || "").replace(/-/g, " ")}
+                    </h2>
+                    <p className="text-gray-500">
+                      Showing products for this category.
+                    </p>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
                     {productsToShow.map((product) => (
@@ -369,7 +409,7 @@ const ProductsPage = ({ searchParams }) => {
             {filteredCategories.map((cat, i) => (
               <Link
                 key={cat.name}
-                href={cat.path}
+                href={`/products?type=${cat.path?.split("/").pop()}`}
                 className={`group relative rounded-[3rem] overflow-hidden bg-white shadow-sm border border-[#e5e3d7] transition-all hover:shadow-2xl hover:border-[#bc9368]/40 
                             ${cat.size === "large" ? "md:col-span-2 md:row-span-2" : ""} 
                             ${cat.size === "medium" ? "md:col-span-2 md:row-span-1" : ""}
