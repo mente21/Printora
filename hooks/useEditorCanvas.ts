@@ -56,26 +56,10 @@ export function useEditorCanvas({ printArea, canvasSize, onSelectionChange, init
     // Undo/Redo: use enlivenObjects (loadFromJSON crashes with Turbopack)
     const applyHistoryState = (stateJson: string) => {
         if (!canvas) return;
-        isInitialLoad.current = true;
         const state = JSON.parse(stateJson);
-        canvas.clear();
-        canvas.setBackgroundColor('transparent', () => {});
-        fabric.util.enlivenObjects(
-            state.objects || [],
-            (objects: fabric.Object[]) => {
-                objects.forEach(obj => canvas.add(obj));
-                if (printArea && canvasSize) {
-                    canvas.clipPath = new fabric.Rect({
-                        left: printArea.left, top: printArea.top,
-                        width: printArea.width, height: printArea.height,
-                        absolutePositioned: true,
-                    });
-                }
-                canvas.renderAll();
-                setTimeout(() => { isInitialLoad.current = false; }, 50);
-            },
-            'fabric'
-        );
+        enlivenDesign(state.objects || [], () => {
+            setTimeout(() => { isInitialLoad.current = false; }, 50);
+        });
     };
 
     const undo = () => {
@@ -214,11 +198,12 @@ export function useEditorCanvas({ printArea, canvasSize, onSelectionChange, init
     // Track which viewId we last loaded, so we don't re-run restore on every viewStates sync
     const lastRestoredViewId = useRef<string | undefined>('__none__');
 
-    const doRestore = (objects: any[]) => {
+    const enlivenDesign = (objects: any[], callback?: () => void) => {
         if (!canvas) return;
         isInitialLoad.current = true;
         canvas.clear();
-        canvas.setBackgroundColor('transparent', () => {});
+        canvas.setBackgroundColor('transparent', () => { });
+
         if (objects.length === 0) {
             if (printArea && canvasSize) {
                 canvas.clipPath = new fabric.Rect({
@@ -228,27 +213,59 @@ export function useEditorCanvas({ printArea, canvasSize, onSelectionChange, init
                 });
             }
             canvas.renderAll();
-            const json = JSON.stringify(canvas.toJSON());
-            setHistory([json]);
-            setHistoryIndex(0);
-            isInitialLoad.current = false;
+            callback?.();
             return;
         }
-        fabric.util.enlivenObjects(objects, (enlived: fabric.Object[]) => {
-            enlived.forEach(obj => canvas.add(obj));
-            if (printArea && canvasSize) {
-                canvas.clipPath = new fabric.Rect({
-                    left: printArea.left, top: printArea.top,
-                    width: printArea.width, height: printArea.height,
-                    absolutePositioned: true,
-                });
+
+        // Helper to enliven nested properties like 'path' (used for curved text)
+        const enlivenNestedPaths = (objs: any[], onComplete: () => void) => {
+            const objectsWithPaths = objs.filter(o => o.path && typeof o.path === 'object' && !(o.path instanceof fabric.Object));
+            if (objectsWithPaths.length === 0) {
+                onComplete();
+                return;
             }
-            canvas.renderAll();
-            const json = JSON.stringify(canvas.toJSON());
+
+            let completed = 0;
+            objectsWithPaths.forEach(obj => {
+                fabric.util.enlivenObjects([obj.path], (enlivedPaths: fabric.Object[]) => {
+                    obj.path = enlivedPaths[0];
+                    completed++;
+                    if (completed === objectsWithPaths.length) onComplete();
+                }, 'fabric');
+            });
+        };
+
+        enlivenNestedPaths(objects, () => {
+            fabric.util.enlivenObjects(objects, (enlived: fabric.Object[]) => {
+                enlived.forEach(obj => {
+                    // Ensure the enlived object also has its path instance if it was revived
+                    const original = objects.find(o => o.left === obj.left && o.top === obj.top && o.type === obj.type);
+                    if (original && original.path instanceof fabric.Object) {
+                        (obj as any).path = original.path;
+                    }
+                    canvas.add(obj);
+                });
+
+                if (printArea && canvasSize) {
+                    canvas.clipPath = new fabric.Rect({
+                        left: printArea.left, top: printArea.top,
+                        width: printArea.width, height: printArea.height,
+                        absolutePositioned: true,
+                    });
+                }
+                canvas.renderAll();
+                callback?.();
+            }, 'fabric');
+        });
+    };
+
+    const doRestore = (objects: any[]) => {
+        enlivenDesign(objects, () => {
+            const json = JSON.stringify(canvas?.toJSON());
             setHistory([json]);
             setHistoryIndex(0);
             setTimeout(() => { isInitialLoad.current = false; }, 100);
-        }, 'fabric');
+        });
     };
 
     // Handle restoring state when view changes or on initial load.
