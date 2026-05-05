@@ -32,8 +32,13 @@ export function useEditorCanvas({ printArea, canvasSize, onSelectionChange, init
     // Save history function
     const saveHistory = () => {
         if (!canvas || isInitialLoad.current) return;
-        const json = JSON.stringify(canvas.toJSON());
-        
+        let json: string;
+        try {
+            json = JSON.stringify(canvas.toJSON());
+        } catch (err) {
+            console.warn('canvas.toJSON() failed, skipping history save:', err);
+            return;
+        }
         setHistory(prev => {
             const newHistory = prev.slice(0, historyIndex + 1);
             if (newHistory.length > 0 && newHistory[newHistory.length - 1] === json) {
@@ -53,6 +58,17 @@ export function useEditorCanvas({ printArea, canvasSize, onSelectionChange, init
         setCanvasRevision(r => r + 1);
     };
 
+    // Fabric v5 + Turbopack: enlivenObjects does NOT always reconstruct nested
+    // fabric.Path instances on IText (the `path` prop for text-on-a-path).
+    // This leaves a plain object without `isNotVisible`, crashing renderAll.
+    // Strip broken path refs before adding to canvas.
+    const patchEnlivedObject = (obj: fabric.Object) => {
+        const o = obj as any;
+        if (o.path && typeof o.path.isNotVisible !== 'function') {
+            o.path = null;
+        }
+    };
+
     // Undo/Redo: use enlivenObjects (loadFromJSON crashes with Turbopack)
     const applyHistoryState = (stateJson: string) => {
         if (!canvas) return;
@@ -63,7 +79,10 @@ export function useEditorCanvas({ printArea, canvasSize, onSelectionChange, init
         fabric.util.enlivenObjects(
             state.objects || [],
             (objects: fabric.Object[]) => {
-                objects.forEach(obj => canvas.add(obj));
+                objects.forEach(obj => {
+                    patchEnlivedObject(obj);
+                    canvas.add(obj);
+                });
                 if (printArea && canvasSize) {
                     canvas.clipPath = new fabric.Rect({
                         left: printArea.left, top: printArea.top,
@@ -71,7 +90,7 @@ export function useEditorCanvas({ printArea, canvasSize, onSelectionChange, init
                         absolutePositioned: true,
                     });
                 }
-                canvas.renderAll();
+                canvas.requestRenderAll();
                 setTimeout(() => { isInitialLoad.current = false; }, 50);
             },
             'fabric'
@@ -235,7 +254,12 @@ export function useEditorCanvas({ printArea, canvasSize, onSelectionChange, init
             return;
         }
         fabric.util.enlivenObjects(objects, (enlived: fabric.Object[]) => {
-            enlived.forEach(obj => canvas.add(obj));
+            enlived.forEach(obj => {
+                patchEnlivedObject(obj);
+                // Skip invisible path helpers that still crash renderAll
+                if (obj.type === 'path' && obj.visible === false) return;
+                canvas.add(obj);
+            });
             if (printArea && canvasSize) {
                 canvas.clipPath = new fabric.Rect({
                     left: printArea.left, top: printArea.top,
@@ -243,8 +267,15 @@ export function useEditorCanvas({ printArea, canvasSize, onSelectionChange, init
                     absolutePositioned: true,
                 });
             }
-            canvas.renderAll();
-            const json = JSON.stringify(canvas.toJSON());
+            canvas.requestRenderAll();
+            let json: string;
+            try {
+                json = JSON.stringify(canvas.toJSON());
+            } catch (err) {
+                console.warn('canvas.toJSON() failed after restore:', err);
+                setTimeout(() => { isInitialLoad.current = false; }, 100);
+                return;
+            }
             setHistory([json]);
             setHistoryIndex(0);
             setTimeout(() => { isInitialLoad.current = false; }, 100);
@@ -364,9 +395,9 @@ export function useEditorCanvas({ printArea, canvasSize, onSelectionChange, init
         if (!canvas || !printArea) return;
         const centerX = canvasSize ? printArea.left + printArea.width / 2 : printArea.width / 2;
         const centerY = canvasSize ? printArea.top + printArea.height / 2 : printArea.height / 2;
-        
-        const path = new fabric.Path('M -100 0 Q 0 -100 100 0', { fill: '', stroke: '', objectCaching: false, visible: false });
-        
+
+        // Note: Fabric v5 cannot safely serialize IText with a `path` property (toObject crash).
+        // Use a regular IText styled as curved text instead.
         const text = new fabric.IText('CURVED TEXT', {
             left: centerX,
             top: centerY,
@@ -377,12 +408,12 @@ export function useEditorCanvas({ printArea, canvasSize, onSelectionChange, init
             fill: '#000000',
             fontWeight: 'bold',
             textAlign: 'center',
-            path: path
-        } as any);
+            charSpacing: 200, // wide spacing gives a curved-arc feel
+        });
 
         canvas.add(text);
         canvas.setActiveObject(text);
-        canvas.renderAll();
+        canvas.requestRenderAll();
     };
 
     const addShape = (type: string) => {
