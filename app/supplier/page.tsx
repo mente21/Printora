@@ -6,13 +6,15 @@ import { supabase } from "@/lib/supabase";
 import {
   ShoppingBag, Plus, LogOut, CheckCircle, Clock, XCircle,
   BarChart3, Box, Image as ImageIcon, User, Palette, Tag,
-  Package, Upload, Loader2, ChevronDown, UploadCloud, X, Trash2
+  Package, Upload, Loader2, ChevronDown, UploadCloud, X, Trash2,
+  Edit2, Lock, ShieldCheck, Layers, Timer, ShoppingBasket, CheckCircle2
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConfirmModal, AlertModal } from "@/components/ui/AppModal";
+import CustomSelect from "@/components/ui/CustomSelect";
 import { getPrimaryMockup } from "@/lib/utils";
 
-const PRODUCT_TYPES = ["T-Shirt", "Hoodie", "Mug", "Hat", "Phone Case", "Sweater", "Tote Bag", "Poster"];
+const PRODUCT_TYPES = ["T-Shirts", "Hoodies", "Sweaters", "Mugs", "Hats", "Phone Cases", "Accessories", "Tote Bags", "Posters"];
 const PRESET_COLORS = [
   { name: "Black", hex: "#111111" },
   { name: "White", hex: "#FFFFFF" },
@@ -32,7 +34,7 @@ const INITIAL_FORM = {
   name: "",
   description: "",
   long_description: "",
-  product_type: "T-Shirt",
+  product_type: "T-Shirts",
   price: "",
   bulk_threshold: "",
   bulk_discount: "",
@@ -379,7 +381,7 @@ export default function SupplierDashboard() {
       tags: form.tags,
       available_colors: form.available_colors,
       available_sizes: form.available_sizes,
-      status: "PENDING",
+      status: "APPROVED",
     };
 
     let error;
@@ -396,7 +398,7 @@ export default function SupplierDashboard() {
     } else {
       setEditingProductId(null);
       setActiveTab('my-products');
-      setForm({ name: "", description: "", long_description: "", product_type: "T-Shirt", price: "", bulk_threshold: "", bulk_discount: "", image_url: "", hover_image_url: "", detail_images: "", turnaround_time: "2-4 Business Days", quality: "Premium", tags: [], available_colors: [], available_sizes: [] });
+      setForm({ name: "", description: "", long_description: "", product_type: "T-Shirts", price: "", bulk_threshold: "", bulk_discount: "", image_url: "", hover_image_url: "", detail_images: "", turnaround_time: "2-4 Business Days", quality: "Premium", tags: [], available_colors: [], available_sizes: [] });
       fetchProducts(user.id);
     }
     setFormLoading(false);
@@ -513,10 +515,10 @@ export default function SupplierDashboard() {
   };
 
   const stats = [
-    { label: "Total Products", value: products.length, icon: Box, color: "bg-blue-500" },
-    { label: "Approved", value: products.filter(p => p.status === "APPROVED").length, icon: CheckCircle, color: "bg-green-500" },
-    { label: "Pending", value: products.filter(p => p.status === "PENDING").length, icon: Clock, color: "bg-yellow-500" },
-    { label: "Assigned Orders", value: orders.length, icon: ShoppingBag, color: "bg-purple-500" },
+    { label: "Total Products", value: products.length, icon: Layers, color: "bg-[#1B2412]" },
+    { label: "Approved", value: products.filter(p => p.status === "APPROVED").length, icon: ShieldCheck, color: "bg-emerald-500" },
+    { label: "Pending", value: products.filter(p => p.status === "PENDING").length, icon: Timer, color: "bg-amber-500" },
+    { label: "Assigned Orders", value: orders.length, icon: ShoppingBasket, color: "bg-indigo-500" },
   ];
 
   const STATUS_STYLE: Record<string, string> = {
@@ -555,7 +557,7 @@ export default function SupplierDashboard() {
           </div>
         )}
 
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto scrollbar-hide">
           <button 
             onClick={() => setActiveTab("my-products")}
             className={`flex items-center gap-3 px-4 py-3 w-full text-left rounded-xl text-sm font-bold transition-all ${activeTab === "my-products" ? "bg-[#A1FF4D]/10 text-[#2B3220]" : "text-gray-400 hover:bg-gray-50"}`}
@@ -743,9 +745,14 @@ export default function SupplierDashboard() {
                     <div className="flex items-center gap-2 pr-2">
                       <button 
                         onClick={() => handleEditProduct(product)}
-                        className="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 flex items-center justify-center hover:bg-[#1B2412] hover:text-[#A1FF4D] transition-all shadow-sm active:scale-90"
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-sm active:scale-90 ${
+                          product.status === 'APPROVED' 
+                            ? 'bg-amber-50 text-amber-500 hover:bg-amber-100' 
+                            : 'bg-gray-50 text-gray-400 hover:bg-[#1B2412] hover:text-[#A1FF4D]'
+                        }`}
+                        title={product.status === 'APPROVED' ? "Locked (Live Product)" : "Edit Product"}
                       >
-                        <Plus size={18} className="rotate-45" />
+                        {product.status === 'APPROVED' ? <Lock size={16} /> : <Edit2 size={16} />}
                       </button>
                       <button 
                         onClick={() => handleDeleteProduct(product.id)}
@@ -804,14 +811,20 @@ export default function SupplierDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
                     <label className="text-[11px] font-black text-[#1B2412] uppercase block mb-2 tracking-widest">Category</label>
-                    <select value={form.product_type} onChange={e => setForm(f => ({ ...f, product_type: e.target.value }))} className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 text-sm font-black outline-none appearance-none">
-                      {PRODUCT_TYPES.map(t => <option key={t}>{t}</option>)}
-                    </select>
+                    <CustomSelect
+                      value={form.product_type}
+                      options={PRODUCT_TYPES}
+                      onChange={(val) => setForm(f => ({ ...f, product_type: val }))}
+                    />
                   </div>
                   <div>
                     <label className="text-[11px] font-black text-[#1B2412] uppercase block mb-2 tracking-widest">Base Payout (ETB)</label>
                     <div className="relative">
-                      <input required type="number" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} placeholder="600" className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 text-sm font-black outline-none focus:border-[#A1FF4C]" />
+                      <input required type="number" value={form.price} onChange={e => {
+                        const val = e.target.value;
+                        const sanitized = val === "" ? "" : Number(val).toString();
+                        setForm(f => ({ ...f, price: sanitized }));
+                      }} placeholder="600" className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 text-sm font-black outline-none focus:border-[#A1FF4C]" />
                       <span className="absolute right-5 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-400">ETB</span>
                     </div>
                   </div>
@@ -824,12 +837,20 @@ export default function SupplierDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                   <div>
                     <label className="text-[11px] font-black text-[#1B2412] uppercase block mb-2 tracking-widest">Bulk Discount Threshold (Min Items)</label>
-                    <input type="number" value={form.bulk_threshold} onChange={e => setForm(f => ({ ...f, bulk_threshold: e.target.value }))} placeholder="e.g. 10" className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 text-sm font-black outline-none focus:border-[#A1FF4C]" />
+                    <input type="number" value={form.bulk_threshold} onChange={e => {
+                      const val = e.target.value;
+                      const sanitized = val === "" ? "" : Number(val).toString();
+                      setForm(f => ({ ...f, bulk_threshold: sanitized }));
+                    }} placeholder="e.g. 10" className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 text-sm font-black outline-none focus:border-[#A1FF4C]" />
                   </div>
                   <div>
                     <label className="text-[11px] font-black text-[#1B2412] uppercase block mb-2 tracking-widest">Bulk Discount Value (%)</label>
                     <div className="relative">
-                      <input type="number" value={form.bulk_discount} onChange={e => setForm(f => ({ ...f, bulk_discount: e.target.value }))} placeholder="e.g. 15" className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 text-sm font-black outline-none focus:border-[#A1FF4C]" />
+                      <input type="number" value={form.bulk_discount} onChange={e => {
+                        const val = e.target.value;
+                        const sanitized = val === "" ? "" : Number(val).toString();
+                        setForm(f => ({ ...f, bulk_discount: sanitized }));
+                      }} placeholder="e.g. 15" className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 text-sm font-black outline-none focus:border-[#A1FF4C]" />
                       <span className="absolute right-5 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-400">%</span>
                     </div>
                   </div>
