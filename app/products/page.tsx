@@ -124,6 +124,8 @@ function ProductsPageContent() {
     { name: "Hats", icon: HardHat },
     { name: "Accessories", icon: Watch },
     { name: "Phone Cases", icon: Smartphone },
+    { name: "Tote Bags", icon: ShoppingBag },
+    { name: "Posters", icon: Grid },
   ];
 
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % carouselItems.length);
