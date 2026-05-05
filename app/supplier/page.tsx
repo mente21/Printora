@@ -13,7 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConfirmModal, AlertModal } from "@/components/ui/AppModal";
 import { getPrimaryMockup } from "@/lib/utils";
 
-const PRODUCT_TYPES = ["T-Shirt", "Hoodie", "Mug", "Hat", "Phone Case", "Sweater", "Tote Bag", "Poster"];
+const PRODUCT_TYPES = ["T-Shirts", "Hoodies", "Sweaters", "Mugs", "Hats", "Phone Cases", "Accessories", "Tote Bags", "Posters"];
 const PRESET_COLORS = [
   { name: "Black", hex: "#111111" },
   { name: "White", hex: "#FFFFFF" },
@@ -817,7 +817,11 @@ export default function SupplierDashboard() {
                   <div>
                     <label className="text-[11px] font-black text-[#1B2412] uppercase block mb-2 tracking-widest">Base Payout (ETB)</label>
                     <div className="relative">
-                      <input required type="number" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} placeholder="600" className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 text-sm font-black outline-none focus:border-[#A1FF4C]" />
+                      <input required type="number" value={form.price} onChange={e => {
+                        const val = e.target.value;
+                        const sanitized = val === "" ? "" : Number(val).toString();
+                        setForm(f => ({ ...f, price: sanitized }));
+                      }} placeholder="600" className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 text-sm font-black outline-none focus:border-[#A1FF4C]" />
                       <span className="absolute right-5 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-400">ETB</span>
                     </div>
                   </div>
@@ -830,12 +834,20 @@ export default function SupplierDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                   <div>
                     <label className="text-[11px] font-black text-[#1B2412] uppercase block mb-2 tracking-widest">Bulk Discount Threshold (Min Items)</label>
-                    <input type="number" value={form.bulk_threshold} onChange={e => setForm(f => ({ ...f, bulk_threshold: e.target.value }))} placeholder="e.g. 10" className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 text-sm font-black outline-none focus:border-[#A1FF4C]" />
+                    <input type="number" value={form.bulk_threshold} onChange={e => {
+                      const val = e.target.value;
+                      const sanitized = val === "" ? "" : Number(val).toString();
+                      setForm(f => ({ ...f, bulk_threshold: sanitized }));
+                    }} placeholder="e.g. 10" className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 text-sm font-black outline-none focus:border-[#A1FF4C]" />
                   </div>
                   <div>
                     <label className="text-[11px] font-black text-[#1B2412] uppercase block mb-2 tracking-widest">Bulk Discount Value (%)</label>
                     <div className="relative">
-                      <input type="number" value={form.bulk_discount} onChange={e => setForm(f => ({ ...f, bulk_discount: e.target.value }))} placeholder="e.g. 15" className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 text-sm font-black outline-none focus:border-[#A1FF4C]" />
+                      <input type="number" value={form.bulk_discount} onChange={e => {
+                        const val = e.target.value;
+                        const sanitized = val === "" ? "" : Number(val).toString();
+                        setForm(f => ({ ...f, bulk_discount: sanitized }));
+                      }} placeholder="e.g. 15" className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 text-sm font-black outline-none focus:border-[#A1FF4C]" />
                       <span className="absolute right-5 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-400">%</span>
                     </div>
                   </div>

@@ -118,8 +118,9 @@ function ProductsPageContent() {
 
   const categories = [
     { name: "T-shirts", icon: Shirt },
-    { name: "Mugs", icon: Coffee },
     { name: "Hoodies", icon: Shirt },
+    { name: "Sweaters", icon: Shirt },
+    { name: "Mugs", icon: Coffee },
     { name: "Hats", icon: HardHat },
     { name: "Accessories", icon: Watch },
     { name: "Phone Cases", icon: Smartphone },
@@ -337,8 +338,16 @@ function ProductsPageContent() {
                     <input 
                       type="number" 
                       placeholder="0" 
-                      value={minPrice}
-                      onChange={(e) => setMinPrice(Number(e.target.value))}
+                      value={minPrice === 0 ? "" : minPrice}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === "") {
+                          setMinPrice(0);
+                        } else {
+                          // Convert to number which naturally removes leading zeros
+                          setMinPrice(Number(val));
+                        }
+                      }}
                       className="bg-transparent w-full text-sm font-bold text-gray-700 outline-none" 
                     />
                   </div>
@@ -348,8 +357,15 @@ function ProductsPageContent() {
                     <input 
                       type="number" 
                       placeholder="5000" 
-                      value={maxPrice}
-                      onChange={(e) => setMaxPrice(Number(e.target.value))}
+                      value={maxPrice === 0 ? "" : maxPrice}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === "") {
+                          setMaxPrice(0);
+                        } else {
+                          setMaxPrice(Number(val));
+                        }
+                      }}
                       className="bg-transparent w-full text-sm font-bold text-gray-700 outline-none" 
                     />
                   </div>
