@@ -62,7 +62,7 @@ function ProductsPageContent() {
       href: "/products?category=Hoodies",
       bg: "linear-gradient(135deg, #1a1030 0%, #2d1b5e 50%, #3b2080 100%)",
       accent: "#A78BFA",
-      image: "/car2.jpg",
+      image: "/car2.png",
       imagePos: "object-top"
     },
     {
@@ -72,6 +72,7 @@ function ProductsPageContent() {
       href: "/products?category=T-shirts",
       bg: "linear-gradient(135deg, #2a0a18 0%, #5c1430 50%, #7d1a42 100%)",
       accent: "#FB7185",
+      textColor: "#000000",
       image: "/car3.jpg",
       imagePos: "object-[center_20%]"
     },
@@ -209,12 +210,19 @@ function ProductsPageContent() {
 
                 {/* ONE unified bold Impact heading across all slides */}
                 <h2
-                  className="text-4xl md:text-5xl lg:text-[58px] text-white leading-[1.0] drop-shadow-lg"
-                  style={{ fontFamily: 'Impact, "Arial Black", "Segoe UI Black", sans-serif', letterSpacing: '0.01em' }}
+                  className={`text-4xl md:text-5xl lg:text-[58px] leading-[1.0] ${item.textColor ? "" : "text-white drop-shadow-lg"}`}
+                  style={{
+                    fontFamily: 'Impact, "Arial Black", "Segoe UI Black", sans-serif',
+                    letterSpacing: '0.01em',
+                    color: item.textColor || 'white'
+                  }}
                 >
                   {item.title}
                 </h2>
-                <p className="text-white/90 text-[15px] md:text-[17px] font-medium leading-relaxed max-w-md drop-shadow-sm">
+                <p
+                  className={`text-[15px] md:text-[17px] font-medium leading-relaxed max-w-md ${item.textColor ? "" : "text-white/90 drop-shadow-sm"}`}
+                  style={{ color: item.textColor ? `${item.textColor}e6` : undefined }}
+                >
                   {item.subtitle}
                 </p>
 
