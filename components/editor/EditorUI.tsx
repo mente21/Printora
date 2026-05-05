@@ -38,6 +38,7 @@ import {
 } from 'lucide-react';
 import { ProductTemplate, ProductView, CanvasDesignState } from '@/types/editor';
 import { supabase } from '@/lib/supabase';
+import CustomSelect from '@/components/ui/CustomSelect';
 
 /* ─── Font catalogue ─────────────────────────────────────────────────────── */
 const FONTS = [
@@ -1697,35 +1698,22 @@ export default function EditorUI() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-3">
                                         <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Select Size</label>
-                                        <div className="relative group">
-                                            <select
-                                                value={orderSize}
-                                                onChange={(e) => setOrderSize(e.target.value)}
-                                                className="w-full appearance-none bg-gray-50 border border-gray-200 rounded-xl px-5 py-3.5 text-sm font-bold text-gray-900 outline-none focus:ring-2 focus:ring-[#ccff00] focus:border-transparent transition-all cursor-pointer"
-                                            >
-                                                <option value="S">Small (S)</option>
-                                                <option value="M">Medium (M)</option>
-                                                <option value="L">Large (L)</option>
-                                                <option value="XL">Extra Large (XL)</option>
-                                                <option value="XXL">Double Extra Large (XXL)</option>
-                                            </select>
-                                            <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-gray-900 transition-colors" size={18} />
-                                        </div>
+                                        <CustomSelect
+                                            value={orderSize}
+                                            options={["S", "M", "L", "XL", "XXL"]}
+                                            onChange={(val) => setOrderSize(val)}
+                                            className="custom-editor-select"
+                                        />
                                     </div>
 
                                     <div className="space-y-3">
                                         <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Garment Quality</label>
-                                        <div className="relative group">
-                                            <select
-                                                value={orderQuality}
-                                                onChange={(e) => setOrderQuality(e.target.value)}
-                                                className="w-full appearance-none bg-gray-50 border border-gray-200 rounded-xl px-5 py-3.5 text-sm font-bold text-gray-900 outline-none focus:ring-2 focus:ring-[#ccff00] focus:border-transparent transition-all cursor-pointer"
-                                            >
-                                                <option value="Standard">Standard Cotton</option>
-                                                <option value="Premium">Premium Ring-Spun (+$5.00)</option>
-                                            </select>
-                                            <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-gray-900 transition-colors" size={18} />
-                                        </div>
+                                        <CustomSelect
+                                            value={orderQuality}
+                                            options={["Standard", "Premium"]}
+                                            onChange={(val) => setOrderQuality(val)}
+                                            className="custom-editor-select"
+                                        />
                                     </div>
                                 </div>
 

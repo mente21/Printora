@@ -150,6 +150,7 @@ function ProductsPageContent() {
       const normalizedSelected = selectedCategories.map(cat => {
           const norm = normalize(cat);
           return {
+              name: cat,
               norm,
               singular: norm.endsWith('s') ? norm.slice(0, -1) : norm
           };
@@ -158,9 +159,39 @@ function ProductsPageContent() {
       result = result.filter(p => {
         if (!p.product_type) return false;
         const typeNorm = normalize(p.product_type);
-        return normalizedSelected.some(cat => 
-          typeNorm.includes(cat.norm) || typeNorm.includes(cat.singular) || cat.norm.includes(typeNorm) || cat.singular.includes(typeNorm)
-        );
+        const nameNorm = normalize(p.name || "");
+        
+        return normalizedSelected.some(cat => {
+          // Check if product type matches category
+          const isMatch = typeNorm.includes(cat.norm) || 
+                         typeNorm.includes(cat.singular) || 
+                         cat.norm.includes(typeNorm) || 
+                         cat.singular.includes(typeNorm);
+          
+          if (isMatch) return true;
+
+          // Special case: Sweaters often named "Crewneck" or "Pullover"
+          if (cat.name === "Sweaters") {
+            const isSweaterKeyword = typeNorm.includes("crewneck") || 
+                                     typeNorm.includes("pullover") ||
+                                     nameNorm.includes("crewneck") ||
+                                     nameNorm.includes("pullover") ||
+                                     nameNorm.includes("sweater");
+            
+            // Avoid matching T-shirts that happen to mention "crewneck"
+            const isExplicitTShirt = nameNorm.includes("tshirt") || 
+                                     nameNorm.includes("tee") || 
+                                     typeNorm.includes("tshirt");
+            
+            return isSweaterKeyword && !isExplicitTShirt;
+          }
+          
+          if (cat.name === "Hoodies") {
+            return nameNorm.includes("hoodie");
+          }
+          
+          return false;
+        });
       });
     }
 
@@ -293,7 +324,18 @@ function ProductsPageContent() {
                   const count = supplierProducts.filter(p => {
                     if (!p.product_type) return false;
                     const typeNorm = normalize(p.product_type);
-                    return typeNorm.includes(catNorm) || typeNorm.includes(catSingular) || catNorm.includes(typeNorm) || catSingular.includes(typeNorm);
+                    const nameNorm = normalize(p.name || "");
+                    const isMatch = typeNorm.includes(catNorm) || typeNorm.includes(catSingular) || catNorm.includes(typeNorm) || catSingular.includes(typeNorm);
+                    if (isMatch) return true;
+                    if (cat.name === "Sweaters") {
+                        const isSweaterKeyword = typeNorm.includes("crewneck") || typeNorm.includes("pullover") || nameNorm.includes("crewneck") || nameNorm.includes("pullover") || nameNorm.includes("sweater");
+                        const isExplicitTShirt = nameNorm.includes("tshirt") || nameNorm.includes("tee") || typeNorm.includes("tshirt");
+                        return isSweaterKeyword && !isExplicitTShirt;
+                    }
+                    if (cat.name === "Hoodies") {
+                        return nameNorm.includes("hoodie");
+                    }
+                    return false;
                   }).length;
                   return (
                     <label key={idx} className="flex items-center justify-between group cursor-pointer p-2 rounded-lg hover:bg-gray-50 transition-colors">
@@ -479,6 +521,17 @@ function ProductsPageContent() {
                     )}
                     
                     <div className="absolute inset-0 bg-black/5 opacity-0 group-hover/img:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                    
+                    {/* Status Badge for Suppliers */}
+                    {product.status !== "APPROVED" && (
+                      <div className="absolute top-4 left-4 z-10">
+                        <span className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg ${
+                          product.status === "PENDING" ? "bg-orange-500 text-white" : "bg-red-500 text-white"
+                        }`}>
+                          {product.status === "PENDING" ? "Pending Approval" : "Rejected"}
+                        </span>
+                      </div>
+                    )}
                   </Link>
                 </div>
                 

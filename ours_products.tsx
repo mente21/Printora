@@ -21,6 +21,7 @@ import {
   Search
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import CustomSelect from "@/components/ui/CustomSelect";
 
 export default function ProductsPage() {
   return (
@@ -74,15 +75,36 @@ function ProductsPageContent() {
   }, [searchParams]);
 
   useEffect(() => {
-    supabase
-      .from("supplier_products")
-      .select("*, supplier:profiles(full_name)")
-      .eq("status", "APPROVED")
-      .order("created_at", { ascending: false })
-      .then(({ data }) => {
-        setSupplierProducts(data || []);
-        setLoading(false);
-      });
+    const fetchProducts = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id ?? null;
+
+      const { data: approvedData } = await supabase
+        .from("supplier_products")
+        .select("*, supplier:profiles(full_name)")
+        .eq("status", "APPROVED")
+        .order("created_at", { ascending: false });
+
+      let allProducts: any[] = approvedData || [];
+
+      if (userId) {
+        const { data: ownData, error: ownError } = await supabase
+          .from("supplier_products")
+          .select("*")
+          .eq("supplier_id", userId)
+          .neq("status", "APPROVED")
+          .order("created_at", { ascending: false });
+
+        if (ownError) console.error("Own products fetch error:", ownError);
+        if (ownData && ownData.length > 0) {
+          allProducts = [...allProducts, ...ownData];
+        }
+      }
+
+      setSupplierProducts(allProducts);
+      setLoading(false);
+    };
+    fetchProducts();
   }, []);
 
   // Auto-scroll logic
@@ -366,18 +388,16 @@ function ProductsPageContent() {
                   className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2 pl-9 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#3da85b]/20 focus:border-[#3da85b] transition-all"
                 />
               </div>
-              <div className="relative group/sort">
-                <select 
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="appearance-none bg-gray-50 border border-gray-100 rounded-xl py-2 pl-4 pr-10 text-sm font-bold text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer outline-none focus:ring-2 focus:ring-[#3da85b]/20"
-                >
-                  <option value="newest">Sort: Newest</option>
-                  <option value="price-low">Price: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
-                </select>
-                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-              </div>
+                <CustomSelect
+                  value={sortBy === "newest" ? "Sort: Newest" : sortBy === "price-low" ? "Price: Low to High" : "Price: High to Low"}
+                  options={["Sort: Newest", "Price: Low to High", "Price: High to Low"]}
+                  onChange={(val) => {
+                    if (val === "Sort: Newest") setSortBy("newest");
+                    else if (val === "Price: Low to High") setSortBy("price-low");
+                    else setSortBy("price-high");
+                  }}
+                  className="w-[180px]"
+                />
             </div>
           </div>
 

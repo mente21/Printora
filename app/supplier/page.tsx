@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConfirmModal, AlertModal } from "@/components/ui/AppModal";
+import CustomSelect from "@/components/ui/CustomSelect";
 import { getPrimaryMockup } from "@/lib/utils";
 
 const PRODUCT_TYPES = ["T-Shirts", "Hoodies", "Sweaters", "Mugs", "Hats", "Phone Cases", "Accessories", "Tote Bags", "Posters"];
@@ -33,7 +34,7 @@ const INITIAL_FORM = {
   name: "",
   description: "",
   long_description: "",
-  product_type: "T-Shirt",
+  product_type: "T-Shirts",
   price: "",
   bulk_threshold: "",
   bulk_discount: "",
@@ -380,7 +381,7 @@ export default function SupplierDashboard() {
       tags: form.tags,
       available_colors: form.available_colors,
       available_sizes: form.available_sizes,
-      status: "PENDING",
+      status: "APPROVED",
     };
 
     let error;
@@ -397,7 +398,7 @@ export default function SupplierDashboard() {
     } else {
       setEditingProductId(null);
       setActiveTab('my-products');
-      setForm({ name: "", description: "", long_description: "", product_type: "T-Shirt", price: "", bulk_threshold: "", bulk_discount: "", image_url: "", hover_image_url: "", detail_images: "", turnaround_time: "2-4 Business Days", quality: "Premium", tags: [], available_colors: [], available_sizes: [] });
+      setForm({ name: "", description: "", long_description: "", product_type: "T-Shirts", price: "", bulk_threshold: "", bulk_discount: "", image_url: "", hover_image_url: "", detail_images: "", turnaround_time: "2-4 Business Days", quality: "Premium", tags: [], available_colors: [], available_sizes: [] });
       fetchProducts(user.id);
     }
     setFormLoading(false);
@@ -810,9 +811,11 @@ export default function SupplierDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
                     <label className="text-[11px] font-black text-[#1B2412] uppercase block mb-2 tracking-widest">Category</label>
-                    <select value={form.product_type} onChange={e => setForm(f => ({ ...f, product_type: e.target.value }))} className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 text-sm font-black outline-none appearance-none">
-                      {PRODUCT_TYPES.map(t => <option key={t}>{t}</option>)}
-                    </select>
+                    <CustomSelect
+                      value={form.product_type}
+                      options={PRODUCT_TYPES}
+                      onChange={(val) => setForm(f => ({ ...f, product_type: val }))}
+                    />
                   </div>
                   <div>
                     <label className="text-[11px] font-black text-[#1B2412] uppercase block mb-2 tracking-widest">Base Payout (ETB)</label>
