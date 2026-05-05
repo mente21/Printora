@@ -48,8 +48,6 @@ function ProductsPageContent() {
 
   const carouselItems = useMemo(() => [
     {
-      title: "YOUR STYLE. YOUR PRINT.",
-      subtitle: "Premium custom T-shirts — bold designs printed on superior fabric, wash after wash.",
       buttonText: "Shop T-Shirts",
       href: "/products?category=T-shirts",
       bg: "linear-gradient(135deg, #1b2412 0%, #2d3f1a 50%, #1a2a10 100%)",
@@ -68,8 +66,8 @@ function ProductsPageContent() {
       imagePos: "object-top"
     },
     {
-      title: "SHE WEARS HER BRAND.",
-      subtitle: "Women's custom apparel — fitted tees & hoodies that carry your design with style and precision.",
+      title: "WEAR YOUR BRAND.",
+      subtitle: "Custom apparel fitted tees & hoodies crafted to carry your design with style and precision.",
       buttonText: "Shop Women's",
       href: "/products?category=T-shirts",
       bg: "linear-gradient(135deg, #2a0a18 0%, #5c1430 50%, #7d1a42 100%)",
