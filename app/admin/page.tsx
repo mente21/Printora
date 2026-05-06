@@ -154,11 +154,13 @@ export default function AdminDashboard() {
 
   // Approve a customer order: auto-assign to the supplier of the chosen product
   const handleApproveOrder = async (order: any) => {
+    setProcessingId(order.id);
     let supplierId = order.supplier_product?.supplier_id || order.supplier_id || null;
 
     if (!supplierId) {
       if (suppliers.length === 0) {
         showAlert("No suppliers registered yet. Please add a supplier first.", "No Suppliers Found");
+        setProcessingId(null);
         return;
       }
       // Build a supplier-picker prompt
@@ -171,11 +173,13 @@ export default function AdminDashboard() {
           supplierId = suppliers[idx].id;
           const { error } = await supabase.from("custom_orders").update({ status: "ASSIGNED_TO_SUPPLIER", supplier_id: supplierId }).eq("id", order.id);
           if (error) showAlert(error.message, "Error");
-          else { setSelectedOrder(null); fetchAll(); }
+          else { setSelectedOrder(null); await fetchAll(); }
+          setProcessingId(null);
         },
         `Which supplier?\n\n${names}`,
         "Enter number (e.g. 1)"
       );
+      setProcessingId(null);
       return;
     }
 
@@ -186,13 +190,15 @@ export default function AdminDashboard() {
         const { error } = await supabase.from("custom_orders").update({ status: "ASSIGNED_TO_SUPPLIER", supplier_id: supplierId }).eq("id", order.id);
         setConfirmModal(m => ({ ...m, open: false }));
         if (error) showAlert(error.message, "Error");
-        else { setSelectedOrder(null); fetchAll(); }
+        else { setSelectedOrder(null); await fetchAll(); }
+        setProcessingId(null);
       },
       "Approve & Assign", "success"
     );
   };
 
   const handleApproveFinalPayment = async (order: any) => {
+    setProcessingId(order.id);
     const qty = order.variants?.quantity || 1;
     const isBulk = qty > 1;
     const nextStatus = isBulk ? "PRODUCTION_APPROVED_AND_PAID" : "COMPLETED";
@@ -206,7 +212,8 @@ export default function AdminDashboard() {
         const { error } = await supabase.from("custom_orders").update({ status: nextStatus }).eq("id", order.id);
         setConfirmModal(m => ({ ...m, open: false }));
         if (error) showAlert(error.message, "Error");
-        else { setSelectedOrder(null); fetchAll(); }
+        else { setSelectedOrder(null); await fetchAll(); }
+        setProcessingId(null);
       },
       "Approve Payment", "success"
     );
@@ -220,7 +227,7 @@ export default function AdminDashboard() {
         const { error } = await supabase.from("custom_orders").update({ status: "SAMPLE_AWAITING_APPROVAL", variants: newVariants }).eq("id", orderId);
         setPromptModal(m => ({ ...m, open: false }));
         if (error) showAlert(error.message, "Error");
-        else { setSelectedOrder(null); fetchAll(); }
+        else { setSelectedOrder(null); await fetchAll(); }
       },
       "Why are you rejecting this receipt? The customer will see this reason.",
       "Enter rejection reason…"
@@ -242,11 +249,12 @@ export default function AdminDashboard() {
       setShowRejectModal(false);
       setRejectReason("");
       setSelectedOrder(null);
-      fetchAll();
+      await fetchAll();
     }
   };
 
   const handleDeleteOrder = (id: string) => {
+    setProcessingId(id);
     showConfirm(
       "Delete Order",
       "Are you sure you want to permanently delete this order? This action cannot be undone.",
@@ -255,6 +263,7 @@ export default function AdminDashboard() {
         setConfirmModal(m => ({ ...m, open: false }));
         if (error) showAlert(error.message, "Error");
         else { setAllOrders(prev => prev.filter(o => o.id !== id)); setPendingOrders(prev => prev.filter(o => o.id !== id)); }
+        setProcessingId(null);
       },
       "Delete Permanently", "danger"
     );
@@ -262,6 +271,7 @@ export default function AdminDashboard() {
 
   // Supplier finished → move to Completed tab (awaiting final delivery confirmation)
   const handleMarkAsCompleted = (id: string) => {
+    setProcessingId(id);
     showConfirm(
       "Move to Completed",
       "Move this order to Completed? It will appear in the Completed tab awaiting delivery confirmation.",
@@ -269,7 +279,8 @@ export default function AdminDashboard() {
         const { error } = await supabase.from("custom_orders").update({ status: "COMPLETED" }).eq("id", id);
         setConfirmModal(m => ({ ...m, open: false }));
         if (error) showAlert(error.message, "Error");
-        else fetchAll();
+        else await fetchAll();
+        setProcessingId(null);
       },
       "Move to Completed", "info"
     );
@@ -277,6 +288,7 @@ export default function AdminDashboard() {
 
   // Final step — physically delivered to customer, enables feedback
   const handleDeliverOrder = (id: string) => {
+    setProcessingId(id);
     showConfirm(
       "Mark as Delivered",
       "Confirm this order has been physically handed to the customer. They will be able to leave feedback after this.",
@@ -284,7 +296,8 @@ export default function AdminDashboard() {
         const { error } = await supabase.from("custom_orders").update({ status: "DELIVERED" }).eq("id", id);
         setConfirmModal(m => ({ ...m, open: false }));
         if (error) showAlert(error.message, "Error");
-        else fetchAll();
+        else await fetchAll();
+        setProcessingId(null);
       },
       "Mark Delivered", "success"
     );
@@ -310,12 +323,13 @@ export default function AdminDashboard() {
     else { 
       setSelectedProduct(null); 
       setAdminTags([]);
-      fetchAll(); 
+      await fetchAll(); 
     }
   };
 
   // Reject supplier product
   const handleRejectProduct = (id: string) => {
+    setProcessingId(id);
     showConfirm(
       "Reject Product",
       "Are you sure you want to reject this supplier product? It will not appear on the platform.",
@@ -323,7 +337,8 @@ export default function AdminDashboard() {
         const { error } = await supabase.from("supplier_products").update({ status: "REJECTED" }).eq("id", id);
         setConfirmModal(m => ({ ...m, open: false }));
         if (error) showAlert(error.message, "Error");
-        else fetchAll();
+        else await fetchAll();
+        setProcessingId(null);
       },
       "Reject Product", "danger"
     );
@@ -553,9 +568,11 @@ export default function AdminDashboard() {
                       </button>
                       <button
                         onClick={() => handleApproveOrder(order)}
-                        className="bg-[#ccff00] text-[#111] px-4 py-2.5 rounded-xl font-black shadow-md hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 text-sm"
+                        disabled={processingId === order.id}
+                        className="bg-[#ccff00] text-[#111] px-4 py-2.5 rounded-xl font-black shadow-md hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 text-sm disabled:opacity-50"
                       >
-                        <CheckCircle size={16} /> APPROVE
+                        {processingId === order.id ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle size={16} />} 
+                        {processingId === order.id ? "WAITING..." : "APPROVE"}
                       </button>
                     </div>
                   </div>
@@ -611,11 +628,13 @@ export default function AdminDashboard() {
                       >
                         REJECT RECEIPT
                       </button>
-                      <button
+                       <button
                         onClick={() => handleApproveFinalPayment(order)}
-                        className="bg-amber-400 text-[#1B2412] px-4 py-2.5 rounded-xl font-black shadow-md hover:scale-105 active:scale-95 transition-all text-xs"
+                        disabled={processingId === order.id}
+                        className="bg-amber-400 text-[#1B2412] px-4 py-2.5 rounded-xl font-black shadow-md hover:scale-105 active:scale-95 transition-all text-xs flex items-center gap-1.5 disabled:opacity-50"
                       >
-                        APPROVE PAYMENT
+                        {processingId === order.id && <Loader2 size={14} className="animate-spin" />}
+                        {processingId === order.id ? "PROCESSING..." : "APPROVE PAYMENT"}
                       </button>
                     </div>
                   </div>
@@ -730,11 +749,13 @@ export default function AdminDashboard() {
                             <CheckCircle size={14} /> Delivered
                           </div>
                         ) : (
-                          <button
+                           <button
                             onClick={() => handleDeliverOrder(order.id)}
-                            className="bg-teal-500 text-white px-5 py-2.5 rounded-xl font-black shadow-md hover:bg-teal-600 hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 text-sm uppercase tracking-widest"
+                            disabled={processingId === order.id}
+                            className="bg-teal-500 text-white px-5 py-2.5 rounded-xl font-black shadow-md hover:bg-teal-600 hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 text-sm uppercase tracking-widest disabled:opacity-50"
                           >
-                            <Truck size={14} /> Mark Delivered
+                            {processingId === order.id ? <Loader2 size={14} className="animate-spin" /> : <Truck size={14} />} 
+                            {processingId === order.id ? "MARKING..." : "Mark Delivered"}
                           </button>
                         )}
                       </div>
@@ -1084,8 +1105,12 @@ export default function AdminDashboard() {
                             <button onClick={() => { setShowRejectModal(true); setRejectReason(""); }} className="flex-1 bg-red-50 text-red-500 py-3 rounded-xl font-black border-2 border-red-100 hover:bg-red-500 hover:text-white transition-all uppercase text-xs tracking-widest">
                               Reject
                             </button>
-                            <button onClick={() => handleApproveOrder(selectedOrder)} className="flex-[2] bg-[#ccff00] text-[#111] py-3 rounded-xl font-black hover:scale-105 active:scale-95 transition-all shadow-lg uppercase text-xs tracking-widest">
-                              Approve & Assign
+                            <button 
+                              onClick={() => handleApproveOrder(selectedOrder)} 
+                              disabled={processingId === selectedOrder.id}
+                              className="flex-[2] bg-[#ccff00] text-[#111] py-3 rounded-xl font-black hover:scale-105 active:scale-95 transition-all shadow-lg uppercase text-xs tracking-widest flex items-center justify-center gap-2 disabled:opacity-50"
+                            >
+                              {processingId === selectedOrder.id ? <Loader2 size={16} className="animate-spin" /> : "Approve & Assign"}
                             </button>
                          </div>
                       )
@@ -1099,24 +1124,30 @@ export default function AdminDashboard() {
                         </button>
                         <button 
                           onClick={() => handleApproveFinalPayment(selectedOrder)} 
-                          className="flex-[2] bg-amber-400 text-[#1B2412] py-4 rounded-xl font-black hover:bg-amber-500 transition-all shadow-xl flex items-center justify-center gap-2 uppercase text-xs tracking-widest"
+                          disabled={processingId === selectedOrder.id}
+                          className="flex-[2] bg-amber-400 text-[#1B2412] py-4 rounded-xl font-black hover:bg-amber-500 transition-all shadow-xl flex items-center justify-center gap-2 uppercase text-xs tracking-widest disabled:opacity-50"
                         >
-                          <ShieldCheck size={18} /> Approve Payment
+                          {processingId === selectedOrder.id ? <Loader2 size={18} className="animate-spin" /> : <ShieldCheck size={18} />} 
+                          {processingId === selectedOrder.id ? "Verifying..." : "Approve Payment"}
                         </button>
                       </div>
                     ) : selectedOrder.status === "COMPLETED" ? (
                       <button
                         onClick={() => handleDeliverOrder(selectedOrder.id)}
-                        className="w-full bg-teal-500 text-white py-3 rounded-xl font-black hover:bg-teal-600 transition-all shadow-xl flex items-center justify-center gap-2 uppercase text-xs tracking-widest"
+                        disabled={processingId === selectedOrder.id}
+                        className="w-full bg-teal-500 text-white py-3 rounded-xl font-black hover:bg-teal-600 transition-all shadow-xl flex items-center justify-center gap-2 uppercase text-xs tracking-widest disabled:opacity-50"
                       >
-                        <Truck size={16} /> Mark as Delivered
+                        {processingId === selectedOrder.id ? <Loader2 size={16} className="animate-spin" /> : <Truck size={16} />} 
+                        {processingId === selectedOrder.id ? "Marking..." : "Mark as Delivered"}
                       </button>
                     ) : selectedOrder.status === "COMPLETED_BY_SUPPLIER" ? (
                       <button
                         onClick={() => handleMarkAsCompleted(selectedOrder.id)}
-                        className="w-full bg-teal-500 text-white py-3 rounded-xl font-black hover:bg-teal-600 transition-all shadow-xl flex items-center justify-center gap-2 uppercase text-xs tracking-widest"
+                        disabled={processingId === selectedOrder.id}
+                        className="w-full bg-teal-500 text-white py-3 rounded-xl font-black hover:bg-teal-600 transition-all shadow-xl flex items-center justify-center gap-2 uppercase text-xs tracking-widest disabled:opacity-50"
                       >
-                        <CheckCircle size={16} /> Move to Completed
+                        {processingId === selectedOrder.id ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle size={16} />} 
+                        {processingId === selectedOrder.id ? "Moving..." : "Move to Completed"}
                       </button>
                     ) : (
                       <div className="w-full py-3 rounded-xl text-[10px] font-black tracking-widest uppercase flex items-center justify-center border-2 bg-gray-100 text-gray-600 border-gray-200">
@@ -1279,8 +1310,10 @@ export default function AdminDashboard() {
               <div className="flex gap-4 mt-12 pt-8 border-t border-gray-100">
                 <button
                   onClick={() => handleRejectProduct(selectedProduct.id)}
-                  className="flex-1 bg-white border-2 border-red-100 text-red-500 py-4 rounded-[1.5rem] font-black text-xs hover:bg-red-500 hover:text-white hover:border-red-500 transition-all shadow-md uppercase tracking-widest"
+                  disabled={processingId === selectedProduct.id}
+                  className="flex-1 bg-white border-2 border-red-100 text-red-500 py-4 rounded-[1.5rem] font-black text-xs hover:bg-red-500 hover:text-white hover:border-red-500 transition-all shadow-md uppercase tracking-widest flex items-center justify-center gap-2 disabled:opacity-50"
                 >
+                  {processingId === selectedProduct.id && <Loader2 size={16} className="animate-spin" />}
                   Reject Submission
                 </button>
                 <button

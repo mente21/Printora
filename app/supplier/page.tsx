@@ -399,7 +399,7 @@ export default function SupplierDashboard() {
       setEditingProductId(null);
       setActiveTab('my-products');
       setForm({ name: "", description: "", long_description: "", product_type: "T-Shirts", price: "", bulk_threshold: "", bulk_discount: "", image_url: "", hover_image_url: "", detail_images: "", turnaround_time: "2-4 Business Days", quality: "Premium", tags: [], available_colors: [], available_sizes: [] });
-      fetchProducts(user.id);
+      await fetchProducts(user.id);
     }
     setFormLoading(false);
   };
@@ -418,15 +418,17 @@ export default function SupplierDashboard() {
       .from("custom_orders")
       .update({ status: nextStatus, supplier_proof_image_url: proofUrl.trim() })
       .eq("id", selectedOrder.id);
-    setFulfillLoading(false);
-    if (error) showAlert(error.message, "Error");
-    else {
+
+    if (error) {
+      showAlert(error.message, "Error");
+    } else {
       setSelectedOrder(null);
       setProofUrl('');
       setProofPreview('');
       const { data: { user } } = await supabase.auth.getUser();
-      if (user) fetchOrders(user.id);
+      if (user) await fetchOrders(user.id);
     }
+    setFulfillLoading(false);
   };
 
   // Extract design layers from Fabric.js design_data JSON (like Printify)

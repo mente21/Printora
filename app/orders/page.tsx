@@ -8,7 +8,8 @@ import {
     Clock, CheckCircle, Truck, XCircle, PenTool,
     Package, ArrowRight, Loader2, LogOut, Home,
     Sparkles, ShieldCheck, User, Star, ShoppingBag,
-    AlertCircle, Image as ImageIcon, ChevronLeft, ChevronRight, Menu
+    AlertCircle, Image as ImageIcon, ChevronLeft, ChevronRight, Menu,
+    UploadCloud
 } from "lucide-react";
 import { getPrimaryMockup } from "@/lib/utils";
 
@@ -915,7 +916,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => void }
                                                                 ) : (
                                                                     <>
                                                                         <div className="w-16 h-16 rounded-3xl bg-white flex items-center justify-center mb-4 shadow-lg group-hover/upload:scale-110 transition-transform">
-                                                                            <ShieldCheck className="text-emerald-500" size={32} />
+                                                                            <UploadCloud className="text-emerald-500" size={32} />
                                                                         </div>
                                                                         <p className="text-xs font-black text-emerald-700 uppercase tracking-widest">Drop receipt or click to upload</p>
                                                                     </>
