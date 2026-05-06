@@ -1466,7 +1466,7 @@ export default function SupplierDashboard() {
         message={confirmModal.message}
         confirmLabel={confirmModal.confirmLabel}
         variant={confirmModal.variant}
-        onConfirm={() => confirmModal.onConfirm()}
+        onConfirm={async () => { await confirmModal.onConfirm(); setConfirmModal(m => ({ ...m, open: false })); }}
         onCancel={() => setConfirmModal(m => ({ ...m, open: false }))}
       />
       <AlertModal

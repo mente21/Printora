@@ -32,6 +32,7 @@ export default function AdminDashboard() {
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
+  const [processingId, setProcessingId] = useState<string | null>(null);
 
   // ── Custom modal state (replaces all native confirm/alert/prompt) ──────────
   type ModalAction = (() => Promise<void>) | (() => void);
@@ -41,7 +42,7 @@ export default function AdminDashboard() {
   const [alertModal, setAlertModal] = useState<{ open: boolean; title?: string; message: string; variant?: "error" | "info" | "success" }>(
     { open: false, message: "" }
   );
-  const [promptModal, setPromptModal] = useState<{ open: boolean; title: string; message?: string; placeholder?: string; onConfirm: (v: string) => void }>(
+  const [promptModal, setPromptModal] = useState<{ open: boolean; title: string; message?: string; placeholder?: string; onConfirm: (v: string) => void | Promise<void> }>(
     { open: false, title: "", onConfirm: () => {} }
   );
 
@@ -49,7 +50,7 @@ export default function AdminDashboard() {
     setConfirmModal({ open: true, title, message, confirmLabel, variant, onConfirm });
   const showAlert = (message: string, title?: string, variant: "error" | "info" | "success" = "error") =>
     setAlertModal({ open: true, message, title, variant });
-  const showPrompt = (title: string, onConfirm: (v: string) => void, message?: string, placeholder?: string) =>
+  const showPrompt = (title: string, onConfirm: (v: string) => void | Promise<void>, message?: string, placeholder?: string) =>
     setPromptModal({ open: true, title, message, placeholder, onConfirm });
 
   useEffect(() => {
@@ -229,11 +230,13 @@ export default function AdminDashboard() {
   // Reject order
   const handleRejectOrder = async (order: any) => {
     if (!rejectReason.trim()) return;
+    setProcessingId(order.id);
     const newVariants = { ...(order.variants || {}), admin_rejection_reason: rejectReason };
     const { error } = await supabase
       .from("custom_orders")
       .update({ status: "REJECTED", variants: newVariants })
       .eq("id", order.id);
+    setProcessingId(null);
     if (error) showAlert(error.message, "Error");
     else {
       setShowRejectModal(false);
@@ -289,6 +292,7 @@ export default function AdminDashboard() {
 
   // Approve a supplier product → it appears on landing page
   const handleApproveProduct = async (id: string) => {
+    setProcessingId(id);
     const product = pendingProducts.find(p => p.id === id);
     const existingTags = Array.isArray(product?.tags) ? product.tags : [];
     const finalTags = [...new Set([...existingTags, ...adminTags])];
@@ -301,6 +305,7 @@ export default function AdminDashboard() {
       })
       .eq("id", id);
       
+    setProcessingId(null);
     if (error) showAlert(error.message, "Error");
     else { 
       setSelectedProduct(null); 
@@ -540,7 +545,7 @@ export default function AdminDashboard() {
                         <Eye size={16} />
                       </button>
                       <button
-                        onClick={() => handleRejectOrder(order.id)}
+                        onClick={() => { setSelectedOrder(order); setShowRejectModal(true); setRejectReason(""); }}
                         className="p-2.5 bg-white border-2 border-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white hover:border-red-500 transition-all"
                         title="Reject Order"
                       >
@@ -869,9 +874,10 @@ export default function AdminDashboard() {
                         </button>
                         <button
                           onClick={() => handleApproveProduct(product.id)}
-                          className="flex-1 bg-[#ccff00] text-[#111] py-2.5 rounded-xl font-black text-xs hover:scale-105 active:scale-95 transition-all shadow-md"
+                          disabled={processingId === product.id}
+                          className="flex-1 bg-[#ccff00] text-[#111] py-2.5 rounded-xl font-black text-xs hover:scale-105 active:scale-95 transition-all shadow-md flex items-center justify-center gap-1.5 disabled:opacity-50"
                         >
-                          ✓ Approve
+                          {processingId === product.id ? <Loader2 size={14} className="animate-spin" /> : "✓"} Approve
                         </button>
                       </div>
                     </div>
@@ -1065,9 +1071,10 @@ export default function AdminDashboard() {
                                 </button>
                                 <button 
                                   onClick={() => handleRejectOrder(selectedOrder)}
-                                  disabled={!rejectReason.trim()} 
-                                  className="flex-1 bg-red-500 text-white py-2 rounded-xl font-black hover:bg-red-600 transition-all text-xs uppercase tracking-widest disabled:opacity-50"
+                                  disabled={!rejectReason.trim() || processingId === selectedOrder.id} 
+                                  className="flex-1 bg-red-500 text-white py-2 rounded-xl font-black hover:bg-red-600 transition-all text-xs uppercase tracking-widest disabled:opacity-50 flex justify-center items-center gap-2"
                                 >
+                                  {processingId === selectedOrder.id && <Loader2 className="w-4 h-4 animate-spin" />}
                                   Confirm
                                 </button>
                              </div>
@@ -1278,8 +1285,10 @@ export default function AdminDashboard() {
                 </button>
                 <button
                   onClick={() => handleApproveProduct(selectedProduct.id)}
-                  className="flex-1 bg-[#ccff00] text-[#111] py-4 rounded-[1.5rem] font-black text-xs hover:scale-[1.02] active:scale-95 transition-all shadow-xl uppercase tracking-widest"
+                  disabled={processingId === selectedProduct.id}
+                  className="flex-1 bg-[#ccff00] text-[#111] py-4 rounded-[1.5rem] font-black text-xs hover:scale-[1.02] active:scale-95 transition-all shadow-xl uppercase tracking-widest flex items-center justify-center gap-2 disabled:opacity-50"
                 >
+                  {processingId === selectedProduct.id && <Loader2 className="w-4 h-4 animate-spin" />}
                   Approve & Go Live
                 </button>
               </div>
@@ -1379,7 +1388,7 @@ export default function AdminDashboard() {
         message={confirmModal.message}
         confirmLabel={confirmModal.confirmLabel}
         variant={confirmModal.variant}
-        onConfirm={() => confirmModal.onConfirm()}
+        onConfirm={async () => { await confirmModal.onConfirm(); setConfirmModal(m => ({ ...m, open: false })); }}
         onCancel={() => setConfirmModal(m => ({ ...m, open: false }))}
       />
       <AlertModal
@@ -1394,7 +1403,7 @@ export default function AdminDashboard() {
         title={promptModal.title}
         message={promptModal.message}
         placeholder={promptModal.placeholder}
-        onConfirm={(v) => { promptModal.onConfirm(v); setPromptModal(m => ({ ...m, open: false })); }}
+        onConfirm={async (v) => { await promptModal.onConfirm(v); setPromptModal(m => ({ ...m, open: false })); }}
         onCancel={() => setPromptModal(m => ({ ...m, open: false }))}
       />
     </div>
