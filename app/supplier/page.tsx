@@ -875,7 +875,7 @@ export default function SupplierDashboard() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                 <div className="space-y-6">
                   <p className="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em] border-b pb-2">03. Available Colors</p>
-                  <div className="grid grid-cols-6 gap-3">
+                  <div className="flex flex-wrap gap-3">
                     {PRESET_COLORS.map(c => {
                       const isSelected = form.available_colors.some(ac => ac.hex === c.hex);
                       return (
@@ -883,13 +883,13 @@ export default function SupplierDashboard() {
                           key={c.hex}
                           type="button"
                           onClick={() => handleColorToggle(c)}
-                          className={`group relative w-full aspect-square rounded-xl border-4 transition-all ${isSelected ? 'border-[#A1FF4D] scale-110 shadow-lg' : 'border-white hover:border-gray-100'}`}
+                          className={`group relative w-8 h-8 rounded-full border-2 transition-all ${isSelected ? 'border-[#A1FF4D] scale-110 shadow-md ring-4 ring-[#A1FF4D]/10' : 'border-white hover:border-gray-100 hover:scale-105'}`}
                           title={c.name}
                         >
-                          <div className="w-full h-full rounded-lg shadow-inner" style={{ backgroundColor: c.hex }} />
+                          <div className="w-full h-full rounded-full shadow-inner" style={{ backgroundColor: c.hex === '#FFFFFF' ? '#fcfcfc' : c.hex }} />
                           {isSelected && (
-                            <div className="absolute -top-2 -right-2 bg-[#1B2412] text-[#A1FF4D] rounded-full p-0.5">
-                              <CheckCircle size={12} />
+                            <div className="absolute -top-1 -right-1 bg-[#1B2412] text-[#A1FF4D] rounded-full p-0.5 z-10 shadow-sm">
+                              <CheckCircle size={10} />
                             </div>
                           )}
                         </button>
