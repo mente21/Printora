@@ -11,6 +11,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/lib/supabase";
 import { getPrimaryMockup } from "@/lib/utils";
 import { ConfirmModal, AlertModal, PromptModal } from "@/components/ui/AppModal";
+import { notifyOrderApproved } from "@/lib/email-service";
+
 
 export default function AdminDashboard() {
   const [adminProfile, setAdminProfile] = useState<any>(null);
@@ -175,7 +177,12 @@ export default function AdminDashboard() {
           supplierId = suppliers[idx].id;
           const { error } = await supabase.from("custom_orders").update({ status: "ASSIGNED_TO_SUPPLIER", supplier_id: supplierId }).eq("id", order.id);
           if (error) showAlert(error.message, "Error");
-          else { setSelectedOrder(null); await fetchAll(); }
+          else { 
+            // Server looks up all real emails from DB
+            notifyOrderApproved(order.id, order.product_type);
+            setSelectedOrder(null); 
+            await fetchAll(); 
+          }
           setProcessingId(null);
         },
         `Which supplier?\n\n${names}`,
@@ -192,7 +199,12 @@ export default function AdminDashboard() {
         const { error } = await supabase.from("custom_orders").update({ status: "ASSIGNED_TO_SUPPLIER", supplier_id: supplierId }).eq("id", order.id);
         setConfirmModal(m => ({ ...m, open: false }));
         if (error) showAlert(error.message, "Error");
-        else { setSelectedOrder(null); await fetchAll(); }
+        else { 
+          // Server looks up all real emails from DB
+          notifyOrderApproved(order.id, order.product_type);
+          setSelectedOrder(null); 
+          await fetchAll(); 
+        }
         setProcessingId(null);
       },
       "Approve & Assign", "success"
