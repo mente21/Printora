@@ -34,7 +34,8 @@ import {
     Smartphone,
     Building2,
     ArrowRight,
-    AlertCircle
+    AlertCircle,
+    Loader2
 } from 'lucide-react';
 import { ProductTemplate, ProductView, CanvasDesignState } from '@/types/editor';
 import { supabase } from '@/lib/supabase';
@@ -1373,9 +1374,14 @@ export default function EditorUI() {
                     <button
                         onClick={handleOrderClick}
                         disabled={isSaving}
-                        className={`${isSaving ? 'bg-gray-300' : 'bg-[#A1FF4D] hover:bg-[#8ee643] text-[#1B2412]'} font-bold px-8 py-1.5 rounded text-sm uppercase transition-colors ml-2 shadow-sm`}
+                        className={`${isSaving ? 'bg-gray-300' : 'bg-[#A1FF4D] hover:bg-[#8ee643] text-[#1B2412]'} font-bold px-8 py-1.5 rounded text-sm uppercase transition-colors ml-2 shadow-sm flex items-center justify-center gap-2`}
                     >
-                        {isSaving ? 'Checking...' : dbOrderId ? 'Update Order' : 'Order'}
+                        {isSaving ? (
+                            <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                Checking...
+                            </>
+                        ) : dbOrderId ? 'Update Order' : 'Order'}
                     </button>
                     <button
                         onClick={() => {

@@ -166,7 +166,7 @@ export const PRODUCT_TEMPLATES: ProductTemplate[] = [
         id: 'crewneck-sweater',
         name: 'Crewneck Sweater',
         description: 'Classic crewneck sweatshirt for all seasons.',
-        category: 'long-sleeves',
+        category: 'sweaters',
         defaultViewId: 'front',
         defaultColorHex: '#ffffff',
         variants: [
