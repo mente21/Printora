@@ -134,7 +134,7 @@ export default function AdminDashboard() {
       if (customerIds.length > 0) {
         const { data: customerProfiles } = await supabase
           .from("profiles")
-          .select("id, full_name, email, phone, location")
+          .select("id, full_name, email, phone_number, location")
           .in("id", customerIds);
 
         const profileMap = Object.fromEntries((customerProfiles || []).map((p: any) => [p.id, p]));
@@ -948,7 +948,7 @@ export default function AdminDashboard() {
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-black text-[#111] truncate">{s.full_name}</p>
                     <p className="text-xs text-gray-500 font-bold truncate mb-2">{s.email}</p>
-                    {s.phone && <p className="text-[11px] text-gray-400 font-medium">📞 {s.phone}</p>}
+                    {(s.phone_number || s.phone) && <p className="text-[11px] text-gray-400 font-medium">📞 {s.phone_number || s.phone}</p>}
                     {s.location && <p className="text-[11px] text-gray-400 font-medium mt-0.5">📍 {s.location}</p>}
                   </div>
                 </div>
@@ -977,7 +977,7 @@ export default function AdminDashboard() {
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-black text-[#111] truncate">{c.full_name || 'Customer'}</p>
                     <p className="text-xs text-gray-500 font-bold truncate mb-2">{c.email}</p>
-                    {c.phone && <p className="text-[11px] text-gray-400 font-medium">📞 {c.phone}</p>}
+                    {(c.phone_number || c.phone) && <p className="text-[11px] text-gray-400 font-medium">📞 {c.phone_number || c.phone}</p>}
                     {c.location && <p className="text-[11px] text-gray-400 font-medium mt-0.5">📍 {c.location}</p>}
                   </div>
                 </div>
@@ -1398,7 +1398,7 @@ export default function AdminDashboard() {
             <div className="w-full space-y-3 text-left bg-gray-50 rounded-2xl p-5 border border-gray-100">
               <div>
                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Phone Number</p>
-                <p className="text-sm font-bold text-gray-800">{selectedUser.phone || 'Not provided'}</p>
+                <p className="text-sm font-bold text-gray-800">{selectedUser.phone_number || selectedUser.phone || 'Not provided'}</p>
               </div>
               <div>
                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Current Location</p>
