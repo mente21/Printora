@@ -81,6 +81,7 @@ export default function AuthCallbackPage() {
             email: user.email,
             full_name: fullName,
             role: selectedRole,
+            avatar_url: user.user_metadata?.avatar_url || null,
             phone_number: phone_number,
             location: location,
             company_name: selectedRole === "SUPPLIER" ? company_name : null,

@@ -57,12 +57,14 @@ export default function SupplierDashboard() {
   const [formLoading, setFormLoading] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [activeViewIdx, setActiveViewIdx] = useState(0);
+  const [supplierImgError, setSupplierImgError] = useState(false);
 
   const [proofUrl, setProofUrl] = useState('');
   const [proofPreview, setProofPreview] = useState('');
   const [fulfillLoading, setFulfillLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("my-products");
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const [processingId, setProcessingId] = useState<string | null>(null);
 
   // Form state initialized with INITIAL_FORM
   const [form, setForm] = useState(INITIAL_FORM);
@@ -86,6 +88,7 @@ export default function SupplierDashboard() {
 
   const initPage = async () => {
     setLoading(true);
+    setSupplierImgError(false);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       window.location.href = "/login";
@@ -105,7 +108,7 @@ export default function SupplierDashboard() {
       return;
     }
 
-    setProfile(prof);
+    setProfile({ ...prof, avatar_url: user.user_metadata?.avatar_url });
     await Promise.all([fetchProducts(user.id), fetchOrders(user.id)]);
     setLoading(false);
   };
@@ -548,8 +551,17 @@ export default function SupplierDashboard() {
         {profile && (
           <div className="p-4 mx-4 my-4 bg-[#A1FF4D]/10 rounded-2xl">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#A1FF4D] flex items-center justify-center text-[#1B2412] font-black text-sm">
-                {profile.full_name?.[0]?.toUpperCase() || 'S'}
+              <div className="w-10 h-10 rounded-full bg-[#A1FF4D] flex items-center justify-center text-[#1B2412] font-black text-sm overflow-hidden">
+                {(profile.avatar_url && !supplierImgError) ? (
+                  <img 
+                    src={profile.avatar_url} 
+                    alt="Supplier" 
+                    onError={() => setSupplierImgError(true)}
+                    className="w-full h-full object-cover" 
+                  />
+                ) : (
+                  profile.full_name?.[0]?.toUpperCase() || 'S'
+                )}
               </div>
               <div>
                 <p className="text-[13px] font-black text-[#1B2412] leading-none">{profile.full_name || 'Supplier'}</p>
@@ -958,8 +970,19 @@ export default function SupplierDashboard() {
                     <p className="text-2xl font-black text-[#1B2412]">{order.variants?.quantity || 1} <span className="text-xs text-gray-400 uppercase">Units</span></p>
                   </div>
                   <div className="pr-4">
-                    <button onClick={() => setSelectedOrder(order)} className="bg-[#1B2412] text-white px-8 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-[#A1FF4D] hover:text-[#1B2412] transition-all shadow-lg active:scale-95 flex items-center gap-2 group/btn">
-                      View & Fulfill <Plus size={14} className="group-hover/btn:rotate-90 transition-transform" />
+                    <button 
+                      onClick={() => {
+                        setProcessingId(order.id);
+                        setTimeout(() => {
+                          setSelectedOrder(order);
+                          setProcessingId(null);
+                        }, 500);
+                      }} 
+                      disabled={processingId === order.id}
+                      className="bg-[#1B2412] text-white px-8 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-[#A1FF4D] hover:text-[#1B2412] transition-all shadow-lg active:scale-95 flex items-center gap-2 group/btn disabled:opacity-50"
+                    >
+                      {processingId === order.id ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} className="group-hover/btn:rotate-90 transition-transform" />}
+                      {processingId === order.id ? 'Loading...' : 'View & Fulfill'}
                     </button>
                   </div>
                 </div>
@@ -1003,8 +1026,19 @@ export default function SupplierDashboard() {
                     </div>
 
                     <div className="pr-2">
-                        <button onClick={() => setSelectedOrder(order)} className="bg-[#1B2412] text-white px-10 py-5 rounded-[2rem] font-black text-xs uppercase tracking-widest hover:bg-red-500 transition-all shadow-xl active:scale-95 flex items-center gap-3 group/btn">
-                        Correct & Resubmit <UploadCloud size={16} className="group-hover/btn:-translate-y-1 transition-transform" />
+                        <button 
+                          onClick={() => {
+                            setProcessingId(order.id);
+                            setTimeout(() => {
+                              setSelectedOrder(order);
+                              setProcessingId(null);
+                            }, 500);
+                          }} 
+                          disabled={processingId === order.id}
+                          className="bg-[#1B2412] text-white px-10 py-5 rounded-[2rem] font-black text-xs uppercase tracking-widest hover:bg-red-500 transition-all shadow-xl active:scale-95 flex items-center gap-3 group/btn disabled:opacity-50"
+                        >
+                          {processingId === order.id ? <Loader2 size={16} className="animate-spin" /> : <UploadCloud size={16} className="group-hover/btn:-translate-y-1 transition-transform" />}
+                          {processingId === order.id ? 'Loading...' : 'Correct & Resubmit'}
                         </button>
                     </div>
                   </div>
@@ -1063,8 +1097,19 @@ export default function SupplierDashboard() {
                     </div>
                   </div>
                   <div className="pr-4">
-                    <button onClick={() => setSelectedOrder(order)} className="bg-gray-100 text-gray-600 px-8 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-[#1B2412] hover:text-white transition-all active:scale-95">
-                      Check Status
+                    <button 
+                      onClick={() => {
+                        setProcessingId(order.id);
+                        setTimeout(() => {
+                          setSelectedOrder(order);
+                          setProcessingId(null);
+                        }, 500);
+                      }} 
+                      disabled={processingId === order.id}
+                      className="bg-gray-100 text-gray-600 px-8 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-[#1B2412] hover:text-white transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50"
+                    >
+                      {processingId === order.id ? <Loader2 size={14} className="animate-spin" /> : null}
+                      {processingId === order.id ? 'Opening...' : 'Check Status'}
                     </button>
                   </div>
                 </div>
@@ -1098,15 +1143,28 @@ export default function SupplierDashboard() {
                   </div>
                   <div className="pr-4">
                     <button
-                      onClick={async () => {
-                        if (!confirm(`Mark Order #${order.id.slice(0,8)} as completed by supplier?`)) return;
-                        const { error } = await supabase.from('custom_orders').update({ status: 'COMPLETED_BY_SUPPLIER' }).eq('id', order.id);
-                        if (error) alert('Error: ' + error.message);
-                        else { const { data: { user } } = await supabase.auth.getUser(); if (user) fetchOrders(user.id); }
+                      onClick={() => {
+                        showConfirm(
+                          "Mark Completed",
+                          `Mark Order #${order.id.slice(0, 8)} as completed and notify the admin?`,
+                          async () => {
+                            setProcessingId(order.id);
+                            const { error } = await supabase.from('custom_orders').update({ status: 'COMPLETED_BY_SUPPLIER' }).eq('id', order.id);
+                            if (error) {
+                              showAlert('Error: ' + error.message);
+                            } else {
+                              const { data: { user } } = await supabase.auth.getUser();
+                              if (user) await fetchOrders(user.id);
+                            }
+                            setProcessingId(null);
+                          }
+                        );
                       }}
-                      className="bg-[#1B2412] text-white px-6 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-[#A1FF4D] hover:text-[#1B2412] transition-all shadow-lg active:scale-95 flex items-center gap-2"
+                      disabled={processingId === order.id}
+                      className="bg-[#1B2412] text-white px-6 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-[#A1FF4D] hover:text-[#1B2412] transition-all shadow-lg active:scale-95 flex items-center gap-2 disabled:opacity-50"
                     >
-                      <CheckCircle size={14} /> Mark Completed
+                      {processingId === order.id ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />} 
+                      {processingId === order.id ? 'Processing...' : 'Mark Completed'}
                     </button>
                   </div>
                 </div>
@@ -1148,12 +1206,38 @@ export default function SupplierDashboard() {
                       {order.status === "DELIVERED" ? "✓ Delivered to Customer" : "✓ Fulfillment Complete"}
                     </p>
                   </div>
-                  <div className="pr-4">
+                  <div className="flex items-center gap-4 pr-4">
                     {order.status === "DELIVERED" ? (
                       <div className="px-6 py-2 rounded-full border border-teal-200 text-teal-600 font-black text-[10px] uppercase tracking-widest bg-teal-50">Delivered</div>
                     ) : (
                       <div className="px-6 py-2 rounded-full border border-emerald-100 text-emerald-600 font-black text-[10px] uppercase tracking-widest bg-emerald-50">Completed</div>
                     )}
+                    <button
+                      onClick={() => {
+                        showConfirm(
+                          "Delete Order History",
+                          "Are you sure you want to permanently remove this order from your history? This action cannot be undone.",
+                          async () => {
+                            setProcessingId(order.id);
+                            const { error } = await supabase.from('custom_orders').delete().eq('id', order.id);
+                            if (error) {
+                              showAlert('Error deleting order: ' + error.message);
+                            } else {
+                              const { data: { user } } = await supabase.auth.getUser();
+                              if (user) await fetchOrders(user.id);
+                            }
+                            setProcessingId(null);
+                          },
+                          "Delete Permanently",
+                          "error"
+                        );
+                      }}
+                      disabled={processingId === order.id}
+                      className="p-3 rounded-xl text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all active:scale-90 disabled:opacity-50"
+                      title="Delete Order History"
+                    >
+                      {processingId === order.id ? <Loader2 size={18} className="animate-spin" /> : <Trash2 size={18} />}
+                    </button>
                   </div>
                 </div>
               ))}

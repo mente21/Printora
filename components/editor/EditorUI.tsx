@@ -35,7 +35,9 @@ import {
     Building2,
     ArrowRight,
     AlertCircle,
-    Loader2
+    Loader2,
+    MapPin,
+    Truck
 } from 'lucide-react';
 import { ProductTemplate, ProductView, CanvasDesignState } from '@/types/editor';
 import { supabase } from '@/lib/supabase';
@@ -800,7 +802,9 @@ export default function EditorUI() {
     const [supplierColors, setSupplierColors] = useState<{ name: string, hex: string }[] | null>(null);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('telebirr');
     const [basePrice, setBasePrice] = useState(25);
-    const [bulkRules, setBulkRules] = useState<{threshold: number, value: number} | null>(null);
+    const [bulkRules, setBulkRules] = useState<{ threshold: number, value: number } | null>(null);
+    const [originalOrder, setOriginalOrder] = useState<any>(null);
+    const [deliveryLocation, setDeliveryLocation] = useState('');
 
     const PAYMENT_METHODS = [
         { id: 'telebirr', name: 'Telebirr', type: 'mobile', shortcode: '123456', icon: Smartphone, image: '/telebirr.png' },
@@ -826,9 +830,26 @@ export default function EditorUI() {
                 if (data.price) setBasePrice(data.price);
                 if (data.bulk_pricing) {
                     try {
-                        setBulkRules(JSON.parse(data.bulk_pricing));
+                        let rules = data.bulk_pricing;
+                        if (typeof rules === 'string') {
+                            const trimmed = rules.trim();
+                            if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+                                rules = JSON.parse(trimmed);
+                            } else {
+                                // It's a descriptive label, not a programmatic rule
+                                rules = null;
+                            }
+                        }
+
+                        // Validate the rules object structure
+                        if (rules && (typeof rules.threshold !== 'number' || typeof rules.value !== 'number')) {
+                            rules = null;
+                        }
+
+                        setBulkRules(rules);
                     } catch (e) {
                         console.error("Failed to parse bulk pricing", e);
+                        setBulkRules(null);
                     }
                 }
             }
@@ -901,6 +922,7 @@ export default function EditorUI() {
                 .eq('id', editOrderId)
                 .single();
             if (!order) return;
+            setOriginalOrder(order);
 
             // Lock order if it's already approved/processed
             if (order.status !== 'PENDING_ADMIN' && order.status !== 'REJECTED') {
@@ -914,6 +936,7 @@ export default function EditorUI() {
             if (order.variants?.size) setOrderSize(order.variants.size);
             if (order.variants?.quantity) setOrderQuantity(order.variants.quantity);
             if (order.variants?.quality) setOrderQuality(order.variants.quality);
+            if (order.delivery_location) setDeliveryLocation(order.delivery_location);
 
             // Rebuild viewStates from design_views (preferred) or design_data
             if (order.design_views && order.design_views.length > 0) {
@@ -1175,12 +1198,13 @@ export default function EditorUI() {
             }
 
             const finalVariants = {
+                ...(originalOrder?.variants || {}),
                 color: selectedColor,
                 view: selectedView.name,
                 size: orderSize,
                 quantity: orderQuantity,
                 quality: orderQuality,
-                receiptDataUrl: receiptDataUrl || null,
+                receiptDataUrl: receiptDataUrl || originalOrder?.variants?.receiptDataUrl || null,
             };
 
             if (dbOrderId) {
@@ -1196,6 +1220,7 @@ export default function EditorUI() {
                     design_views: design_views,
                     mockup_image_url: dataUrl,
                     status: 'PENDING_ADMIN',
+                    delivery_location: deliveryLocation,
                 }).eq('id', dbOrderId);
 
                 if (error) {
@@ -1218,6 +1243,7 @@ export default function EditorUI() {
                     design_views: design_views,
                     mockup_image_url: dataUrl,
                     status: 'PENDING_ADMIN',
+                    delivery_location: deliveryLocation,
                     ...(supplierProductId ? { supplier_product_id: supplierProductId } : {}),
                 }).select().single();
 
@@ -1723,16 +1749,32 @@ export default function EditorUI() {
                                     </div>
                                 </div>
 
-                                <div className="space-y-3 max-w-[200px]">
-                                    <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Quantity</label>
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        value={orderQuantity}
-                                        onChange={(e) => setOrderQuantity(e.target.value === '' ? ('' as any) : parseInt(e.target.value))}
-                                        onBlur={() => setOrderQuantity(Math.max(1, parseInt(orderQuantity as any) || 1))}
-                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-3.5 text-sm font-bold text-gray-900 outline-none focus:ring-2 focus:ring-[#ccff00] transition-all"
-                                    />
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-3 max-w-[200px]">
+                                        <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Quantity</label>
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            value={orderQuantity}
+                                            onChange={(e) => setOrderQuantity(e.target.value === '' ? ('' as any) : parseInt(e.target.value))}
+                                            onBlur={() => setOrderQuantity(Math.max(1, parseInt(orderQuantity as any) || 1))}
+                                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-3.5 text-sm font-bold text-gray-900 outline-none focus:ring-2 focus:ring-[#ccff00] transition-all"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Delivery Location</label>
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                value={deliveryLocation}
+                                                onChange={(e) => setDeliveryLocation(e.target.value)}
+                                                placeholder="e.g. Bole, Addis Ababa"
+                                                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-3.5 text-sm font-bold text-gray-900 outline-none focus:ring-2 focus:ring-[#ccff00] transition-all"
+                                            />
+                                            <MapPin size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -1873,7 +1915,7 @@ export default function EditorUI() {
                                         const premiumExtra = orderQuality === "Premium" ? 5 : 0;
                                         const finalUnitPrice = unitPrice + premiumExtra;
                                         const finalTotalPrice = finalUnitPrice * orderQuantity;
-                                        
+
                                         return (
                                             <div className="space-y-4">
                                                 <div className="flex justify-between items-center text-sm font-bold text-gray-500">

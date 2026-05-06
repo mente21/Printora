@@ -32,6 +32,9 @@ export default function ProfileSettingsPage() {
   
   const [profileId, setProfileId] = useState<string | null>(null);
   const [role, setRole] = useState<string>("CUSTOMER");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [initials, setInitials] = useState<string>("U");
+  const [imgError, setImgError] = useState(false);
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -57,6 +60,8 @@ export default function ProfileSettingsPage() {
         if (profile) {
           setProfileId(profile.id);
           setRole(profile.role || "CUSTOMER");
+          setAvatarUrl(session.user.user_metadata?.avatar_url || null);
+          setInitials((profile.full_name || session.user.email || 'U')[0].toUpperCase());
           setFormData({
             full_name: profile.full_name || "",
             email: profile.email || session.user.email || "",
@@ -90,6 +95,15 @@ export default function ProfileSettingsPage() {
     setError(null);
 
     try {
+      // Validate Ethiopian Phone Format
+      if (formData.phone_number) {
+        const phoneClean = formData.phone_number.replace(/\s/g, '');
+        const phoneRegex = /^(09|07)\d{8}$/;
+        if (!phoneRegex.test(phoneClean)) {
+          throw new Error("Invalid phone format. Must start with 09 (Ethio Telecom) or 07 (Safaricom) and be 10 digits long.");
+        }
+      }
+
       const { error } = await supabase
         .from("profiles")
         .update({
@@ -116,24 +130,42 @@ export default function ProfileSettingsPage() {
   if (loading) {
     return (
       <div className="flex h-[80vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-[#3da85b]" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#A1FF4D]" />
       </div>
     );
   }
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-12">
-      <div className="mb-10 text-center md:text-left">
-        <h1 className="text-3xl font-black text-gray-900 tracking-tight">Account Settings</h1>
-        <p className="text-gray-500 mt-2 font-medium">Manage your personal information, contact details, and platform preferences.</p>
+      <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="text-center md:text-left">
+          <button 
+            onClick={() => router.back()}
+            className="flex items-center gap-2 text-xs font-black text-gray-400 uppercase tracking-widest hover:text-[#1B2412] transition-colors mb-4 group"
+          >
+            <span className="group-hover:-translate-x-1 transition-transform">←</span> Go Back
+          </button>
+          <h1 className="text-4xl font-black text-[#1B2412] tracking-tight uppercase" style={{ fontFamily: 'Impact, sans-serif' }}>Account Settings</h1>
+          <p className="text-gray-500 mt-2 font-bold">Manage your personal information and contact details.</p>
+        </div>
       </div>
 
-      <div className="bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-[2.5rem] shadow-xl border border-gray-100 overflow-hidden">
         {/* Banner area */}
-        <div className="h-32 bg-gradient-to-r from-gray-900 to-[#1c211f] relative">
-           <div className="absolute -bottom-12 left-8 w-24 h-24 bg-white rounded-2xl flex items-center justify-center border-4 border-white shadow-sm overflow-hidden">
-             <div className="w-full h-full bg-gray-50 flex items-center justify-center text-gray-400">
-               <UserIcon size={32} />
+        <div className="h-40 bg-[#1B2412] relative overflow-hidden">
+           <div className="absolute top-0 right-0 w-64 h-64 bg-[#A1FF4D]/10 rounded-full blur-3xl -mr-32 -mt-32" />
+           <div className="absolute -bottom-12 left-10 w-28 h-28 bg-white rounded-3xl flex items-center justify-center border-8 border-white shadow-lg overflow-hidden">
+             <div className="w-full h-full bg-gray-50 flex items-center justify-center text-[#1B2412]">
+               {(avatarUrl && !imgError) ? (
+                 <img 
+                   src={avatarUrl} 
+                   alt="Profile" 
+                   onError={() => setImgError(true)}
+                   className="w-full h-full object-cover" 
+                 />
+               ) : (
+                 <span className="text-3xl font-black uppercase">{initials}</span>
+               )}
              </div>
            </div>
         </div>
@@ -143,93 +175,97 @@ export default function ProfileSettingsPage() {
              
              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Full Name */}
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-gray-700">Full Name</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                      <UserIcon size={18} />
+                <div className="space-y-3">
+                  <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Full Name</label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#A1FF4D] transition-colors">
+                      <UserIcon size={20} />
                     </div>
                     <input 
                       type="text" 
                       name="full_name"
                       value={formData.full_name}
                       onChange={handleInputChange}
-                      className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-[#3da85b]/20 focus:border-[#3da85b] transition-all"
+                      className="w-full pl-12 pr-5 py-4 bg-gray-50 border-2 border-gray-50 rounded-2xl text-sm text-[#111] font-black focus:outline-none focus:border-[#A1FF4D] focus:bg-white transition-all shadow-sm"
                       placeholder="Jane Doe"
                     />
                   </div>
                 </div>
 
-                {/* Email Address (View Only mostly, handled by Auth) */}
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-gray-700">Email Address</label>
+                {/* Email Address */}
+                <div className="space-y-3">
+                  <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Email Address</label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                      <Mail size={18} />
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                      <Mail size={20} />
                     </div>
                     <input 
                       type="email" 
                       name="email"
                       value={formData.email}
                       disabled
-                      className="w-full pl-10 pr-4 py-3 bg-gray-100/50 border border-gray-100 rounded-xl text-sm text-gray-500 font-medium cursor-not-allowed"
+                      className="w-full pl-12 pr-5 py-4 bg-gray-100/50 border-2 border-transparent rounded-2xl text-sm text-gray-400 font-bold cursor-not-allowed"
                     />
                   </div>
-                  <p className="text-[11px] text-gray-400 mt-1">Email cannot be changed directly.</p>
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-1 ml-1">Email cannot be changed</p>
                 </div>
 
                 {/* Phone Number */}
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-gray-700">Phone Number</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                      <Phone size={18} />
+                <div className="space-y-3">
+                  <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Phone Number</label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#A1FF4D] transition-colors">
+                      <Phone size={20} />
                     </div>
                     <input 
                       type="tel" 
                       name="phone_number"
                       value={formData.phone_number}
                       onChange={handleInputChange}
-                      className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-[#3da85b]/20 focus:border-[#3da85b] transition-all"
-                      placeholder="+1 (555) 000-0000"
+                      className="w-full pl-12 pr-5 py-4 bg-gray-50 border-2 border-gray-50 rounded-2xl text-sm text-[#111] font-black focus:outline-none focus:border-[#A1FF4D] focus:bg-white transition-all shadow-sm"
+                      placeholder="09... or 07..."
                     />
+                  </div>
+                  <div className="flex justify-between px-1">
+                    <p className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Ethio Telecom (09) / Safaricom (07)</p>
+                    <p className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">10 Digits</p>
                   </div>
                 </div>
 
-                {/* Location / Address */}
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-gray-700">
-                    {role === "SUPPLIER" ? "Production Facility Location" : "Primary Shipping Location"}
+                {/* Location */}
+                <div className="space-y-3">
+                  <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">
+                    {role === "SUPPLIER" ? "Facility Location" : "Shipping Address"}
                   </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                      <MapPin size={18} />
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#A1FF4D] transition-colors">
+                      <MapPin size={20} />
                     </div>
                     <input 
                       type="text" 
                       name="location"
                       value={formData.location}
                       onChange={handleInputChange}
-                      className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-[#3da85b]/20 focus:border-[#3da85b] transition-all"
-                      placeholder="123 Output St, City, Country"
+                      className="w-full pl-12 pr-5 py-4 bg-gray-50 border-2 border-gray-50 rounded-2xl text-sm text-[#111] font-black focus:outline-none focus:border-[#A1FF4D] focus:bg-white transition-all shadow-sm"
+                      placeholder="Addis Ababa, Ethiopia"
                     />
                   </div>
                 </div>
 
-                {/* Conditional Fields based on Role */}
+                {/* Supplier Fields */}
                 {role === "SUPPLIER" && (
-                  <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm font-bold text-gray-700">Supplier Company Name</label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                        <Building size={18} />
+                  <div className="space-y-3 md:col-span-2">
+                    <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Company Name</label>
+                    <div className="relative group">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#A1FF4D] transition-colors">
+                        <Building size={20} />
                       </div>
                       <input 
                         type="text" 
                         name="company_name"
                         value={formData.company_name}
                         onChange={handleInputChange}
-                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-[#3da85b]/20 focus:border-[#3da85b] transition-all"
+                        className="w-full pl-12 pr-5 py-4 bg-gray-50 border-2 border-gray-50 rounded-2xl text-sm text-[#111] font-black focus:outline-none focus:border-[#A1FF4D] focus:bg-white transition-all shadow-sm"
                         placeholder="My Print Shop LLC"
                       />
                     </div>
@@ -244,12 +280,12 @@ export default function ProfileSettingsPage() {
                </div>
              )}
 
-             <div className="pt-6 border-t border-gray-100 flex items-center justify-between">
-                <div className="flex items-center h-8">
+             <div className="pt-8 border-t border-gray-100 flex items-center justify-between">
+                <div className="flex items-center">
                   {success && (
-                    <span className="flex items-center gap-2 text-[#3da85b] text-sm font-bold animate-in fade-in slide-in-from-bottom-2">
-                      <CheckCircle2 size={16} />
-                      Profile saved successfully!
+                    <span className="flex items-center gap-2 text-emerald-600 text-xs font-black uppercase tracking-[0.1em] animate-in slide-in-from-left-4 duration-500">
+                      <CheckCircle2 size={18} className="text-[#A1FF4D]" />
+                      Profile Updated Successfully
                     </span>
                   )}
                 </div>
@@ -257,19 +293,21 @@ export default function ProfileSettingsPage() {
                 <button 
                   type="submit"
                   disabled={saving}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all
-                    ${saving ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-[#1c211f] text-white hover:bg-black hover:-translate-y-0.5 shadow-sm active:translate-y-0'}`
+                  className={`flex items-center gap-3 px-10 py-4 rounded-[2rem] text-xs font-black uppercase tracking-widest transition-all
+                    ${saving 
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                      : 'bg-[#A1FF4D] text-[#1B2412] hover:scale-105 shadow-lg shadow-[#A1FF4D]/20 active:scale-95'}`
                   }
                 >
                   {saving ? (
                     <>
-                      <Loader2 size={16} className="animate-spin" />
-                      Saving...
+                      <Loader2 size={18} className="animate-spin" />
+                      Saving Changes...
                     </>
                   ) : (
                     <>
-                      <Save size={16} />
-                      Save Changes
+                      <Save size={18} />
+                      Save My Profile
                     </>
                   )}
                 </button>

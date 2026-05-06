@@ -13,7 +13,7 @@ async function run() {
   try {
     await client.connect();
     console.log('Connected to database');
-    const sql = fs.readFileSync('supabase/migrations/005_product_images_bucket.sql', 'utf8');
+    const sql = fs.readFileSync('supabase/migrations/add_delivery_location.sql', 'utf8');
     await client.query(sql);
     console.log('Migration executed successfully');
   } catch (err) {

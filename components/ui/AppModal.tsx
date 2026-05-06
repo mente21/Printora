@@ -16,7 +16,7 @@ function Backdrop({ children }: { children: React.ReactNode }) {
 }
 
 // ─── ConfirmModal ─────────────────────────────────────────────────────────────
-export type ConfirmVariant = "danger" | "warning" | "success" | "info";
+export type ConfirmVariant = "danger" | "warning" | "success" | "info" | "error";
 
 interface ConfirmModalProps {
   open: boolean;
@@ -34,6 +34,7 @@ const VARIANT_STYLES: Record<ConfirmVariant, { icon: React.ReactNode; btn: strin
   warning: { icon: <AlertTriangle size={22} />,  btn: "bg-amber-400 hover:bg-amber-500 text-[#1B2412]", ring: "ring-amber-100", iconBg: "bg-amber-100 text-amber-500" },
   success: { icon: <CheckCircle size={22} />,    btn: "bg-emerald-500 hover:bg-emerald-600 text-white", ring: "ring-emerald-100", iconBg: "bg-emerald-100 text-emerald-500" },
   info:    { icon: <Info size={22} />,           btn: "bg-[#1B2412] hover:bg-[#2d3d1e] text-[#A1FF4D]", ring: "ring-gray-100",  iconBg: "bg-gray-100 text-gray-500" },
+  error:   { icon: <Trash2 size={22} />,        btn: "bg-red-500 hover:bg-red-600 text-white",     ring: "ring-red-100",     iconBg: "bg-red-100 text-red-500" },
 };
 
 export function ConfirmModal({
@@ -56,7 +57,7 @@ export function ConfirmModal({
   };
 
   if (!open) return null;
-  const s = VARIANT_STYLES[variant];
+  const s = VARIANT_STYLES[variant] || VARIANT_STYLES.info;
   return (
     <Backdrop>
       <div className={`bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 ring-4 ${s.ring}`}>

@@ -689,6 +689,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                     { label: 'Size', value: order.variants?.size || 'N/A' },
                                     { label: 'Base View', value: order.variants?.view || 'Front' },
                                     { label: 'Quantity', value: `${order.variants?.quantity || 1} units`, highlight: true },
+                                    ...(order.delivery_location ? [{ label: 'Delivery', value: order.delivery_location }] : []),
                                 ].map((row, i) => (
                                     <div key={i} className="relative flex items-center justify-between py-2.5 pl-3">
                                         {/* Glowing left accent bar */}
@@ -769,22 +770,32 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                     </div>
                                 </div>
 
-                                {/* Balance Due */}
+                                {/* Balance Due / Paid */}
                                 <div className="flex items-center justify-between rounded-2xl px-4 py-3 bg-[#162d1d] border border-[#1e3b26]
                                     hover:bg-[#193622] hover:border-[#25462e] transition-all duration-300 group/row2">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-7 h-7 rounded-lg bg-[#1e3b26] flex items-center justify-center group-hover/row2:bg-[#25462e] transition-colors duration-300">
-                                            <span className="text-[#8ec8a2] text-xs group-hover/row2:text-white transition-colors duration-300">→</span>
+                                        <div className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors duration-300 ${['PRODUCTION_APPROVED_AND_PAID', 'COMPLETED_BY_SUPPLIER', 'DELIVERED', 'COMPLETED'].includes(order.status) ? 'bg-[#A1FF4D]/20' : 'bg-[#1e3b26] group-hover/row2:bg-[#25462e]'}`}>
+                                            {['PRODUCTION_APPROVED_AND_PAID', 'COMPLETED_BY_SUPPLIER', 'DELIVERED', 'COMPLETED'].includes(order.status) ? (
+                                                <CheckCircle size={13} className="text-[#A1FF4D]" />
+                                            ) : order.status === 'FINAL_PAYMENT_PENDING' ? (
+                                                <Loader2 size={13} className="text-amber-400 animate-spin" />
+                                            ) : (
+                                                <span className="text-[#8ec8a2] text-xs group-hover/row2:text-white transition-colors duration-300">→</span>
+                                            )}
                                         </div>
                                         <div>
-                                            <p className="text-[8px] font-black text-[#8ec8a2] uppercase tracking-widest">Balance Due</p>
+                                            <p className={`text-[8px] font-black uppercase tracking-widest ${['PRODUCTION_APPROVED_AND_PAID', 'COMPLETED_BY_SUPPLIER', 'DELIVERED', 'COMPLETED'].includes(order.status) ? 'text-[#A1FF4D]' : 'text-[#8ec8a2]'}`}>
+                                                {['PRODUCTION_APPROVED_AND_PAID', 'COMPLETED_BY_SUPPLIER', 'DELIVERED', 'COMPLETED'].includes(order.status) ? 'Balance Paid' : order.status === 'FINAL_PAYMENT_PENDING' ? 'Verifying Payment' : 'Balance Due'}
+                                            </p>
                                             <p className="text-sm font-black text-white mt-0.5 group-hover/fin:text-[#A1FF4D] transition-colors duration-500">
                                                 {(() => { const b = order.supplier_product?.price || 600; return (b * (order.variants?.quantity || 1) / 2).toLocaleString(); })()} <span className="text-[9px] font-bold text-[#8ec8a2] group-hover/fin:text-[#A1FF4D]/70 transition-colors duration-500">ETB</span>
                                             </p>
                                         </div>
                                     </div>
                                     <div className="w-5 h-5 rounded-full border border-[#25462e] flex items-center justify-center bg-[#193622]">
-                                        <span className="text-[#8ec8a2] text-[10px]">→</span>
+                                        <span className={`text-[10px] ${['PRODUCTION_APPROVED_AND_PAID', 'COMPLETED_BY_SUPPLIER', 'DELIVERED', 'COMPLETED'].includes(order.status) ? 'text-[#A1FF4D]' : 'text-[#8ec8a2]'}`}>
+                                            {['PRODUCTION_APPROVED_AND_PAID', 'COMPLETED_BY_SUPPLIER', 'DELIVERED', 'COMPLETED'].includes(order.status) ? '✓' : '→'}
+                                        </span>
                                     </div>
                                 </div>
                             </div>

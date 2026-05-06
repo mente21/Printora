@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ShoppingBag, LogOut, ChevronDown } from "lucide-react";
+import { ShoppingBag, LogOut, ChevronDown, User as UserIcon } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 export default function Navbar() {
   const [user, setUser] = useState<any>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   useEffect(() => {
     // Get initial session
@@ -25,6 +26,7 @@ export default function Navbar() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       const currentUser = session?.user ?? null;
       setUser(currentUser);
+      setImgError(false);
       if (currentUser) {
         supabase.from("profiles").select("role").eq("id", currentUser.id).single().then(({ data }) => {
           if (data) setUserRole(data.role);
@@ -89,14 +91,15 @@ export default function Navbar() {
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className="flex items-center gap-2.5 bg-white border border-gray-200 rounded-full px-3 pr-4 py-1.5 hover:shadow-md transition-all group"
               >
-                {user.user_metadata?.avatar_url ? (
+                {(user.user_metadata?.avatar_url && !imgError) ? (
                   <img
                     src={user.user_metadata.avatar_url}
                     alt="Avatar"
+                    onError={() => setImgError(true)}
                     className="w-8 h-8 rounded-full object-cover ring-2 ring-[#A1FF4D]"
                   />
                 ) : (
-                  <div className="w-8 h-8 rounded-full bg-[#A1FF4D] flex items-center justify-center text-[#1B2412] font-black text-sm">
+                  <div className="w-8 h-8 rounded-full bg-[#A1FF4D] flex items-center justify-center text-[#1B2412] font-black text-sm uppercase">
                     {(user.user_metadata?.full_name || user.email || 'U')[0].toUpperCase()}
                   </div>
                 )}
@@ -129,6 +132,9 @@ export default function Navbar() {
                         <ShoppingBag size={15} /> Orders
                       </Link>
                     )}
+                    <Link href="/profile" onClick={() => setShowUserMenu(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] font-bold text-gray-700 hover:bg-gray-100 transition-colors">
+                      <UserIcon size={15} /> Profile Settings
+                    </Link>
                   </div>
                   <div className="p-2 border-t border-gray-100">
                     <button

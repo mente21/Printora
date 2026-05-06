@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import {
   ShoppingBag, CheckCircle, Clock, XCircle, BarChart3, Users,
   User, Box, Truck, ShieldCheck, AlertCircle,
-  Package, Palette, Loader2, LogOut, Eye, Download, Sparkles
+  Package, Palette, Loader2, LogOut, Eye, Download, Sparkles, Phone, MapPin
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/lib/supabase";
@@ -23,6 +23,7 @@ export default function AdminDashboard() {
   const [customers, setCustomers] = useState<any[]>([]);
   const [allOrders, setAllOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [adminImgError, setAdminImgError] = useState(false);
 
   // Modals
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
@@ -63,6 +64,7 @@ export default function AdminDashboard() {
 
   const initDashboard = async () => {
     setLoading(true);
+    setAdminImgError(false);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       window.location.href = "/login";
@@ -77,7 +79,7 @@ export default function AdminDashboard() {
       return;
     }
 
-    setAdminProfile(prof);
+    setAdminProfile({ ...prof, avatar_url: user.user_metadata?.avatar_url });
     await fetchAll();
     setLoading(false);
   };
@@ -390,8 +392,17 @@ export default function AdminDashboard() {
         {adminProfile && (
           <div className="p-4 mx-4 my-4 bg-[#A1FF4D]/10 rounded-2xl border border-[#A1FF4D]/20">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-[#A1FF4D] flex items-center justify-center text-[#1B2412] font-black text-sm">
-                {adminProfile.full_name?.[0]?.toUpperCase() || 'A'}
+              <div className="w-9 h-9 rounded-full bg-[#A1FF4D] flex items-center justify-center text-[#1B2412] font-black text-sm overflow-hidden">
+                {(adminProfile.avatar_url && !adminImgError) ? (
+                  <img 
+                    src={adminProfile.avatar_url} 
+                    alt="Admin" 
+                    onError={() => setAdminImgError(true)}
+                    className="w-full h-full object-cover" 
+                  />
+                ) : (
+                  adminProfile.full_name?.[0]?.toUpperCase() || 'A'
+                )}
               </div>
               <div>
                 <p className="text-[12px] font-black text-[#2B3220] leading-none">{adminProfile.full_name || 'Admin'}</p>
@@ -927,8 +938,12 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {suppliers.map(s => (
                 <div key={s.id} className="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl border border-gray-100 hover:shadow-md hover:bg-white transition-all cursor-pointer" onClick={() => setSelectedUser(s)}>
-                  <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-black text-lg flex-shrink-0 mt-1">
-                    {s.full_name?.[0]?.toUpperCase() || 'S'}
+                  <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-black text-lg flex-shrink-0 mt-1 overflow-hidden">
+                    {s.avatar_url ? (
+                      <img src={s.avatar_url} alt={s.full_name} className="w-full h-full object-cover" />
+                    ) : (
+                      s.full_name?.[0]?.toUpperCase() || 'S'
+                    )}
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-black text-[#111] truncate">{s.full_name}</p>
@@ -952,8 +967,12 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {customers.map(c => (
                 <div key={c.id} className="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl border border-gray-100 hover:shadow-md hover:bg-white transition-all cursor-pointer" onClick={() => setSelectedUser(c)}>
-                  <div className="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 font-black text-lg flex-shrink-0 mt-1">
-                    {c.full_name?.[0]?.toUpperCase() || 'C'}
+                  <div className="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 font-black text-lg flex-shrink-0 mt-1 overflow-hidden">
+                    {c.avatar_url ? (
+                      <img src={c.avatar_url} alt={c.full_name} className="w-full h-full object-cover" />
+                    ) : (
+                      c.full_name?.[0]?.toUpperCase() || 'C'
+                    )}
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-black text-[#111] truncate">{c.full_name || 'Customer'}</p>
@@ -1040,7 +1059,16 @@ export default function AdminDashboard() {
                       <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Customer</p>
                       <p className="font-black text-[#111] text-sm">{selectedOrder.customer?.full_name || 'N/A'}</p>
                       <p className="text-xs text-gray-500">{selectedOrder.customer?.email}</p>
-                      {selectedOrder.customer?.phone && <p className="text-[10px] text-gray-400 font-bold mt-1">📞 {selectedOrder.customer.phone}</p>}
+                      {(selectedOrder.customer?.phone_number || selectedOrder.customer?.phone) && (
+                        <p className="text-[10px] text-gray-500 font-bold mt-1.5 flex items-center gap-1.5 bg-white px-2 py-1 rounded-lg border border-gray-100 w-fit">
+                          <Phone size={10} className="text-[#A1FF4D]" /> {selectedOrder.customer?.phone_number || selectedOrder.customer?.phone}
+                        </p>
+                      )}
+                      {selectedOrder.customer?.location && (
+                        <p className="text-[10px] text-gray-500 font-bold mt-1 flex items-center gap-1.5 bg-white px-2 py-1 rounded-lg border border-gray-100 w-fit">
+                          <MapPin size={10} className="text-[#A1FF4D]" /> {selectedOrder.customer.location}
+                        </p>
+                      )}
                     </div>
                     <div className="bg-gray-50 rounded-2xl p-4">
                       <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Amount & Status</p>
@@ -1070,6 +1098,17 @@ export default function AdminDashboard() {
                             <p className="text-[10px] text-gray-400 font-bold uppercase">Quantity</p>
                             <p className="font-black text-[#111] text-xs">{selectedOrder.variants?.quantity || 1}</p>
                         </div>
+                        {selectedOrder.delivery_location && (
+                          <div className="col-span-2 mt-2 pt-2 border-t border-gray-100">
+                              <p className="text-[10px] text-gray-400 font-bold uppercase flex items-center gap-1.5 mb-1">
+                                <Truck size={10} className="text-[#A1FF4D]" /> Order Delivery Destination
+                              </p>
+                              <p className="font-black text-[#1B2412] text-[13px] bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex items-center gap-2">
+                                <MapPin size={14} className="text-[#A1FF4D]" />
+                                {selectedOrder.delivery_location}
+                              </p>
+                          </div>
+                        )}
                         <div>
                             <p className="text-[10px] text-gray-400 font-bold uppercase">Quality</p>
                             <p className="font-black text-[#111] text-xs">{selectedOrder.variants?.quality || 'Standard'}</p>
@@ -1346,8 +1385,12 @@ export default function AdminDashboard() {
             <button onClick={() => setSelectedUser(null)} className="absolute top-6 right-6 text-gray-400 hover:text-gray-900">
               <XCircle size={24} />
             </button>
-            <div className={`w-20 h-20 rounded-full flex items-center justify-center text-2xl font-black mb-4 ${selectedUser.role === 'SUPPLIER' ? 'bg-blue-100 text-blue-600' : 'bg-teal-100 text-teal-600'}`}>
-              {selectedUser.full_name?.[0]?.toUpperCase() || 'U'}
+            <div className={`w-20 h-20 rounded-full flex items-center justify-center text-2xl font-black mb-4 overflow-hidden ${selectedUser.role === 'SUPPLIER' ? 'bg-blue-100 text-blue-600' : 'bg-teal-100 text-teal-600'}`}>
+              {selectedUser.avatar_url ? (
+                <img src={selectedUser.avatar_url} alt={selectedUser.full_name} className="w-full h-full object-cover" />
+              ) : (
+                selectedUser.full_name?.[0]?.toUpperCase() || 'U'
+              )}
             </div>
             <h3 className="text-xl font-black text-[#111]">{selectedUser.full_name || 'User'}</h3>
             <p className="text-sm text-gray-500 font-bold mb-6">{selectedUser.email}</p>
