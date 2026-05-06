@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConfirmModal, AlertModal } from "@/components/ui/AppModal";
 import CustomSelect from "@/components/ui/CustomSelect";
 import { getPrimaryMockup } from "@/lib/utils";
+import { COUNTRIES, getCountryByName } from "@/lib/countries";
 
 const PRODUCT_TYPES = ["T-Shirts", "Hoodies", "Sweaters", "Mugs", "Hats", "Phone Cases", "Accessories", "Tote Bags", "Posters"];
 const PRESET_COLORS = [
@@ -46,6 +47,7 @@ const INITIAL_FORM = {
   tags: [] as string[],
   available_colors: [] as { name: string; hex: string }[],
   available_sizes: [] as string[],
+  supplier_country: "",
 };
 
 export default function SupplierDashboard() {
@@ -109,6 +111,10 @@ export default function SupplierDashboard() {
     }
 
     setProfile({ ...prof, avatar_url: user.user_metadata?.avatar_url });
+    // Pre-fill supplier_country from profile
+    if (prof.country) {
+      setForm(f => ({ ...f, supplier_country: prof.country }));
+    }
     await Promise.all([fetchProducts(user.id), fetchOrders(user.id)]);
     setLoading(false);
   };
@@ -331,6 +337,7 @@ export default function SupplierDashboard() {
       tags: p.tags || [],
       available_colors: p.available_colors || [],
       available_sizes: p.available_sizes || [],
+      supplier_country: p.supplier_country || profile?.country || "",
     });
     setActiveTab("add-product");
   };
@@ -384,6 +391,7 @@ export default function SupplierDashboard() {
       tags: form.tags,
       available_colors: form.available_colors,
       available_sizes: form.available_sizes,
+      supplier_country: form.supplier_country || (profile?.country ?? null),
       status: "PENDING",
     };
 
@@ -816,6 +824,17 @@ export default function SupplierDashboard() {
                     <label className="text-[11px] font-black text-[#1B2412] uppercase block mb-2 tracking-widest">Full Technical Specs</label>
                     <textarea value={form.long_description} onChange={e => setForm(f => ({ ...f, long_description: e.target.value }))} placeholder="Detailed fabric composition, care instructions, etc..." className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 text-sm font-bold min-h-[100px] outline-none focus:border-[#A1FF4C]" />
                   </div>
+                </div>
+                {/* Shipping Origin */}
+                <div className="flex items-center gap-3 p-4 bg-[#A1FF4D]/5 border border-[#A1FF4D]/20 rounded-2xl">
+                  <div className="text-2xl leading-none">{getCountryByName(form.supplier_country)?.flag || '🌍'}</div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Ships From (Country of Origin)</p>
+                    <p className="text-sm font-black text-[#1B2412]">{form.supplier_country || 'Not set — update your profile country'}</p>
+                  </div>
+                  {!form.supplier_country && (
+                    <a href="/profile" target="_blank" rel="noopener" className="text-[10px] font-black text-[#3da85b] uppercase tracking-widest border-b border-[#3da85b]/40 shrink-0">Set in Profile →</a>
+                  )}
                 </div>
               </div>
 

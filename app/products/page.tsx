@@ -44,6 +44,9 @@ function ProductsPageContent() {
   const [sortBy, setSortBy] = useState<string>("newest");
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [userCountry, setUserCountry] = useState<string>("");
+  const [selectedCountry, setSelectedCountry] = useState<string>("");
+  const [isCountryOpen, setIsCountryOpen] = useState(false);
   const searchParams = useSearchParams();
 
   const carouselItems = useMemo(() => [
@@ -98,13 +101,35 @@ function ProductsPageContent() {
   useEffect(() => {
     supabase
       .from("supplier_products")
-      .select("*, supplier:profiles(full_name)")
+      .select("*, supplier:profiles(full_name, country)")
       .eq("status", "APPROVED")
       .order("created_at", { ascending: false })
       .then(({ data }) => {
         setSupplierProducts(data || []);
         setLoading(false);
       });
+  }, []);
+
+  // Detect country: logged-in profile first, then IP fallback
+  useEffect(() => {
+    const detectCountry = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: prof } = await supabase
+          .from("profiles")
+          .select("country")
+          .eq("id", user.id)
+          .single();
+        if (prof?.country) { setUserCountry(prof.country); return; }
+      }
+      // IP fallback
+      try {
+        const res = await fetch("https://ip-api.com/json/?fields=status,country", { signal: AbortSignal.timeout(4000) });
+        const json = await res.json();
+        if (json.status === "success" && json.country) setUserCountry(json.country);
+      } catch {}
+    };
+    detectCountry();
   }, []);
 
   // Auto-scroll logic — slow crossfade every 7 seconds
@@ -128,10 +153,10 @@ function ProductsPageContent() {
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % carouselItems.length);
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + carouselItems.length) % carouselItems.length);
 
+  const activeCountry = selectedCountry || userCountry;
+
   const filteredProducts = useMemo(() => {
     let result = [...supplierProducts];
-
-    // Filter by Search
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       result = result.filter(p =>
@@ -140,18 +165,12 @@ function ProductsPageContent() {
         (p.product_type || "").toLowerCase().includes(q)
       );
     }
-
-    // Filter by Category
     if (selectedCategories.length > 0) {
       const normalize = (str: string) => str.toLowerCase().replace(/[^a-z0-9]/g, '');
       const normalizedSelected = selectedCategories.map(cat => {
         const norm = normalize(cat);
-        return {
-          norm,
-          singular: norm.endsWith('s') ? norm.slice(0, -1) : norm
-        };
+        return { norm, singular: norm.endsWith('s') ? norm.slice(0, -1) : norm };
       });
-
       result = result.filter(p => {
         if (!p.product_type) return false;
         const typeNorm = normalize(p.product_type);
@@ -160,21 +179,38 @@ function ProductsPageContent() {
         );
       });
     }
-
-    // Filter by Price
     result = result.filter(p => (p.price || 0) >= minPrice && (p.price || 0) <= maxPrice);
-
-    // Sorting
-    if (sortBy === "price-low") {
-      result.sort((a, b) => (a.price || 0) - (b.price || 0));
-    } else if (sortBy === "price-high") {
-      result.sort((a, b) => (b.price || 0) - (a.price || 0));
-    } else if (sortBy === "newest") {
-      result.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
-    }
-
+    if (sortBy === "price-low") result.sort((a, b) => (a.price || 0) - (b.price || 0));
+    else if (sortBy === "price-high") result.sort((a, b) => (b.price || 0) - (a.price || 0));
+    else result.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
     return result;
   }, [supplierProducts, selectedCategories, searchQuery, minPrice, maxPrice, sortBy]);
+
+  // Geo-filtered view: local-first, fallback to all
+  const localProducts = useMemo(() => {
+    if (!activeCountry) return filteredProducts;
+    return filteredProducts.filter(p =>
+      (p.supplier_country || p.supplier?.country || "").toLowerCase() === activeCountry.toLowerCase()
+    );
+  }, [filteredProducts, activeCountry]);
+
+  const showingLocal = activeCountry && localProducts.length > 0;
+  const displayedProducts = (activeCountry && !selectedCountry)
+    ? (localProducts.length > 0 ? localProducts : filteredProducts)
+    : (selectedCountry
+      ? filteredProducts.filter(p => (p.supplier_country || p.supplier?.country || "").toLowerCase() === selectedCountry.toLowerCase())
+      : filteredProducts);
+  const showFallbackMsg = activeCountry && !selectedCountry && localProducts.length === 0 && filteredProducts.length > 0;
+
+  // Unique countries from products for dropdown
+  const availableCountries = useMemo(() => {
+    const set = new Set<string>();
+    supplierProducts.forEach(p => {
+      const c = p.supplier_country || p.supplier?.country;
+      if (c) set.add(c);
+    });
+    return Array.from(set).sort();
+  }, [supplierProducts]);
 
   if (loading) {
     return (
@@ -364,7 +400,40 @@ function ProductsPageContent() {
               </div>
             </div>
 
+            <hr className="my-6 border-gray-100" />
 
+            {/* Country Filter */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Ships From</h3>
+                {selectedCountry && (
+                  <button onClick={() => setSelectedCountry('')} className="text-[10px] font-black text-[#3da85b] uppercase tracking-wider hover:underline">Clear</button>
+                )}
+              </div>
+              {userCountry && !selectedCountry && (
+                <div className="flex items-center gap-2 px-3 py-2 bg-[#3da85b]/5 border border-[#3da85b]/20 rounded-xl">
+                  <span className="w-2 h-2 rounded-full bg-[#3da85b] animate-pulse flex-shrink-0" />
+                  <span className="text-[11px] font-bold text-[#3da85b]">Auto: {userCountry}</span>
+                </div>
+              )}
+              <div className="space-y-1">
+                <label className="flex items-center justify-between group cursor-pointer p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <input type="radio" className="w-4 h-4 text-[#3da85b] cursor-pointer" checked={selectedCountry === ''} onChange={() => setSelectedCountry('')} />
+                    <span className="text-sm font-medium text-gray-700">All Countries</span>
+                  </div>
+                </label>
+                {availableCountries.map(country => (
+                  <label key={country} className="flex items-center justify-between group cursor-pointer p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <input type="radio" className="w-4 h-4 text-[#3da85b] cursor-pointer" checked={selectedCountry === country} onChange={() => setSelectedCountry(country)} />
+                      <span className="text-sm font-medium text-gray-600 group-hover:text-[#1c211f]">{country}</span>
+                    </div>
+                    {country === userCountry && <span className="text-[9px] font-black text-[#3da85b] bg-[#3da85b]/10 px-1.5 py-0.5 rounded-full uppercase">Local</span>}
+                  </label>
+                ))}
+              </div>
+            </div>
 
           </div>
 
@@ -386,7 +455,8 @@ function ProductsPageContent() {
           {/* Top Bar above categories */}
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-4 rounded-3xl border border-gray-100 shadow-sm">
             <div className="flex items-center gap-2 text-gray-500 font-medium text-sm px-2">
-              Showing <span className="text-[#1c211f] font-black">{filteredProducts.length}</span> results
+              Showing <span className="text-[#1c211f] font-black">{displayedProducts.length}</span> results
+              {showingLocal && !selectedCountry && <span className="text-[10px] font-black text-[#3da85b] bg-[#3da85b]/10 px-2 py-0.5 rounded-full ml-1 uppercase tracking-wider">Near You</span>}
             </div>
             <div className="flex items-center gap-3 w-full sm:w-auto">
               <Link
@@ -448,9 +518,17 @@ function ProductsPageContent() {
 
 
 
+          {/* Fallback message */}
+          {showFallbackMsg && (
+            <div className="flex items-center gap-3 px-5 py-3.5 bg-amber-50 border border-amber-100 rounded-2xl text-sm">
+              <span className="text-xl">🌍</span>
+              <p className="font-medium text-amber-700">No local suppliers found. Showing international options.</p>
+            </div>
+          )}
+
           {/* Product Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12">
-            {filteredProducts.map((product) => (
+            {displayedProducts.map((product) => (
               <div key={product.id} className="flex flex-col group hover:-translate-y-2 transition-transform duration-500">
                 <div className="relative aspect-[4/5] rounded-[2rem] bg-white border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] mb-5 p-[2px]">
                   <Link href={`/products/${product.id}`} className="block w-full h-full relative rounded-[calc(2rem-4px)] overflow-hidden bg-[#f8f9fa] group/img cursor-pointer">
@@ -507,6 +585,15 @@ function ProductsPageContent() {
                       <span className="text-[11px] text-gray-400 font-bold ml-1">{product.colors?.length || 3} colors</span>
                     </div>
                   </div>
+                  {(product.supplier_country || product.supplier?.country) && (
+                    <div className="flex items-center gap-1.5 pt-1">
+                      <span className="text-[10px] text-gray-400 font-medium">🌍 Ships from:</span>
+                      <span className="text-[10px] font-black text-gray-500">{product.supplier_country || product.supplier?.country}</span>
+                      {(product.supplier_country || product.supplier?.country) === userCountry && (
+                        <span className="text-[8px] font-black text-[#3da85b] bg-[#3da85b]/10 px-1.5 py-0.5 rounded-full uppercase tracking-wider">Local</span>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div className="mt-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300 pointer-events-none group-hover:pointer-events-auto h-0 group-hover:h-auto overflow-hidden">

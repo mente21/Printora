@@ -11,9 +11,11 @@ import {
   Mail, 
   Save, 
   Building,
+  Globe,
   CheckCircle2,
   AlertCircle
 } from "lucide-react";
+import { COUNTRIES } from "@/lib/countries";
 
 export default function ProfileSettingsPage() {
   const router = useRouter();
@@ -28,6 +30,7 @@ export default function ProfileSettingsPage() {
     phone_number: "",
     location: "",
     company_name: "",
+    country: "",
   });
   
   const [profileId, setProfileId] = useState<string | null>(null);
@@ -48,7 +51,7 @@ export default function ProfileSettingsPage() {
 
         const { data: profile, error } = await supabase
           .from("profiles")
-          .select("id, email, full_name, role, phone_number, location, company_name")
+          .select("id, email, full_name, role, phone_number, location, company_name, country")
           .eq("id", session.user.id)
           .single();
 
@@ -68,6 +71,7 @@ export default function ProfileSettingsPage() {
             phone_number: profile.phone_number || "",
             location: profile.location || "",
             company_name: profile.company_name || "",
+            country: profile.country || "",
           });
         }
       } catch (err) {
@@ -111,6 +115,7 @@ export default function ProfileSettingsPage() {
           phone_number: formData.phone_number,
           location: formData.location,
           company_name: formData.company_name,
+          country: formData.country,
         })
         .eq("id", profileId);
 
@@ -252,6 +257,33 @@ export default function ProfileSettingsPage() {
                       placeholder="Addis Ababa, Ethiopia"
                     />
                   </div>
+                </div>
+
+                {/* Country */}
+                <div className="space-y-3">
+                  <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1 flex items-center gap-1.5">
+                    <Globe size={13} />
+                    {role === "SUPPLIER" ? "Country of Origin" : "Your Country"}
+                  </label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#A1FF4D] transition-colors">
+                      <Globe size={20} />
+                    </div>
+                    <select
+                      name="country"
+                      value={formData.country}
+                      onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                      className="w-full pl-12 pr-5 py-4 bg-gray-50 border-2 border-gray-50 rounded-2xl text-sm text-[#111] font-black focus:outline-none focus:border-[#A1FF4D] focus:bg-white transition-all shadow-sm appearance-none cursor-pointer"
+                    >
+                      <option value="">Select a country…</option>
+                      {COUNTRIES.map(c => (
+                        <option key={c.code} value={c.name}>{c.flag} {c.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  {role === "SUPPLIER" && (
+                    <p className="text-[9px] text-gray-400 font-bold uppercase tracking-wider ml-1">This auto-populates on all your product listings.</p>
+                  )}
                 </div>
 
                 {/* Supplier Fields */}

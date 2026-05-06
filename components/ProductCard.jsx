@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Heart, Star, ShoppingBag, Zap } from 'lucide-react';
+import { Heart, Star, ShoppingBag, Zap, Globe } from 'lucide-react';
 import Link from 'next/link';
 
 /* ── Printora-style tiled "CUSTOMIZE ME" overlay ── */
@@ -115,7 +115,15 @@ const ProductCard = ({ product }) => {
              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#bc9368]">Start Design</span>
              <div className="w-1.5 h-1.5 rounded-full bg-[#bc9368]" />
           </div>
-          <div className="flex items-center justify-end pt-3 border-t border-[#f0f0eb]">
+          <div className="flex items-center justify-between pt-3 border-t border-[#f0f0eb]">
+            {product.supplier_country ? (
+              <span className="flex items-center gap-1 text-[9px] font-bold text-gray-400 uppercase tracking-wider">
+                <Globe size={9} className="text-gray-300" />
+                Ships from: {product.supplier_country}
+              </span>
+            ) : (
+              <span />
+            )}
           </div>
         </div>
       </div>
