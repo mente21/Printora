@@ -395,7 +395,7 @@ function OrdersContent() {
     );
 }
 
-function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => void }) {
+function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promise<void> }) {
     const [finalReceipt, setFinalReceipt] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isDeclining, setIsDeclining] = useState(false);
@@ -928,8 +928,8 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => void }
                                                                         setIsSubmitting(true);
                                                                         const newVariants = { ...order.variants, finalReceiptUrl: finalReceipt };
                                                                         await supabase.from('custom_orders').update({ variants: newVariants, status: 'FINAL_PAYMENT_PENDING' }).eq('id', order.id);
+                                                                        await onRefresh();
                                                                         setIsSubmitting(false);
-                                                                        onRefresh();
                                                                     }}
                                                                     disabled={isSubmitting}
                                                                     className="w-full mt-8 bg-[#A1FF4D] text-[#1B2412] py-6 rounded-[2.5rem] font-black text-sm uppercase tracking-[0.2em] shadow-2xl shadow-[#A1FF4D]/30 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
