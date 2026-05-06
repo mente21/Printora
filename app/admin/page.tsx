@@ -105,7 +105,7 @@ export default function AdminDashboard() {
       supabase
         .from("custom_orders")
         .select("id, status, created_at, product_type, customer_id")
-        .in("status", ["DELIVERED", "REJECTED"])
+        .in("status", ["DELIVERED", "REJECTED", "COMPLETED", "COMPLETED_BY_SUPPLIER"])
         .order("created_at", { ascending: false })
         .limit(20),
     ]);
@@ -199,7 +199,7 @@ export default function AdminDashboard() {
 
   const handleApproveFinalPayment = async (order: any) => {
     setProcessingId(order.id);
-    const qty = order.variants?.quantity || 1;
+    const qty = parseInt(order.variants?.quantity || "1");
     const isBulk = qty > 1;
     const nextStatus = isBulk ? "PRODUCTION_APPROVED_AND_PAID" : "COMPLETED";
     const msg = isBulk
@@ -748,6 +748,15 @@ export default function AdminDashboard() {
                           <div className="bg-gray-100 text-teal-700 border border-teal-200 px-5 py-2.5 rounded-xl font-black flex items-center gap-1.5 text-sm uppercase tracking-widest cursor-default">
                             <CheckCircle size={14} /> Delivered
                           </div>
+                        ) : order.status === "COMPLETED_BY_SUPPLIER" ? (
+                          <button
+                            onClick={() => handleMarkAsCompleted(order.id)}
+                            disabled={processingId === order.id}
+                            className="bg-amber-500 text-white px-5 py-2.5 rounded-xl font-black shadow-md hover:bg-amber-600 hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 text-sm uppercase tracking-widest disabled:opacity-50"
+                          >
+                            {processingId === order.id ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />} 
+                            {processingId === order.id ? "MOVING..." : "Confirm Production"}
+                          </button>
                         ) : (
                            <button
                             onClick={() => handleDeliverOrder(order.id)}
