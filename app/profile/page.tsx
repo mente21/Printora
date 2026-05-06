@@ -150,24 +150,26 @@ export default function ProfileSettingsPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-[2.5rem] shadow-xl border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-[2.5rem] shadow-xl border border-gray-100 overflow-hidden relative">
         {/* Banner area */}
         <div className="h-40 bg-[#1B2412] relative overflow-hidden">
            <div className="absolute top-0 right-0 w-64 h-64 bg-[#A1FF4D]/10 rounded-full blur-3xl -mr-32 -mt-32" />
-           <div className="absolute -bottom-12 left-10 w-28 h-28 bg-white rounded-3xl flex items-center justify-center border-8 border-white shadow-lg overflow-hidden">
-             <div className="w-full h-full bg-gray-50 flex items-center justify-center text-[#1B2412]">
-               {(avatarUrl && !imgError) ? (
-                 <img 
-                   src={avatarUrl} 
-                   alt="Profile" 
-                   onError={() => setImgError(true)}
-                   className="w-full h-full object-cover" 
-                 />
-               ) : (
-                 <span className="text-3xl font-black uppercase">{initials}</span>
-               )}
-             </div>
-           </div>
+        </div>
+        
+        {/* Profile Avatar - Moved outside overflow-hidden header and pushed up */}
+        <div className="absolute top-20 left-10 w-28 h-28 bg-white rounded-3xl flex items-center justify-center border-8 border-white shadow-lg overflow-hidden z-10">
+          <div className="w-full h-full bg-gray-50 flex items-center justify-center text-[#1B2412]">
+            {(avatarUrl && !imgError) ? (
+              <img 
+                src={avatarUrl} 
+                alt="Profile" 
+                onError={() => setImgError(true)}
+                className="w-full h-full object-cover" 
+              />
+            ) : (
+              <span className="text-3xl font-black uppercase">{initials}</span>
+            )}
+          </div>
         </div>
         
         <div className="px-8 pt-16 pb-8">
