@@ -201,6 +201,17 @@ export default function ProductDetailPage() {
             
             {/* Removed Supplier Badge */}
 
+            {/* Promotion Tags */}
+            {product.tags && Array.isArray(product.tags) && product.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-4">
+                {product.tags.map((tag: string) => (
+                  <span key={tag} className="bg-[#1c211f] text-[#A1FF4D] text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-sm">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+
             <h1 className="text-3xl lg:text-4xl font-black text-[#1c211f] leading-tight mb-4">
               {product.name}
             </h1>

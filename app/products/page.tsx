@@ -454,6 +454,16 @@ function ProductsPageContent() {
               <div key={product.id} className="flex flex-col group hover:-translate-y-2 transition-transform duration-500">
                 <div className="relative aspect-[4/5] rounded-[2rem] bg-white border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] mb-5 p-[2px]">
                   <Link href={`/products/${product.id}`} className="block w-full h-full relative rounded-[calc(2rem-4px)] overflow-hidden bg-[#f8f9fa] group/img cursor-pointer">
+                    {/* Promotion Tags */}
+                    {product.tags && Array.isArray(product.tags) && product.tags.length > 0 && (
+                      <div className="absolute top-4 left-4 z-20 flex flex-wrap gap-1.5 pointer-events-none">
+                        {product.tags.map((tag: string) => (
+                          <span key={tag} className="bg-[#1c211f] text-[#A1FF4D] text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest shadow-lg border border-[#A1FF4D]/20">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                     {product.image_url ? (
                       <>
                         <img
