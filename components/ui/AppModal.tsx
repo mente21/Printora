@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AlertTriangle, CheckCircle, Info, Trash2, X } from "lucide-react";
+import { AlertTriangle, CheckCircle, Info, Trash2, X, Loader2 } from "lucide-react";
 
 // ─── Shared backdrop ─────────────────────────────────────────────────────────
 function Backdrop({ children }: { children: React.ReactNode }) {
@@ -25,7 +25,7 @@ interface ConfirmModalProps {
   confirmLabel?: string;
   cancelLabel?: string;
   variant?: ConfirmVariant;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
   onCancel: () => void;
 }
 
@@ -40,6 +40,21 @@ export function ConfirmModal({
   open, title, message, confirmLabel = "Confirm", cancelLabel = "Cancel",
   variant = "info", onConfirm, onCancel,
 }: ConfirmModalProps) {
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  useEffect(() => {
+    if (open) setIsProcessing(false);
+  }, [open]);
+
+  const handleConfirm = async () => {
+    setIsProcessing(true);
+    try {
+      await onConfirm();
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   if (!open) return null;
   const s = VARIANT_STYLES[variant];
   return (
@@ -53,14 +68,17 @@ export function ConfirmModal({
         <div className="flex gap-3">
           <button
             onClick={onCancel}
-            className="flex-1 py-3 rounded-2xl border-2 border-gray-100 text-gray-500 font-black text-sm hover:bg-gray-50 transition-all active:scale-95"
+            disabled={isProcessing}
+            className="flex-1 py-3 rounded-2xl border-2 border-gray-100 text-gray-500 font-black text-sm hover:bg-gray-50 transition-all active:scale-95 disabled:opacity-50"
           >
             {cancelLabel}
           </button>
           <button
-            onClick={onConfirm}
-            className={`flex-1 py-3 rounded-2xl font-black text-sm shadow-md hover:shadow-lg transition-all active:scale-95 ${s.btn}`}
+            onClick={handleConfirm}
+            disabled={isProcessing}
+            className={`flex-1 py-3 rounded-2xl font-black text-sm shadow-md transition-all flex items-center justify-center gap-2 ${isProcessing ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-lg active:scale-95'} ${s.btn}`}
           >
+            {isProcessing && <Loader2 className="w-4 h-4 animate-spin" />}
             {confirmLabel}
           </button>
         </div>
@@ -118,7 +136,7 @@ interface PromptModalProps {
   placeholder?: string;
   confirmLabel?: string;
   cancelLabel?: string;
-  onConfirm: (value: string) => void;
+  onConfirm: (value: string) => void | Promise<void>;
   onCancel: () => void;
 }
 
@@ -128,11 +146,26 @@ export function PromptModal({
   onConfirm, onCancel,
 }: PromptModalProps) {
   const [value, setValue] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    if (open) { setValue(""); setTimeout(() => inputRef.current?.focus(), 50); }
+    if (open) { 
+      setValue(""); 
+      setIsProcessing(false);
+      setTimeout(() => inputRef.current?.focus(), 50); 
+    }
   }, [open]);
+
+  const handleConfirm = async () => {
+    if (!value.trim()) return;
+    setIsProcessing(true);
+    try {
+      await onConfirm(value.trim());
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   if (!open) return null;
   return (
@@ -151,15 +184,17 @@ export function PromptModal({
         <div className="flex gap-3">
           <button
             onClick={onCancel}
-            className="flex-1 py-3 rounded-2xl border-2 border-gray-100 text-gray-500 font-black text-sm hover:bg-gray-50 transition-all active:scale-95"
+            disabled={isProcessing}
+            className="flex-1 py-3 rounded-2xl border-2 border-gray-100 text-gray-500 font-black text-sm hover:bg-gray-50 transition-all active:scale-95 disabled:opacity-50"
           >
             {cancelLabel}
           </button>
           <button
-            onClick={() => { if (value.trim()) onConfirm(value.trim()); }}
-            disabled={!value.trim()}
-            className="flex-1 py-3 rounded-2xl bg-[#1B2412] text-[#A1FF4D] font-black text-sm shadow-md hover:bg-[#2d3d1e] transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+            onClick={handleConfirm}
+            disabled={!value.trim() || isProcessing}
+            className={`flex-1 py-3 rounded-2xl bg-[#1B2412] text-[#A1FF4D] font-black text-sm shadow-md transition-all flex items-center justify-center gap-2 ${(!value.trim() || isProcessing) ? 'opacity-40 cursor-not-allowed' : 'hover:bg-[#2d3d1e] active:scale-95'}`}
           >
+            {isProcessing && <Loader2 className="w-4 h-4 animate-spin" />}
             {confirmLabel}
           </button>
         </div>
