@@ -381,7 +381,7 @@ export default function SupplierDashboard() {
       tags: form.tags,
       available_colors: form.available_colors,
       available_sizes: form.available_sizes,
-      status: "APPROVED",
+      status: "PENDING",
     };
 
     let error;

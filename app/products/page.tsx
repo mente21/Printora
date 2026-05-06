@@ -117,8 +117,9 @@ function ProductsPageContent() {
 
   const categories = [
     { name: "T-shirts", icon: Shirt },
-    { name: "Mugs", icon: Coffee },
+    { name: "Sweaters", icon: Shirt },
     { name: "Hoodies", icon: Shirt },
+    { name: "Mugs", icon: Coffee },
     { name: "Hats", icon: HardHat },
     { name: "Accessories", icon: Watch },
     { name: "Phone Cases", icon: Smartphone },
@@ -388,6 +389,14 @@ function ProductsPageContent() {
               Showing <span className="text-[#1c211f] font-black">{filteredProducts.length}</span> results
             </div>
             <div className="flex items-center gap-3 w-full sm:w-auto">
+              <Link
+                href="/orders"
+                className="flex items-center justify-center gap-2 px-4 py-2 bg-[#1c211f] text-white rounded-xl text-sm font-bold hover:bg-black transition-colors shadow-[0_4px_12px_rgba(28,33,31,0.1)] shrink-0"
+                title="View My Orders"
+              >
+                <ShoppingBag size={16} />
+                <span className="hidden sm:inline">My Orders</span>
+              </Link>
               <div className="relative flex-1 sm:w-64">
                 <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
