@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { User, ShoppingBag, Eye, EyeOff, Loader2, Globe } from 'lucide-react';
+import { User, ShoppingBag, Eye, EyeOff, Loader2, Map } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { COUNTRIES } from '@/lib/countries';
+import CustomSelect from '@/components/ui/CustomSelect';
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -123,7 +124,7 @@ export default function SignupPage() {
         email,
         full_name,
         phone_number,
-        location,
+        location: country, // Sync with region for compatibility
         country,
         company_name: role === 'SUPPLIER' ? company_name : null,
         role,
@@ -212,42 +213,26 @@ export default function SignupPage() {
               <input type="email" value={formData.email} onChange={(e) => { setFormData({ ...formData, email: e.target.value }); setError(''); }} className="w-full bg-white border border-gray-300 shadow-sm rounded-md px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-[#A1FF4C] focus:border-transparent text-gray-900" required />
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex flex-col gap-1.5 flex-1">
-                <label className="text-[14px] font-bold text-gray-800">Phone number</label>
-                <input type="tel" value={formData.phone_number} onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })} className="w-full bg-white border border-gray-300 shadow-sm rounded-md px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-[#A1FF4C] focus:border-transparent text-gray-900" required />
-              </div>
-              <div className="flex flex-col gap-1.5 flex-1">
-                <label className="text-[14px] font-bold text-gray-800">City / Address</label>
-                <input type="text" value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} className="w-full bg-white border border-gray-300 shadow-sm rounded-md px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-[#A1FF4C] focus:border-transparent text-gray-900" required />
-              </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[14px] font-bold text-gray-800">Phone number</label>
+              <input type="tel" value={formData.phone_number} onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })} className="w-full bg-white border border-gray-300 shadow-sm rounded-md px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-[#A1FF4C] focus:border-transparent text-gray-900" required />
             </div>
 
-            {/* Country Selection */}
+            {/* Region / City Selection */}
             <div className="flex flex-col gap-1.5">
               <label className="text-[14px] font-bold text-gray-800 flex items-center gap-1.5">
-                <Globe size={14} className="text-[#2DC1DB]" />
-                {formData.role === 'SUPPLIER' ? 'Country of Origin' : 'Your Country'}
+                <Map size={14} className="text-[#2DC1DB]" />
+                {formData.role === 'SUPPLIER' ? 'Operating Region' : 'Your Region / City'}
                 <span className="text-red-400 text-xs">*</span>
               </label>
-              <div className="relative">
-                <select
-                  value={formData.country}
-                  onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                  required
-                  className="w-full bg-white border border-gray-300 shadow-sm rounded-md px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-[#A1FF4C] focus:border-transparent text-gray-900 appearance-none cursor-pointer"
-                >
-                  <option value="">Select a country…</option>
-                  {COUNTRIES.map(c => (
-                    <option key={c.code} value={c.name}>{c.flag} {c.name}</option>
-                  ))}
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M6 9l6 6 6-6"/></svg>
-                </div>
-              </div>
+              <CustomSelect
+                options={COUNTRIES.map(c => ({ value: c.name, label: `${c.flag} ${c.name}` }))}
+                value={formData.country}
+                onChange={(val) => setFormData({ ...formData, country: val })}
+                placeholder="Select your region…"
+              />
               {formData.role === 'SUPPLIER' && (
-                <p className="text-[11px] text-gray-400 font-medium">This is shown on your product listings as the shipping origin.</p>
+                <p className="text-[11px] text-gray-400 font-medium">This ensures your products are correctly categorized by location.</p>
               )}
             </div>
 

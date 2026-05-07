@@ -13,9 +13,11 @@ import {
   Building,
   Globe,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Map
 } from "lucide-react";
 import { COUNTRIES } from "@/lib/countries";
+import CustomSelect from "@/components/ui/CustomSelect";
 
 export default function ProfileSettingsPage() {
   const router = useRouter();
@@ -113,7 +115,7 @@ export default function ProfileSettingsPage() {
         .update({
           full_name: formData.full_name,
           phone_number: formData.phone_number,
-          location: formData.location,
+          location: formData.country, // Sync with region for compatibility
           company_name: formData.company_name,
           country: formData.country,
         })
@@ -239,50 +241,22 @@ export default function ProfileSettingsPage() {
                   </div>
                 </div>
 
-                {/* Location */}
-                <div className="space-y-3">
-                  <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">
-                    {role === "SUPPLIER" ? "Facility Location" : "Shipping Address"}
-                  </label>
-                  <div className="relative group">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#A1FF4D] transition-colors">
-                      <MapPin size={20} />
-                    </div>
-                    <input 
-                      type="text" 
-                      name="location"
-                      value={formData.location}
-                      onChange={handleInputChange}
-                      className="w-full pl-12 pr-5 py-4 bg-gray-50 border-2 border-gray-50 rounded-2xl text-sm text-[#111] font-black focus:outline-none focus:border-[#A1FF4D] focus:bg-white transition-all shadow-sm"
-                      placeholder="Addis Ababa, Ethiopia"
-                    />
-                  </div>
-                </div>
 
-                {/* Country */}
+
+                {/* Region / City */}
                 <div className="space-y-3">
                   <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1 flex items-center gap-1.5">
-                    <Globe size={13} />
-                    {role === "SUPPLIER" ? "Country of Origin" : "Your Country"}
+                    <Map size={13} />
+                    {role === "SUPPLIER" ? "Operating Region" : "Your Region / City"}
                   </label>
-                  <div className="relative group">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#A1FF4D] transition-colors">
-                      <Globe size={20} />
-                    </div>
-                    <select
-                      name="country"
-                      value={formData.country}
-                      onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                      className="w-full pl-12 pr-5 py-4 bg-gray-50 border-2 border-gray-50 rounded-2xl text-sm text-[#111] font-black focus:outline-none focus:border-[#A1FF4D] focus:bg-white transition-all shadow-sm appearance-none cursor-pointer"
-                    >
-                      <option value="">Select a country…</option>
-                      {COUNTRIES.map(c => (
-                        <option key={c.code} value={c.name}>{c.flag} {c.name}</option>
-                      ))}
-                    </select>
-                  </div>
+                  <CustomSelect
+                    options={COUNTRIES.map(c => ({ value: c.name, label: `${c.flag} ${c.name}` }))}
+                    value={formData.country}
+                    onChange={(val) => setFormData({ ...formData, country: val })}
+                    placeholder="Select your region…"
+                  />
                   {role === "SUPPLIER" && (
-                    <p className="text-[9px] text-gray-400 font-bold uppercase tracking-wider ml-1">This auto-populates on all your product listings.</p>
+                    <p className="text-[9px] text-gray-400 font-bold uppercase tracking-wider ml-1">This ensures local customers see your proximity.</p>
                   )}
                 </div>
 

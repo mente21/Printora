@@ -892,31 +892,25 @@ function SupplierDashboardContent() {
                 </div>
                 {/* Shipping Origin */}
                 <div className="flex items-center gap-3 p-4 bg-[#A1FF4D]/5 border border-[#A1FF4D]/20 rounded-2xl">
-                  <div className="text-2xl leading-none">{getCountryByName(form.supplier_country)?.flag || '🌍'}</div>
+                  <div className="text-2xl leading-none">{getCountryByName(form.supplier_country)?.flag || '📍'}</div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Ships From (Country of Origin) *</p>
-                    <select
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Shipping Origin (Operating Region) *</p>
+                    <CustomSelect
+                      options={COUNTRIES.map(c => ({ value: c.name, label: `${c.flag} ${c.name}` }))}
                       value={form.supplier_country}
-                      required
-                      onChange={async (e) => {
-                        const newCountry = e.target.value;
-                        setForm(f => ({ ...f, supplier_country: newCountry }));
+                      placeholder="Select operating region..."
+                      onChange={async (newRegion) => {
+                        setForm(f => ({ ...f, supplier_country: newRegion }));
                         const { data: { user } } = await supabase.auth.getUser();
                         if (user) {
-                           await supabase.from('profiles').update({ country: newCountry }).eq('id', user.id);
-                           setProfile((p: any) => ({...p, country: newCountry}));
+                           await supabase.from('profiles').update({ 
+                             country: newRegion,
+                             location: newRegion // Sync with region for compatibility
+                           }).eq('id', user.id);
+                           setProfile((p: any) => ({...p, country: newRegion, location: newRegion}));
                         }
                       }}
-                      className="text-sm font-black text-[#1B2412] bg-transparent outline-none w-full cursor-pointer appearance-none"
-                    >
-                      <option value="">Select your country...</option>
-                      {COUNTRIES.map(c => (
-                        <option key={c.code} value={c.name}>{c.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="text-[10px] font-black text-[#3da85b] uppercase tracking-widest pointer-events-none shrink-0">
-                    ▼
+                    />
                   </div>
                 </div>
               </div>

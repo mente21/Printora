@@ -1,4 +1,4 @@
-// Ethiopian Regions & Cities for local operation
+// Ethiopian Regions & Major Cities for local operation
 // Used across signup, profile, and supplier forms.
 
 export interface Location {
@@ -8,22 +8,66 @@ export interface Location {
 }
 
 export const ETHIOPIAN_REGIONS: Location[] = [
-  { code: "AA", name: "Addis Ababa", flag: "📍" },
-  { code: "OR", name: "Oromia", flag: "📍" },
-  { code: "AM", name: "Amhara", flag: "📍" },
-  { code: "TI", name: "Tigray", flag: "📍" },
-  { code: "SN", name: "SNNPR", flag: "📍" },
-  { code: "SI", name: "Sidama", flag: "📍" },
-  { code: "SO", name: "Somali", flag: "📍" },
-  { code: "AF", name: "Afar", flag: "📍" },
-  { code: "DD", name: "Dire Dawa", flag: "📍" },
-  { code: "BG", name: "Benishangul-Gumuz", flag: "📍" },
-  { code: "GA", name: "Gambela", flag: "📍" },
-  { code: "HA", name: "Harari", flag: "📍" },
-  { code: "SW", name: "South West Ethiopia", flag: "📍" },
+  // Chartered Cities
+  { code: "AA", name: "Addis Ababa", flag: "🇪🇹" },
+  { code: "DD", name: "Dire Dawa", flag: "🇪🇹" },
+
+  // Oromia Region
+  { code: "AD", name: "Adama (Nazret)", flag: "🇪🇹" },
+  { code: "JI", name: "Jimma", flag: "🇪🇹" },
+  { code: "SH", name: "Shashamane", flag: "🇪🇹" },
+  { code: "AM", name: "Ambo", flag: "🇪🇹" },
+  { code: "AW", name: "Awash", flag: "🇪🇹" },
+  { code: "AG", name: "Agaro", flag: "🇪🇹" },
+  { code: "OR-REG", name: "Oromia Region", flag: "🇪🇹" },
+
+  // Amhara Region
+  { code: "GD", name: "Gondar", flag: "🇪🇹" },
+  { code: "BD", name: "Bahir Dar", flag: "🇪🇹" },
+  { code: "DE", name: "Dessie", flag: "🇪🇹" },
+  { code: "AN", name: "Ankober", flag: "🇪🇹" },
+  { code: "AM-REG", name: "Amhara Region", flag: "🇪🇹" },
+
+  // Tigray Region
+  { code: "MK", name: "Mekelle", flag: "🇪🇹" },
+  { code: "ADG", name: "Adigrat", flag: "🇪🇹" },
+  { code: "ADW", name: "Adwa", flag: "🇪🇹" },
+  { code: "AX", name: "Axum", flag: "🇪🇹" },
+  { code: "TI-REG", name: "Tigray Region", flag: "🇪🇹" },
+
+  // Sidama Region
+  { code: "HW", name: "Hawassa (Awasa)", flag: "🇪🇹" },
+  { code: "SI-REG", name: "Sidama Region", flag: "🇪🇹" },
+
+  // Somali Region
+  { code: "JJ", name: "Jijiga", flag: "🇪🇹" },
+  { code: "SO-REG", name: "Somali Region", flag: "🇪🇹" },
+
+  // SNNPR / South Ethiopia
+  { code: "AB", name: "Arba Minch", flag: "🇪🇹" },
+  { code: "ALW", name: "Aleta Wendo", flag: "🇪🇹" },
+  { code: "ARK", name: "Areka", flag: "🇪🇹" },
+  { code: "SN-REG", name: "SNNPR Region", flag: "🇪🇹" },
+
+  // Harari Region
+  { code: "HR", name: "Harar", flag: "🇪🇹" },
+  { code: "HR-REG", name: "Harari Region", flag: "🇪🇹" },
+
+  // Benishangul-Gumuz
+  { code: "AS", name: "Asosa", flag: "🇪🇹" },
+  { code: "BG-REG", name: "Benishangul-Gumuz", flag: "🇪🇹" },
+
+  // Gambela Region
+  { code: "GA", name: "Gambela", flag: "🇪🇹" },
+  { code: "GA-REG", name: "Gambela Region", flag: "🇪🇹" },
+
+  // Other Regions
+  { code: "AF", name: "Afar Region", flag: "🇪🇹" },
+  { code: "SW", name: "South West Ethiopia", flag: "🇪🇹" },
+  { code: "CE", name: "Central Ethiopia (Hosaina)", flag: "🇪🇹" },
 ];
 
-// Alias for backwards compatibility if needed, but we'll migrate
+// Alias for backwards compatibility
 export const COUNTRIES = ETHIOPIAN_REGIONS;
 
 export function getCountryByCode(code: string): Location | undefined {

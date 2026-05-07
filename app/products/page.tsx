@@ -21,6 +21,7 @@ import {
   Search
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import CustomSelect from "@/components/ui/CustomSelect";
 
 export default function ProductsPage() {
   return (
@@ -110,9 +111,9 @@ function ProductsPageContent() {
       });
   }, []);
 
-  // Detect country: logged-in profile first, then IP fallback
+  // Detect Region: logged-in profile first, then fallback to Addis Ababa
   useEffect(() => {
-    const detectCountry = async () => {
+    const detectRegion = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { data: prof } = await supabase
@@ -122,14 +123,10 @@ function ProductsPageContent() {
           .single();
         if (prof?.country) { setUserCountry(prof.country); return; }
       }
-      // IP fallback
-      try {
-        const res = await fetch("https://ip-api.com/json/?fields=status,country", { signal: AbortSignal.timeout(4000) });
-        const json = await res.json();
-        if (json.status === "success" && json.country) setUserCountry(json.country);
-      } catch {}
+      // Fallback for Ethiopian market
+      setUserCountry("Addis Ababa");
     };
-    detectCountry();
+    detectRegion();
   }, []);
 
   // Auto-scroll logic — slow crossfade every 7 seconds
@@ -402,37 +399,40 @@ function ProductsPageContent() {
 
             <hr className="my-6 border-gray-100" />
 
-            {/* Country Filter */}
+            {/* Region Filter */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Ships From</h3>
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Operating Region</h3>
                 {selectedCountry && (
                   <button onClick={() => setSelectedCountry('')} className="text-[10px] font-black text-[#3da85b] uppercase tracking-wider hover:underline">Clear</button>
                 )}
               </div>
+              
               {userCountry && !selectedCountry && (
-                <div className="flex items-center gap-2 px-3 py-2 bg-[#3da85b]/5 border border-[#3da85b]/20 rounded-xl">
+                <button 
+                  onClick={() => setSelectedCountry(userCountry)}
+                  className="w-full flex items-center gap-2 px-3 py-2 bg-[#3da85b]/5 border border-[#3da85b]/20 rounded-xl mb-2 hover:bg-[#3da85b]/10 transition-all group"
+                  title={`Click to filter strictly by ${userCountry}`}
+                >
                   <span className="w-2 h-2 rounded-full bg-[#3da85b] animate-pulse flex-shrink-0" />
-                  <span className="text-[11px] font-bold text-[#3da85b]">Auto: {userCountry}</span>
-                </div>
+                  <span className="text-[11px] font-bold text-[#3da85b] flex-1 text-left">Near you: {userCountry}</span>
+                  <span className="text-[9px] font-black text-[#3da85b] opacity-0 group-hover:opacity-100 transition-opacity uppercase">Filter</span>
+                </button>
               )}
-              <div className="space-y-1">
-                <label className="flex items-center justify-between group cursor-pointer p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <input type="radio" className="w-4 h-4 text-[#3da85b] cursor-pointer" checked={selectedCountry === ''} onChange={() => setSelectedCountry('')} />
-                    <span className="text-sm font-medium text-gray-700">All Countries</span>
-                  </div>
-                </label>
-                {availableCountries.map(country => (
-                  <label key={country} className="flex items-center justify-between group cursor-pointer p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <input type="radio" className="w-4 h-4 text-[#3da85b] cursor-pointer" checked={selectedCountry === country} onChange={() => setSelectedCountry(country)} />
-                      <span className="text-sm font-medium text-gray-600 group-hover:text-[#1c211f]">{country}</span>
-                    </div>
-                    {country === userCountry && <span className="text-[9px] font-black text-[#3da85b] bg-[#3da85b]/10 px-1.5 py-0.5 rounded-full uppercase">Local</span>}
-                  </label>
-                ))}
-              </div>
+
+              <CustomSelect
+                options={[
+                  { value: '', label: 'All Regions' },
+                  ...availableCountries.map(country => ({
+                    value: country,
+                    label: country === userCountry ? `📍 ${country} (Local)` : country
+                  }))
+                ]}
+                value={selectedCountry}
+                onChange={(val) => setSelectedCountry(val)}
+                placeholder="Filter by region..."
+                className="w-full"
+              />
             </div>
 
           </div>
@@ -520,9 +520,11 @@ function ProductsPageContent() {
 
           {/* Fallback message */}
           {showFallbackMsg && (
-            <div className="flex items-center gap-3 px-5 py-3.5 bg-amber-50 border border-amber-100 rounded-2xl text-sm">
-              <span className="text-xl">🌍</span>
-              <p className="font-medium text-amber-700">No local suppliers found. Showing international options.</p>
+            <div className="flex items-center gap-3 px-5 py-3.5 bg-amber-50 border border-amber-100 rounded-2xl text-sm animate-in fade-in slide-in-from-top-2 duration-500">
+              <span className="text-xl">📍</span>
+              <p className="font-bold text-amber-800">
+                No suppliers found in {activeCountry}. Showing high-quality options from other regions in Ethiopia.
+              </p>
             </div>
           )}
 
@@ -587,7 +589,7 @@ function ProductsPageContent() {
                   </div>
                   {(product.supplier_country || product.supplier?.country) && (
                     <div className="flex items-center gap-1.5 pt-1">
-                      <span className="text-[10px] text-gray-400 font-medium">🌍 Ships from:</span>
+                      <span className="text-[10px] text-gray-400 font-medium">📍 Ships from:</span>
                       <span className="text-[10px] font-black text-gray-500">{product.supplier_country || product.supplier?.country}</span>
                       {(product.supplier_country || product.supplier?.country) === userCountry && (
                         <span className="text-[8px] font-black text-[#3da85b] bg-[#3da85b]/10 px-1.5 py-0.5 rounded-full uppercase tracking-wider">Local</span>

@@ -1410,12 +1410,24 @@ export default function AdminDashboard() {
             <div className="w-full space-y-3 text-left bg-gray-50 rounded-2xl p-5 border border-gray-100">
               <div>
                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Phone Number</p>
-                <p className="text-sm font-bold text-gray-800">{selectedUser.phone_number || selectedUser.phone || 'Not provided'}</p>
+                <p className="text-sm font-bold text-gray-800">{selectedUser.phone_number || 'Not provided'}</p>
               </div>
               <div>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Current Location</p>
-                <p className="text-sm font-bold text-gray-800">{selectedUser.location || 'Not provided'}</p>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Operating Region</p>
+                <p className="text-sm font-bold text-gray-800">{selectedUser.country || selectedUser.location || 'Not provided'}</p>
               </div>
+              <div>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Account Type</p>
+                <p className={`text-[10px] font-black px-2 py-0.5 rounded-full inline-block uppercase tracking-wider ${selectedUser.role === 'SUPPLIER' ? 'bg-blue-100 text-blue-600' : 'bg-teal-100 text-teal-600'}`}>
+                  {selectedUser.role}
+                </p>
+              </div>
+              {selectedUser.role === 'SUPPLIER' && (
+                <div>
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Company Name</p>
+                  <p className="text-sm font-bold text-gray-800">{selectedUser.company_name || 'Not provided'}</p>
+                </div>
+              )}
               <div>
                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Joined</p>
                 <p className="text-sm font-bold text-gray-800">{selectedUser.created_at ? new Date(selectedUser.created_at).toLocaleDateString() : 'Unknown'}</p>
