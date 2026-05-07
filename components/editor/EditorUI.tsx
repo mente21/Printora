@@ -42,6 +42,7 @@ import {
 import { ProductTemplate, ProductView, CanvasDesignState } from '@/types/editor';
 import { supabase } from '@/lib/supabase';
 import CustomSelect from '@/components/ui/CustomSelect';
+import { notifyNewOrder } from '@/lib/email-service';
 
 /* ─── Font catalogue ─────────────────────────────────────────────────────── */
 const FONTS = [
@@ -1251,7 +1252,11 @@ export default function EditorUI() {
                     console.error('Error saving order:', error);
                     alert('Failed to save product: ' + error.message);
                 } else {
-                    if (newOrder) setDbOrderId(newOrder.id);
+                    if (newOrder) {
+                        setDbOrderId(newOrder.id);
+                        // Server looks up all real emails from DB — just pass orderId + productType
+                        notifyNewOrder(newOrder.id, selectedProduct.name);
+                    }
                     window.location.href = '/orders?submitted=true';
                 }
             }
