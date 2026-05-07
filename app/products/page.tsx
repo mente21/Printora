@@ -48,6 +48,7 @@ function ProductsPageContent() {
   const [userCountry, setUserCountry] = useState<string>("");
   const [selectedCountry, setSelectedCountry] = useState<string>("");
   const [isCountryOpen, setIsCountryOpen] = useState(false);
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const searchParams = useSearchParams();
 
   const carouselItems = useMemo(() => [
@@ -237,7 +238,7 @@ function ProductsPageContent() {
     <div className="min-h-screen bg-[#fafbfa] font-sans text-[#1c211f]">
 
       {/* Hero Carousel — crossfade, no images */}
-      <div className="relative overflow-hidden w-full h-[300px] md:h-[350px] lg:h-[450px]">
+      <div className="relative overflow-hidden w-full h-[260px] sm:h-[300px] md:h-[350px]">
 
         {/* Slides — stacked, fading in/out */}
         {carouselItems.map((item, idx) => (
@@ -260,7 +261,7 @@ function ProductsPageContent() {
 
                 {/* ONE unified bold Impact heading across all slides */}
                 <h2
-                  className={`text-2xl md:text-5xl lg:text-[58px] leading-[1.0] ${item.textColor ? "" : "text-white drop-shadow-lg"}`}
+                  className={`text-3xl sm:text-4xl md:text-5xl lg:text-[58px] leading-[1.0] ${item.textColor ? "" : "text-white drop-shadow-lg"}`}
                   style={{
                     fontFamily: 'Impact, "Arial Black", "Segoe UI Black", sans-serif',
                     letterSpacing: '0.01em',
@@ -270,7 +271,7 @@ function ProductsPageContent() {
                   {item.title}
                 </h2>
                 <p
-                  className={`text-[13px] md:text-[17px] font-medium leading-relaxed max-w-md ${item.textColor ? "" : "text-white/90 drop-shadow-sm"}`}
+                  className={`text-[15px] md:text-[17px] font-medium leading-relaxed max-w-md ${item.textColor ? "" : "text-white/90 drop-shadow-sm"}`}
                   style={{ color: item.textColor ? `${item.textColor}e6` : undefined }}
                 >
                   {item.subtitle}
@@ -311,10 +312,102 @@ function ProductsPageContent() {
       </div>
 
       {/* Main Layout with Sidebar */}
-      <main className="max-w-[1600px] mx-auto px-6 md:px-12 py-12 flex flex-col lg:flex-row gap-10">
+      <main className="max-w-[1600px] mx-auto px-4 md:px-12 py-8 md:py-12 flex flex-col lg:flex-row gap-8 md:gap-10">
+        
+        {/* Mobile Categories Scroller */}
+        <div className="lg:hidden -mx-4 px-4 pb-4 overflow-x-auto flex items-center gap-3 no-scrollbar scroll-smooth">
+          <button 
+            onClick={() => setSelectedCategories([])}
+            className={`flex-shrink-0 px-5 py-2.5 rounded-2xl text-xs font-bold transition-all border ${selectedCategories.length === 0 ? 'bg-[#1c211f] text-[#A1FF4D] border-[#1c211f] shadow-lg' : 'bg-white text-gray-500 border-gray-100 hover:border-gray-200'}`}
+          >
+            All Products
+          </button>
+          {categories.map((cat, idx) => (
+            <button 
+              key={idx}
+              onClick={() => {
+                setSelectedCategories(prev => 
+                  prev.includes(cat.name) 
+                    ? prev.filter(c => c !== cat.name) 
+                    : [cat.name] // Single select on mobile for better UX
+                );
+              }}
+              className={`flex-shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold transition-all border ${selectedCategories.includes(cat.name) ? 'bg-[#3da85b] text-white border-[#3da85b] shadow-lg' : 'bg-white text-gray-500 border-gray-100 hover:border-gray-200'}`}
+            >
+              <cat.icon size={14} />
+              {cat.name}
+            </button>
+          ))}
+        </div>
 
-        {/* Sidebar */}
-        <aside className="w-full lg:w-[280px] flex-shrink-0 space-y-8">
+        {/* Mobile Filter Toggle & Summary */}
+        <div className="lg:hidden flex flex-col gap-4 mb-2">
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => setIsMobileFiltersOpen(!isMobileFiltersOpen)}
+              className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all border ${isMobileFiltersOpen ? 'bg-[#3da85b] text-white border-[#3da85b]' : 'bg-white text-gray-700 border-gray-200'}`}
+            >
+              <SlidersHorizontal size={16} />
+              {isMobileFiltersOpen ? 'Close Filters' : 'Filters & Region'}
+              {(minPrice > 0 || maxPrice < 5000 || selectedCountry) && (
+                <span className="w-2 h-2 rounded-full bg-[#A1FF4D] animate-pulse" />
+              )}
+            </button>
+          </div>
+
+          {isMobileFiltersOpen && (
+            <div className="bg-white rounded-3xl p-6 shadow-xl border border-gray-100 animate-in fade-in slide-in-from-top-4 duration-300 space-y-8">
+               <div className="space-y-4">
+                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Price Range (ETB)</h3>
+                  <div className="px-2 space-y-4">
+                    <input
+                      type="range"
+                      className="w-full accent-[#3da85b]"
+                      min="0"
+                      max="5000"
+                      step="50"
+                      value={maxPrice}
+                      onChange={(e) => setMaxPrice(Number(e.target.value))}
+                    />
+                    <div className="flex items-center gap-2 text-sm font-bold text-gray-700">
+                      <span>ETB {minPrice}</span>
+                      <span className="text-gray-300">-</span>
+                      <span>ETB {maxPrice}</span>
+                    </div>
+                  </div>
+               </div>
+
+               <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Region</h3>
+                    {selectedCountry && (
+                      <button onClick={() => setSelectedCountry('')} className="text-[10px] font-black text-[#3da85b] uppercase tracking-wider">Clear</button>
+                    )}
+                  </div>
+                  <CustomSelect
+                    options={[
+                      { value: '', label: 'All Regions' },
+                      ...availableCountries.map(country => ({
+                        value: country,
+                        label: country === userCountry ? `📍 ${country} (Local)` : country
+                      }))
+                    ]}
+                    value={selectedCountry}
+                    onChange={(val) => {
+                      setSelectedCountry(val);
+                      // Auto-close on selection for mobile flow
+                      setTimeout(() => setIsMobileFiltersOpen(false), 300);
+                    }}
+                    placeholder="Filter by region..."
+                    className="w-full"
+                  />
+               </div>
+            </div>
+          )}
+        </div>
+
+        {/* Sidebar - Hidden on mobile, shown on large screens */}
+        <aside className="hidden lg:block w-[280px] flex-shrink-0 space-y-8">
 
           <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
             <div className="flex items-center gap-2 mb-6 text-[#1c211f]">
