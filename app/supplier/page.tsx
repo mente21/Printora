@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import {
   ShoppingBag, Plus, LogOut, CheckCircle, Clock, XCircle,
@@ -52,6 +53,18 @@ const INITIAL_FORM = {
 };
 
 export default function SupplierDashboard() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-[#fafafa]">
+        <Loader2 className="animate-spin text-[#A1FF4D]" size={48} />
+      </div>
+    }>
+      <SupplierDashboardContent />
+    </Suspense>
+  );
+}
+
+function SupplierDashboardContent() {
   const [profile, setProfile] = useState<any>(null);
   const [products, setProducts] = useState<any[]>([]);
   const [orders, setOrders] = useState<any[]>([]);
@@ -65,7 +78,9 @@ export default function SupplierDashboard() {
   const [proofUrl, setProofUrl] = useState('');
   const [proofPreview, setProofPreview] = useState('');
   const [fulfillLoading, setFulfillLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("my-products");
+  const searchParams = useSearchParams();
+  const requestedTab = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState(requestedTab || "my-products");
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [processingId, setProcessingId] = useState<string | null>(null);
 
@@ -89,56 +104,100 @@ export default function SupplierDashboard() {
     initPage();
   }, []);
 
+  useEffect(() => {
+    if (requestedTab) {
+      setActiveTab(requestedTab);
+    }
+  }, [requestedTab]);
+
   const initPage = async () => {
-    setLoading(true);
-    setSupplierImgError(false);
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      window.location.href = "/login";
-      return;
-    }
+    try {
+      setLoading(true);
+      setSupplierImgError(false);
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError || !user) {
+        console.error("Auth error:", authError);
+        window.location.href = "/login";
+        return;
+      }
 
-    // Fetch profile
-    const { data: prof } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .single();
+      // Fetch profile
+      const { data: prof, error: profError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
 
-    // 🔒 SUPPLIER / ADMIN ONLY
-    if (!prof || !["SUPPLIER", "ADMIN"].includes(prof.role)) {
-      window.location.href = "/";
-      return;
-    }
+      if (profError) {
+        console.error("Profile error:", profError);
+        window.location.href = "/";
+        return;
+      }
 
-    setProfile({ ...prof, avatar_url: user.user_metadata?.avatar_url });
-    // Pre-fill supplier_country from profile
-    if (prof.country) {
-      setForm(f => ({ ...f, supplier_country: prof.country }));
+      // 🔒 SUPPLIER / ADMIN ONLY
+      if (!prof || !["SUPPLIER", "ADMIN"].includes(prof.role)) {
+        window.location.href = "/";
+        return;
+      }
+
+      setProfile({ ...prof, avatar_url: user.user_metadata?.avatar_url });
+      
+      // Pre-fill supplier_country from profile
+      if (prof.country) {
+        setForm(f => ({ ...f, supplier_country: prof.country }));
+      }
+      
+      await Promise.all([
+        fetchProducts(user.id),
+        fetchOrders(user.id)
+      ]);
+    } catch (err) {
+      console.error("Global init error:", err);
+    } finally {
+      setLoading(false);
     }
-    await Promise.all([fetchProducts(user.id), fetchOrders(user.id)]);
-    setLoading(false);
   };
 
   const fetchProducts = async (uid: string) => {
-    const { data } = await supabase
-      .from("supplier_products")
-      .select("*")
-      .eq("supplier_id", uid)
-      .order("created_at", { ascending: false });
-    setProducts(data || []);
+    try {
+      const { data, error } = await supabase
+        .from("supplier_products")
+        .select("*")
+        .eq("supplier_id", uid)
+        .order("created_at", { ascending: false });
+      
+      if (error) {
+        console.error("Fetch products error:", error);
+        setProducts([]);
+        return;
+      }
+      setProducts(data || []);
+    } catch (err) {
+      console.error("Fetch products exception:", err);
+      setProducts([]);
+    }
   };
 
   const fetchOrders = async (uid: string) => {
-    const { data, error } = await supabase
-      .from("custom_orders")
-      .select("*, supplier_product:supplier_products(price, bulk_pricing)")
-      .eq("supplier_id", uid)
-      .order("created_at", { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from("custom_orders")
+        .select("*, supplier_product:supplier_products(price, bulk_pricing)")
+        .eq("supplier_id", uid)
+        .order("created_at", { ascending: false });
 
-    if (error) { console.error("Fetch orders error:", error); setOrders([]); return; }
+      if (error) { 
+        console.error("Fetch orders error:", error); 
+        setOrders([]); 
+        return; 
+      }
 
-    setOrders(data || []);
+      setOrders(data || []);
+    } catch (err) {
+      console.error("Fetch orders exception:", err);
+      setOrders([]);
+    }
   };
 
   const handleColorToggle = (color: { name: string; hex: string }) => {

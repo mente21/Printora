@@ -36,8 +36,8 @@ export default function CustomSelect({ value, options, onChange, placeholder, cl
       </button>
       
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-2xl shadow-2xl z-[500] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-          <div className="max-h-60 overflow-y-auto scrollbar-hide">
+        <div className="absolute top-full left-0 right-0 mt-3 bg-white/90 backdrop-blur-xl border border-white/20 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-[500] overflow-hidden animate-in fade-in zoom-in-95 slide-in-from-top-4 duration-300">
+          <div className="max-h-60 overflow-y-auto scrollbar-hide p-2">
             {options.map((option) => (
               <button
                 key={option}
@@ -46,8 +46,10 @@ export default function CustomSelect({ value, options, onChange, placeholder, cl
                   onChange(option);
                   setIsOpen(false);
                 }}
-                className={`w-full px-5 py-4 text-left text-sm font-bold transition-colors ${
-                  value === option ? 'bg-[#A1FF4D] text-[#1B2412]' : 'hover:bg-gray-50 text-gray-700'
+                className={`w-full px-5 py-3.5 text-left text-[13px] font-black rounded-2xl transition-all ${
+                  value === option 
+                    ? 'bg-[#A1FF4D] text-[#1B2412] shadow-lg shadow-[#A1FF4D]/20 scale-[1.02]' 
+                    : 'hover:bg-[#A1FF4D]/10 text-gray-600 hover:text-[#1B2412]'
                 }`}
               >
                 {option}

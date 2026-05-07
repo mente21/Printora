@@ -103,48 +103,118 @@ export default function Navbar() {
                     {(user.user_metadata?.full_name || user.email || 'U')[0].toUpperCase()}
                   </div>
                 )}
-                <span className="text-[14px] font-bold text-[#1B2412] max-w-[120px] truncate">
-                  {user.user_metadata?.full_name || user.email?.split('@')[0]}
-                </span>
+                <div className="flex flex-col items-start leading-none">
+                  <span className="text-[14px] font-black text-[#1B2412] max-w-[120px] truncate">
+                    {user.user_metadata?.full_name || user.email?.split('@')[0]}
+                  </span>
+                  {userRole === 'SUPPLIER' && (
+                    <span className="text-[9px] font-black text-[#A1FF4D] uppercase tracking-widest bg-[#1B2412] px-1.5 py-0.5 rounded-sm mt-0.5">Supplier</span>
+                  )}
+                </div>
 
               </button>
 
               {/* Dropdown Menu */}
               {showUserMenu && (
-                <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                  <div className="p-4 border-b border-gray-100 bg-gray-50/50">
-                    <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Signed in as</p>
-                    <p className="text-sm font-bold text-[#1B2412] truncate mt-0.5">{user.email}</p>
+                <div className="absolute right-0 top-full mt-4 w-72 bg-white/95 backdrop-blur-2xl rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100 overflow-hidden z-50 animate-in fade-in zoom-in-95 slide-in-from-top-4 duration-300">
+                  {/* Profile Header */}
+                  <div className="p-6 pb-4 bg-gradient-to-br from-[#A1FF4D]/10 to-transparent border-b border-gray-100">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-full bg-[#A1FF4D] flex items-center justify-center text-[#1B2412] font-black text-xl uppercase shadow-lg shadow-[#A1FF4D]/20">
+                        {(user.user_metadata?.full_name || user.email || 'U')[0].toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-base font-black text-[#1B2412] truncate">
+                          {user.user_metadata?.full_name || user.email?.split('@')[0]}
+                        </p>
+                        <p className="text-xs font-bold text-gray-400 truncate">{user.email}</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="p-2">
+
+                  {/* Menu Items */}
+                  <div className="p-3 space-y-1">
                     {userRole === "ADMIN" && (
-                      <Link href="/admin" onClick={() => setShowUserMenu(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] font-bold text-gray-700 hover:bg-gray-100 transition-colors">
-                        <ShoppingBag size={15} /> Admin Panel
+                      <Link 
+                        href="/admin" 
+                        onClick={() => setShowUserMenu(false)} 
+                        className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[14px] font-black text-gray-700 hover:bg-[#A1FF4D]/10 hover:text-[#1B2412] transition-all group"
+                      >
+                        <div className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center group-hover:bg-[#A1FF4D] transition-colors">
+                          <ShoppingBag size={16} className="group-hover:scale-110 transition-transform" />
+                        </div>
+                        Admin Dashboard
                       </Link>
                     )}
-                    {userRole === "SUPPLIER" && (
-                      <Link href="/supplier" onClick={() => setShowUserMenu(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] font-bold text-gray-700 hover:bg-gray-100 transition-colors">
-                        <ShoppingBag size={15} /> Supplier Panel
-                      </Link>
+
+                    {userRole === "SUPPLIER" ? (
+                      <div className="mb-2">
+                        <div className="px-4 py-2">
+                          <p className="text-[10px] font-black text-[#A1FF4D] uppercase tracking-[0.2em] bg-[#1B2412] px-3 py-1 rounded-full inline-block">Supplier Hub</p>
+                        </div>
+                        <div className="space-y-1">
+                          <Link 
+                            href="/supplier" 
+                            onClick={() => setShowUserMenu(false)} 
+                            className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[14px] font-black text-gray-900 bg-gray-50 hover:bg-[#A1FF4D] transition-all group border border-gray-100"
+                          >
+                            <div className="w-8 h-8 rounded-xl bg-white flex items-center justify-center shadow-sm">
+                              <ShoppingBag size={16} className="group-hover:scale-110 transition-transform text-[#1B2412]" />
+                            </div>
+                            Supplier Panel
+                          </Link>
+                          <Link 
+                            href="/supplier?tab=my-products" 
+                            onClick={() => setShowUserMenu(false)} 
+                            className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[14px] font-black text-gray-700 hover:bg-[#A1FF4D]/10 hover:text-[#1B2412] transition-all group"
+                          >
+                            <div className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center group-hover:bg-[#A1FF4D] transition-colors">
+                              <ShoppingBag size={16} className="group-hover:scale-110 transition-transform" />
+                            </div>
+                            My Products
+                          </Link>
+                        </div>
+                      </div>
+                    ) : (
+                      userRole === "CUSTOMER" && (
+                        <Link 
+                          href="/orders" 
+                          onClick={() => setShowUserMenu(false)} 
+                          className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[14px] font-black text-gray-700 hover:bg-[#A1FF4D]/10 hover:text-[#1B2412] transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center group-hover:bg-[#A1FF4D] transition-colors">
+                            <ShoppingBag size={16} className="group-hover:scale-110 transition-transform" />
+                          </div>
+                          My Orders
+                        </Link>
+                      )
                     )}
-                    {userRole === "CUSTOMER" && (
-                      <Link href="/orders" onClick={() => setShowUserMenu(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] font-bold text-gray-700 hover:bg-gray-100 transition-colors">
-                        <ShoppingBag size={15} /> Orders
-                      </Link>
-                    )}
-                    <Link href="/profile" onClick={() => setShowUserMenu(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] font-bold text-gray-700 hover:bg-gray-100 transition-colors">
-                      <UserIcon size={15} /> Profile Settings
+
+                    <Link 
+                      href="/profile" 
+                      onClick={() => setShowUserMenu(false)} 
+                      className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[14px] font-black text-gray-700 hover:bg-[#A1FF4D]/10 hover:text-[#1B2412] transition-all group"
+                    >
+                      <div className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center group-hover:bg-[#A1FF4D] transition-colors">
+                        <UserIcon size={16} className="group-hover:scale-110 transition-transform" />
+                      </div>
+                      Profile Settings
                     </Link>
                   </div>
-                  <div className="p-2 border-t border-gray-100">
+
+                  {/* Sign Out Section */}
+                  <div className="p-3 bg-gray-50/50 border-t border-gray-100">
                     <button
                       onClick={async () => {
                         await supabase.auth.signOut();
                         setShowUserMenu(false);
                       }}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] font-bold text-red-500 hover:bg-red-50 transition-colors w-full"
+                      className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[14px] font-black text-red-500 hover:bg-red-50 transition-all group w-full"
                     >
-                      <LogOut size={15} /> Sign Out
+                      <div className="w-8 h-8 rounded-xl bg-red-50 flex items-center justify-center group-hover:bg-red-100 transition-colors">
+                        <LogOut size={16} className="group-hover:-translate-x-0.5 transition-transform" />
+                      </div>
+                      Sign Out
                     </button>
                   </div>
                 </div>
