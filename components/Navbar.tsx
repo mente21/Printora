@@ -191,7 +191,7 @@ export default function Navbar() {
                     )}
 
                     <Link 
-                      href="/profile" 
+                      href={userRole === "SUPPLIER" ? "/supplier?tab=profile" : "/profile"} 
                       onClick={() => setShowUserMenu(false)} 
                       className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[14px] font-black text-gray-700 hover:bg-[#A1FF4D]/10 hover:text-[#1B2412] transition-all group"
                     >

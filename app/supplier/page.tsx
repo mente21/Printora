@@ -8,7 +8,8 @@ import {
   ShoppingBag, Plus, LogOut, CheckCircle, Clock, XCircle,
   BarChart3, Box, Image as ImageIcon, User, Palette, Tag,
   Package, Upload, Loader2, ChevronDown, UploadCloud, X, Trash2,
-  Edit2, Lock, ShieldCheck, Layers, Timer, ShoppingBasket, CheckCircle2
+  Edit2, Lock, ShieldCheck, Layers, Timer, ShoppingBasket, CheckCircle2,
+  Phone, MapPin, Mail, Save, Building, Globe, AlertCircle, Map
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConfirmModal, AlertModal } from "@/components/ui/AppModal";
@@ -87,6 +88,19 @@ function SupplierDashboardContent() {
   // Form state initialized with INITIAL_FORM
   const [form, setForm] = useState(INITIAL_FORM);
 
+  // Profile Form State
+  const [profileForm, setProfileForm] = useState({
+    full_name: "",
+    email: "",
+    phone_number: "",
+    location: "",
+    company_name: "",
+    country: "",
+  });
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [profileSuccess, setProfileSuccess] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
+
   // ── Custom modal state (replaces all native confirm/alert) ──────────────
   type ModalAction = (() => Promise<void>) | (() => void);
   const [confirmModal, setConfirmModal] = useState<{ open: boolean; title: string; message: string; confirmLabel?: string; variant?: any; onConfirm: ModalAction }>(
@@ -144,6 +158,16 @@ function SupplierDashboardContent() {
       }
 
       setProfile({ ...prof, avatar_url: user.user_metadata?.avatar_url });
+      
+      // Initialize profile form
+      setProfileForm({
+        full_name: prof.full_name || "",
+        email: prof.email || user.email || "",
+        phone_number: prof.phone_number || "",
+        location: prof.location || "",
+        company_name: prof.company_name || "",
+        country: prof.country || "",
+      });
       
       // Pre-fill supplier_country from profile
       if (prof.country) {
@@ -587,6 +611,53 @@ function SupplierDashboardContent() {
     downloadFile(offscreen.toDataURL('image/png'), `${layer.kind}-layer-${index + 1}.png`);
   };
 
+  const handleProfileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setProfileForm({ ...profileForm, [e.target.name]: e.target.value });
+    setProfileSuccess(false);
+    setProfileError(null);
+  };
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!profile) return;
+
+    setProfileSaving(true);
+    setProfileSuccess(false);
+    setProfileError(null);
+
+    try {
+      if (profileForm.phone_number) {
+        const phoneClean = profileForm.phone_number.replace(/\s/g, '');
+        const phoneRegex = /^(09|07)\d{8}$/;
+        if (!phoneRegex.test(phoneClean)) {
+          throw new Error("Invalid phone format. Must start with 09 (Ethio Telecom) or 07 (Safaricom) and be 10 digits long.");
+        }
+      }
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          full_name: profileForm.full_name,
+          phone_number: profileForm.phone_number,
+          location: profileForm.country,
+          company_name: profileForm.company_name,
+          country: profileForm.country,
+        })
+        .eq("id", profile.id);
+
+      if (error) throw error;
+      
+      setProfileSuccess(true);
+      setProfile({ ...profile, ...profileForm });
+      setTimeout(() => setProfileSuccess(false), 3000);
+    } catch (err: any) {
+      console.error("Error saving profile:", err);
+      setProfileError(err.message || "Failed to save profile updates.");
+    } finally {
+      setProfileSaving(false);
+    }
+  };
+
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     window.location.href = "/";
@@ -725,12 +796,12 @@ function SupplierDashboardContent() {
 
           <div className="pt-2">
             <p className="px-4 text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Account</p>
-            <Link 
-              href="/profile"
-              className="flex items-center gap-3 px-4 py-3 w-full text-left rounded-xl text-sm font-bold text-gray-400 hover:bg-gray-50 transition-all"
+            <button 
+              onClick={() => setActiveTab("profile")}
+              className={`flex items-center gap-3 px-4 py-3 w-full text-left rounded-xl text-sm font-bold transition-all ${activeTab === "profile" ? "bg-[#A1FF4D]/10 text-[#2B3220]" : "text-gray-400 hover:bg-gray-50"}`}
             >
               <User size={16} /> Profile Settings
-            </Link>
+            </button>
           </div>
         </nav>
 
@@ -1337,6 +1408,171 @@ function SupplierDashboardContent() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+        
+        {activeTab === "profile" && (
+          <div className="max-w-4xl">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="bg-[#1B2412] text-white p-2 rounded-xl"><User size={18} /></div>
+              <h2 className="text-xl font-black text-[#2B3220] uppercase tracking-widest" style={{ fontFamily: 'Impact, sans-serif', wordSpacing: '0.15em' }}>
+                Account Settings
+              </h2>
+            </div>
+
+            <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden relative">
+              {/* Banner area */}
+              <div className="h-32 bg-[#1B2412] relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-[#A1FF4D]/10 rounded-full blur-3xl -mr-32 -mt-32" />
+              </div>
+              
+              {/* Profile Avatar */}
+              <div className="absolute top-16 left-10 w-24 h-24 bg-white rounded-3xl flex items-center justify-center border-4 border-white shadow-lg overflow-hidden z-10">
+                <div className="w-full h-full bg-gray-50 flex items-center justify-center text-[#1B2412]">
+                  {(profile?.avatar_url && !supplierImgError) ? (
+                    <img 
+                      src={profile.avatar_url} 
+                      alt="Profile" 
+                      onError={() => setSupplierImgError(true)}
+                      className="w-full h-full object-cover" 
+                    />
+                  ) : (
+                    <span className="text-2xl font-black uppercase">{profile?.full_name?.[0] || profile?.email?.[0] || 'S'}</span>
+                  )}
+                </div>
+              </div>
+              
+              <div className="px-8 pt-12 pb-8">
+                <form onSubmit={handleSaveProfile} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Full Name */}
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Full Name</label>
+                      <div className="relative group">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#A1FF4D] transition-colors">
+                          <User size={18} />
+                        </div>
+                        <input 
+                          type="text" 
+                          name="full_name"
+                          value={profileForm.full_name}
+                          onChange={handleProfileInputChange}
+                          className="w-full pl-11 pr-5 py-3.5 bg-gray-50 border-2 border-transparent rounded-2xl text-sm text-[#111] font-black focus:outline-none focus:border-[#A1FF4D] focus:bg-white transition-all"
+                          placeholder="Jane Doe"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Email Address */}
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Email Address</label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                          <Mail size={18} />
+                        </div>
+                        <input 
+                          type="email" 
+                          name="email"
+                          value={profileForm.email}
+                          disabled
+                          className="w-full pl-11 pr-5 py-3.5 bg-gray-100/50 border-2 border-transparent rounded-2xl text-sm text-gray-400 font-bold cursor-not-allowed"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Phone Number */}
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Phone Number</label>
+                      <div className="relative group">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#A1FF4D] transition-colors">
+                          <Phone size={18} />
+                        </div>
+                        <input 
+                          type="tel" 
+                          name="phone_number"
+                          value={profileForm.phone_number}
+                          onChange={handleProfileInputChange}
+                          className="w-full pl-11 pr-5 py-3.5 bg-gray-50 border-2 border-transparent rounded-2xl text-sm text-[#111] font-black focus:outline-none focus:border-[#A1FF4D] focus:bg-white transition-all"
+                          placeholder="09... or 07..."
+                        />
+                      </div>
+                    </div>
+
+                    {/* Operating Region */}
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 flex items-center gap-1.5">
+                        <Map size={12} />
+                        Operating Region
+                      </label>
+                      <CustomSelect
+                        options={COUNTRIES.map(c => ({ value: c.name, label: `${c.flag} ${c.name}` }))}
+                        value={profileForm.country}
+                        onChange={(val) => setProfileForm({ ...profileForm, country: val })}
+                        placeholder="Select region…"
+                      />
+                    </div>
+
+                    {/* Company Name */}
+                    <div className="space-y-2 md:col-span-2">
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Company Name</label>
+                      <div className="relative group">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#A1FF4D] transition-colors">
+                          <Building size={18} />
+                        </div>
+                        <input 
+                          type="text" 
+                          name="company_name"
+                          value={profileForm.company_name}
+                          onChange={handleProfileInputChange}
+                          className="w-full pl-11 pr-5 py-3.5 bg-gray-50 border-2 border-transparent rounded-2xl text-sm text-[#111] font-black focus:outline-none focus:border-[#A1FF4D] focus:bg-white transition-all"
+                          placeholder="My Print Shop LLC"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {profileError && (
+                    <div className="flex items-center gap-2 text-red-500 bg-red-50 p-4 rounded-2xl text-xs font-bold border border-red-100 animate-in fade-in slide-in-from-top-1">
+                      <AlertCircle size={14} />
+                      {profileError}
+                    </div>
+                  )}
+
+                  <div className="pt-6 border-t border-gray-100 flex items-center justify-between">
+                    <div className="flex items-center">
+                      {profileSuccess && (
+                        <span className="flex items-center gap-2 text-emerald-600 text-[10px] font-black uppercase tracking-widest animate-in slide-in-from-left-4">
+                          <CheckCircle2 size={16} className="text-[#A1FF4D]" />
+                          Profile Updated Successfully
+                        </span>
+                      )}
+                    </div>
+                    
+                    <button 
+                      type="submit"
+                      disabled={profileSaving}
+                      className={`flex items-center gap-3 px-8 py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all
+                        ${profileSaving 
+                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                          : 'bg-[#A1FF4D] text-[#1B2412] hover:shadow-lg shadow-[#A1FF4D]/20 active:scale-95'}`
+                      }
+                    >
+                      {profileSaving ? (
+                        <>
+                          <Loader2 size={16} className="animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <Save size={16} />
+                          Save Changes
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
         )}

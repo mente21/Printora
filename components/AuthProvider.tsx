@@ -49,8 +49,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (mounted) setIsChecking(false);
           }
         } else if (role === 'SUPPLIER') {
-          // Suppliers can go anywhere EXCEPT the admin panel
-          if (pathname.startsWith('/admin')) {
+          // Suppliers are restricted to their panel and profile
+          const isAllowedPath = pathname.startsWith('/supplier') || pathname.startsWith('/profile') || pathname.startsWith('/auth');
+          
+          if (!isAllowedPath || pathname === '/') {
             router.replace('/supplier');
           } else {
             if (mounted) setIsChecking(false);
