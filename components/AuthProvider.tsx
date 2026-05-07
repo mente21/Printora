@@ -40,33 +40,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         const role = profile?.role || 'CUSTOMER';
 
+        // 🔒 Protected Routes Logic
         if (role === 'ADMIN') {
-          if (!pathname.startsWith('/admin')) {
+          // Admins can go anywhere EXCEPT the supplier panel
+          if (pathname.startsWith('/supplier')) {
             router.replace('/admin');
           } else {
             if (mounted) setIsChecking(false);
           }
         } else if (role === 'SUPPLIER') {
-          if (!pathname.startsWith('/supplier')) {
+          // Suppliers can go anywhere EXCEPT the admin panel
+          if (pathname.startsWith('/admin')) {
             router.replace('/supplier');
           } else {
             if (mounted) setIsChecking(false);
           }
         } else {
-          // CUSTOMER
+          // CUSTOMERS cannot see admin or supplier panels
           if (pathname.startsWith('/admin') || pathname.startsWith('/supplier')) {
             router.replace('/');
           } else if (pathname.startsWith('/login') || pathname.startsWith('/signup')) {
             router.replace('/');
           } else {
-             if (mounted) setIsChecking(false);
+            if (mounted) setIsChecking(false);
           }
-        }
-
-        // Handle case where Admin or Supplier navigates to login/signup
-        if (pathname.startsWith('/login') || pathname.startsWith('/signup')) {
-             if (role === 'ADMIN') router.replace('/admin');
-             else if (role === 'SUPPLIER') router.replace('/supplier');
         }
 
       } catch (e) {

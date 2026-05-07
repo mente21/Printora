@@ -149,9 +149,7 @@ function OrdersContent() {
         const { data: prof } = await supabase
             .from("profiles").select("*").eq("id", user.id).single();
 
-        // Suppliers have their own panel — redirect them away
-        if (prof?.role === "SUPPLIER") { router.push("/supplier"); return; }
-
+        // Profile is loaded, proceed
         setProfile(prof);
 
         const { data: ordersData } = await supabase
