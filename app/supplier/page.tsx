@@ -12,6 +12,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConfirmModal, AlertModal } from "@/components/ui/AppModal";
 import CustomSelect from "@/components/ui/CustomSelect";
+import { notifyOrderFulfilled } from "@/lib/email-service";
 import { getPrimaryMockup } from "@/lib/utils";
 import { COUNTRIES, getCountryByName } from "@/lib/countries";
 
@@ -429,10 +430,13 @@ export default function SupplierDashboard() {
       .from("custom_orders")
       .update({ status: nextStatus, supplier_proof_image_url: proofUrl.trim() })
       .eq("id", selectedOrder.id);
+    setFulfillLoading(false);
 
     if (error) {
       showAlert(error.message, "Error");
     } else {
+      // Server looks up all real emails from DB (admin + customer)
+      notifyOrderFulfilled(selectedOrder.id, selectedOrder.product_type);
       setSelectedOrder(null);
       setProofUrl('');
       setProofPreview('');
