@@ -207,11 +207,11 @@ function ProductsPageContent() {
         </Link>
 
         <div 
-          className="flex h-[350px] md:h-[450px] transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]"
+          className="flex h-[250px] md:h-[450px] transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]"
             style={{ transform: `translateX(-${currentSlide * 100}%)` }}
           >
             {carouselItems.map((item, idx) => (
-              <div key={idx} className="min-w-full h-full relative flex items-center px-6 md:px-24">
+              <div key={idx} className="min-w-full h-full relative flex items-center px-8 md:px-24">
                 <img 
                   src={item.image} 
                   alt={item.title} 
@@ -220,7 +220,7 @@ function ProductsPageContent() {
                 <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent z-10"></div>
                 
                 <div className="relative z-20 max-w-xl space-y-5">
-                  <h2 className="text-3xl md:text-5xl lg:text-7xl font-black text-white leading-[1.1] drop-shadow-md">
+                  <h2 className="text-2xl md:text-5xl lg:text-7xl font-black text-white leading-[1.1] drop-shadow-md">
                     {item.title}
                   </h2>
                   <p className="text-white/90 text-base md:text-lg font-medium drop-shadow-sm max-w-md">

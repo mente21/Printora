@@ -237,7 +237,7 @@ function ProductsPageContent() {
     <div className="min-h-screen bg-[#fafbfa] font-sans text-[#1c211f]">
 
       {/* Hero Carousel — crossfade, no images */}
-      <div className="relative overflow-hidden w-full h-[320px] md:h-[380px] lg:h-[450px]">
+      <div className="relative overflow-hidden w-full h-[250px] md:h-[320px] lg:h-[450px]">
 
         {/* Slides — stacked, fading in/out */}
         {carouselItems.map((item, idx) => (
@@ -255,12 +255,12 @@ function ProductsPageContent() {
             </div>
 
             {/* Text content overlay */}
-            <div className="relative z-10 h-full flex items-center px-6 md:px-20 lg:px-28 w-full md:w-2/3 lg:w-1/2">
+            <div className="relative z-10 h-full flex items-center px-8 md:px-20 lg:px-28 w-full md:w-2/3 lg:w-1/2">
               <div className="max-w-xl space-y-4">
 
                 {/* ONE unified bold Impact heading across all slides */}
                 <h2
-                  className={`text-3xl md:text-5xl lg:text-[72px] leading-[1.0] ${item.textColor ? "" : "text-white drop-shadow-lg"}`}
+                  className={`text-2xl md:text-5xl lg:text-[72px] leading-[1.0] ${item.textColor ? "" : "text-white drop-shadow-lg"}`}
                   style={{
                     fontFamily: 'Impact, "Arial Black", "Segoe UI Black", sans-serif',
                     letterSpacing: '0.01em',
