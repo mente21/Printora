@@ -110,6 +110,7 @@ export default function SignupPage() {
       }
     }
 
+
     if (!session || !user) {
       setError('Signup successful, but session could not be started. Please go to the Log In page.');
       setLoading(false);

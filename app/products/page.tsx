@@ -44,7 +44,6 @@ function ProductsPageContent() {
   const [minPrice, setMinPrice] = useState<number>(0);
   const [maxPrice, setMaxPrice] = useState<number>(5000);
   const [sortBy, setSortBy] = useState<string>("newest");
-  const [isSortOpen, setIsSortOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [userCountry, setUserCountry] = useState<string>("");
   const [selectedCountry, setSelectedCountry] = useState<string>("");
@@ -101,15 +100,36 @@ function ProductsPageContent() {
   }, [searchParams]);
 
   useEffect(() => {
-    supabase
-      .from("supplier_products")
-      .select("*, supplier:profiles(full_name, country)")
-      .eq("status", "APPROVED")
-      .order("created_at", { ascending: false })
-      .then(({ data }) => {
-        setSupplierProducts(data || []);
-        setLoading(false);
-      });
+    const fetchProducts = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id ?? null;
+
+      const { data: approvedData } = await supabase
+        .from("supplier_products")
+        .select("*, supplier:profiles(full_name, country)")
+        .eq("status", "APPROVED")
+        .order("created_at", { ascending: false });
+
+      let allProducts: any[] = approvedData || [];
+
+      if (userId) {
+        const { data: ownData, error: ownError } = await supabase
+          .from("supplier_products")
+          .select("*, supplier:profiles(full_name, country)")
+          .eq("supplier_id", userId)
+          .neq("status", "APPROVED")
+          .order("created_at", { ascending: false });
+
+        if (ownError) console.error("Own products fetch error:", ownError);
+        if (ownData && ownData.length > 0) {
+          allProducts = [...allProducts, ...ownData];
+        }
+      }
+
+      setSupplierProducts(allProducts);
+      setLoading(false);
+    };
+    fetchProducts();
   }, []);
 
   // Detect Region: logged-in profile first, then fallback to Addis Ababa
@@ -473,42 +493,16 @@ function ProductsPageContent() {
                   className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2 pl-9 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#3da85b]/20 focus:border-[#3da85b] transition-all"
                 />
               </div>
-              <div className="relative">
-                <button
-                  onClick={() => setIsSortOpen(!isSortOpen)}
-                  className="w-full sm:w-[170px] appearance-none bg-gray-50 border border-gray-100 rounded-xl py-2 pl-4 pr-10 text-sm font-bold text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer outline-none focus:ring-2 focus:ring-[#3da85b]/20 text-left relative"
-                >
-                  {sortBy === 'newest' ? 'Sort: Newest' : sortBy === 'price-low' ? 'Price: Low to High' : 'Price: High to Low'}
-                  <ChevronDown size={14} className={`absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none transition-transform duration-200 ${isSortOpen ? 'rotate-180' : ''}`} />
-                </button>
-
-                {isSortOpen && (
-                  <>
-                    {/* Invisible backdrop to dismiss dropdown */}
-                    <div className="fixed inset-0 z-40" onClick={() => setIsSortOpen(false)}></div>
-                    <div className="absolute right-0 sm:left-0 mt-2 w-[170px] bg-white border border-gray-100 rounded-[14px] shadow-[0_10px_40px_rgb(0,0,0,0.06)] z-50 overflow-hidden text-sm font-bold py-1.5 transform origin-top-right transition-all animate-in fade-in slide-in-from-top-2">
-                      <button
-                        onClick={() => { setSortBy('newest'); setIsSortOpen(false); }}
-                        className={`w-full text-left px-4 py-2.5 transition-colors ${sortBy === 'newest' ? 'text-[#3da85b] bg-[#3da85b]/[0.04]' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}`}
-                      >
-                        Sort: Newest
-                      </button>
-                      <button
-                        onClick={() => { setSortBy('price-low'); setIsSortOpen(false); }}
-                        className={`w-full text-left px-4 py-2.5 transition-colors ${sortBy === 'price-low' ? 'text-[#3da85b] bg-[#3da85b]/[0.04]' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}`}
-                      >
-                        Price: Low to High
-                      </button>
-                      <button
-                        onClick={() => { setSortBy('price-high'); setIsSortOpen(false); }}
-                        className={`w-full text-left px-4 py-2.5 transition-colors ${sortBy === 'price-high' ? 'text-[#3da85b] bg-[#3da85b]/[0.04]' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}`}
-                      >
-                        Price: High to Low
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
+              <CustomSelect
+                value={sortBy === "newest" ? "Sort: Newest" : sortBy === "price-low" ? "Price: Low to High" : "Price: High to Low"}
+                options={["Sort: Newest", "Price: Low to High", "Price: High to Low"]}
+                onChange={(val) => {
+                  if (val === "Sort: Newest") setSortBy("newest");
+                  else if (val === "Price: Low to High") setSortBy("price-low");
+                  else setSortBy("price-high");
+                }}
+                className="w-[180px]"
+              />
             </div>
           </div>
 
