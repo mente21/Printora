@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import CustomSelect from "@/components/ui/CustomSelect";
+import { ETHIOPIAN_REGIONS } from "@/lib/countries";
 
 export default function ProductsPage() {
   return (
@@ -199,15 +200,10 @@ function ProductsPageContent() {
       : filteredProducts);
   const showFallbackMsg = activeCountry && !selectedCountry && localProducts.length === 0 && filteredProducts.length > 0;
 
-  // Unique countries from products for dropdown
-  const availableCountries = useMemo(() => {
-    const set = new Set<string>();
-    supplierProducts.forEach(p => {
-      const c = p.supplier_country || p.supplier?.country;
-      if (c) set.add(c);
-    });
-    return Array.from(set).sort();
-  }, [supplierProducts]);
+  // Use the full set of Ethiopian regions for the filter list
+  const availableCountries = useMemo(() => 
+    ETHIOPIAN_REGIONS.map(r => r.name).sort()
+  , []);
 
   if (loading) {
     return (
