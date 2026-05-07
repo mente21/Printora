@@ -406,9 +406,9 @@ function ProductsPageContent() {
           {/* Product Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 sm:gap-x-8 gap-y-8 sm:gap-y-12">
             {filteredProducts.map((product) => (
-              <div key={product.id} className="flex flex-col group hover:-translate-y-2 transition-transform duration-500">
-                <div className="relative aspect-[4/5] rounded-[2rem] bg-white border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] mb-5 p-[2px]">
-                  <Link href={`/products/${product.id}`} className="block w-full h-full relative rounded-[calc(2rem-4px)] overflow-hidden bg-[#f8f9fa] group/img cursor-pointer">
+              <div key={product.id} className="flex flex-col group hover:-translate-y-1 transition-transform duration-500">
+                <div className="relative aspect-square rounded-2xl sm:rounded-[2rem] bg-white border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] mb-4 p-[2px] overflow-hidden">
+                  <Link href={`/products/${product.id}`} className="block w-full h-full relative rounded-[calc(1.5rem-4px)] sm:rounded-[calc(2rem-4px)] overflow-hidden bg-[#f8f9fa] group/img cursor-pointer">
                     {product.image_url ? (
                       <>
                         <img 
