@@ -136,7 +136,9 @@ function SupplierDashboardContent() {
       }
 
       // 🔒 SUPPLIER / ADMIN ONLY
-      if (!prof || !["SUPPLIER", "ADMIN"].includes(prof.role)) {
+      const userRole = prof.role?.toUpperCase();
+      if (!prof || !["SUPPLIER", "ADMIN"].includes(userRole)) {
+        console.warn("Access denied. Role:", prof.role);
         window.location.href = "/";
         return;
       }
