@@ -18,7 +18,8 @@ import {
   SlidersHorizontal,
   ChevronDown,
   Star,
-  Search
+  Search,
+  Package
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import CustomSelect from "@/components/ui/CustomSelect";
@@ -48,6 +49,7 @@ function ProductsPageContent() {
   const [userCountry, setUserCountry] = useState<string>("");
   const [selectedCountry, setSelectedCountry] = useState<string>("");
   const [isCountryOpen, setIsCountryOpen] = useState(false);
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const searchParams = useSearchParams();
 
   const carouselItems = useMemo(() => [
@@ -120,7 +122,7 @@ function ProductsPageContent() {
           .neq("status", "APPROVED")
           .order("created_at", { ascending: false });
 
-        if (ownError) console.error("Own products fetch error:", ownError);
+        if (ownError) console.warn("Own products fetch warning:", ownError);
         if (ownData && ownData.length > 0) {
           allProducts = [...allProducts, ...ownData];
         }
@@ -323,14 +325,70 @@ function ProductsPageContent() {
       {/* Main Layout with Sidebar */}
       <main className="max-w-[1600px] mx-auto px-6 md:px-12 py-12 flex flex-col lg:flex-row gap-10">
 
-        {/* Sidebar */}
-        <aside className="w-full lg:w-[280px] flex-shrink-0 space-y-8">
+        {/* Mobile Filter Overlay */}
+        {isMobileFiltersOpen && (
+          <div 
+            className="fixed inset-0 bg-black/60 z-[60] lg:hidden backdrop-blur-sm transition-opacity"
+            onClick={() => setIsMobileFiltersOpen(false)}
+          />
+        )}
 
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
-            <div className="flex items-center gap-2 mb-6 text-[#1c211f]">
+        {/* Sidebar */}
+        <aside className={`
+          fixed inset-y-0 left-0 z-[70] w-[300px] sm:w-[320px] bg-white overflow-y-auto transition-transform duration-300 ease-out 
+          lg:relative lg:translate-x-0 lg:z-auto lg:w-[280px] lg:flex-shrink-0 lg:bg-transparent lg:overflow-visible
+          ${isMobileFiltersOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full lg:shadow-none"}
+          flex flex-col h-full lg:h-auto space-y-0 lg:space-y-8
+        `}>
+          {/* Mobile Header */}
+          <div className="flex lg:hidden items-center justify-between p-6 border-b border-gray-100 bg-white sticky top-0 z-10">
+            <div className="flex items-center gap-2 text-[#1c211f]">
+              <Package size={20} className="text-[#3da85b]" />
+              <h2 className="text-lg font-black tracking-tight">Products & Filters</h2>
+            </div>
+            <button 
+              onClick={() => setIsMobileFiltersOpen(false)} 
+              className="p-2 -mr-2 text-gray-400 hover:text-black hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <ChevronLeft size={20} />
+            </button>
+          </div>
+
+          <div className="p-6 lg:p-6 bg-white lg:rounded-3xl lg:shadow-sm lg:border lg:border-gray-100 flex-1 overflow-y-auto lg:overflow-visible">
+            <div className="hidden lg:flex items-center gap-2 mb-6 text-[#1c211f]">
               <Filter size={20} className="text-[#3da85b]" />
               <h2 className="text-lg font-black tracking-tight">Filters</h2>
             </div>
+
+            {/* Quick Actions (Mobile Only) */}
+            <div className="space-y-4 mb-6 lg:hidden">
+              <Link
+                href="/orders"
+                className="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-[#1c211f] text-white rounded-xl text-sm font-bold hover:bg-black transition-colors shadow-sm"
+              >
+                <ShoppingBag size={16} />
+                My Orders
+              </Link>
+            </div>
+
+            <hr className="my-6 border-gray-100 lg:hidden" />
+
+            {/* Sort Options (Mobile Only) */}
+            <div className="space-y-4 mb-6 lg:hidden">
+              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Sort By</h3>
+              <CustomSelect
+                value={sortBy === "newest" ? "Sort: Newest" : sortBy === "price-low" ? "Price: Low to High" : "Price: High to Low"}
+                options={["Sort: Newest", "Price: Low to High", "Price: High to Low"]}
+                onChange={(val) => {
+                  if (val === "Sort: Newest") setSortBy("newest");
+                  else if (val === "Price: Low to High") setSortBy("price-low");
+                  else setSortBy("price-high");
+                }}
+                className="w-full"
+              />
+            </div>
+
+            <hr className="my-6 border-gray-100 lg:hidden" />
 
             {/* Categories in Sidebar */}
             <div className="space-y-4">
@@ -463,15 +521,17 @@ function ProductsPageContent() {
 
           </div>
 
-          <div className="bg-[#3f566a] rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
-            <div className="relative z-10 space-y-3">
-              <h3 className="font-black text-xl leading-tight">Supplier<br />Discounts</h3>
-              <p className="text-white/70 text-sm">Get up to 20% off on bulk orders.</p>
-              <button className="bg-white text-[#3f566a] px-4 py-2 rounded-xl text-xs font-bold mt-2 shadow-lg w-full hover:bg-gray-50 transition-colors">
-                Learn More
-              </button>
+          <div className="p-6 lg:p-0 mt-auto">
+            <div className="bg-[#3f566a] rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
+              <div className="relative z-10 space-y-3">
+                <h3 className="font-black text-xl leading-tight">Supplier<br />Discounts</h3>
+                <p className="text-white/70 text-sm">Get up to 20% off on bulk orders.</p>
+                <button className="bg-white text-[#3f566a] px-4 py-2 rounded-xl text-xs font-bold mt-2 shadow-lg w-full hover:bg-gray-50 transition-colors">
+                  Learn More
+                </button>
+              </div>
+              <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
             </div>
-            <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
           </div>
         </aside>
 
@@ -479,40 +539,72 @@ function ProductsPageContent() {
         <div className="flex-1 min-w-0 space-y-10">
 
           {/* Top Bar above categories */}
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-4 rounded-3xl border border-gray-100 shadow-sm">
-            <div className="flex items-center gap-2 text-gray-500 font-medium text-sm px-2">
-              Showing <span className="text-[#1c211f] font-black">{displayedProducts.length}</span> results
-              {showingLocal && !selectedCountry && <span className="text-[10px] font-black text-[#3da85b] bg-[#3da85b]/10 px-2 py-0.5 rounded-full ml-1 uppercase tracking-wider">Near You</span>}
-            </div>
-            <div className="flex items-center gap-3 w-full sm:w-auto">
-              <Link
-                href="/orders"
-                className="flex items-center justify-center gap-2 px-4 py-2 bg-[#1c211f] text-white rounded-xl text-sm font-bold hover:bg-black transition-colors shadow-[0_4px_12px_rgba(28,33,31,0.1)] shrink-0"
-                title="View My Orders"
-              >
-                <ShoppingBag size={16} />
-                <span className="hidden sm:inline">My Orders</span>
-              </Link>
-              <div className="relative flex-1 sm:w-64">
-                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2 pl-9 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#3da85b]/20 focus:border-[#3da85b] transition-all"
+          <div className="flex flex-col gap-4 bg-white p-4 rounded-3xl border border-gray-100 shadow-sm">
+            
+            {/* Desktop View */}
+            <div className="hidden lg:flex items-center justify-between w-full px-2">
+              <div className="flex items-center gap-2 text-gray-500 font-medium text-sm">
+                Showing <span className="text-[#1c211f] font-black">{displayedProducts.length}</span> results
+                {showingLocal && !selectedCountry && <span className="text-[10px] font-black text-[#3da85b] bg-[#3da85b]/10 px-2 py-0.5 rounded-full ml-1 uppercase tracking-wider">Near You</span>}
+              </div>
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/orders"
+                  className="flex items-center justify-center gap-2 px-4 py-2 bg-[#1c211f] text-white rounded-xl text-sm font-bold hover:bg-black transition-colors shadow-[0_4px_12px_rgba(28,33,31,0.1)] shrink-0"
+                  title="View My Orders"
+                >
+                  <ShoppingBag size={16} />
+                  <span>My Orders</span>
+                </Link>
+                <div className="relative w-64">
+                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search products..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2 pl-9 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#3da85b]/20 focus:border-[#3da85b] transition-all"
+                  />
+                </div>
+                <CustomSelect
+                  value={sortBy === "newest" ? "Sort: Newest" : sortBy === "price-low" ? "Price: Low to High" : "Price: High to Low"}
+                  options={["Sort: Newest", "Price: Low to High", "Price: High to Low"]}
+                  onChange={(val) => {
+                    if (val === "Sort: Newest") setSortBy("newest");
+                    else if (val === "Price: Low to High") setSortBy("price-low");
+                    else setSortBy("price-high");
+                  }}
+                  className="w-[180px]"
                 />
               </div>
-              <CustomSelect
-                value={sortBy === "newest" ? "Sort: Newest" : sortBy === "price-low" ? "Price: Low to High" : "Price: High to Low"}
-                options={["Sort: Newest", "Price: Low to High", "Price: High to Low"]}
-                onChange={(val) => {
-                  if (val === "Sort: Newest") setSortBy("newest");
-                  else if (val === "Price: Low to High") setSortBy("price-low");
-                  else setSortBy("price-high");
-                }}
-                className="w-[180px]"
-              />
+            </div>
+
+            {/* Mobile View */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full px-2 gap-4 lg:hidden">
+              <div className="flex items-center gap-3 w-full sm:w-auto">
+                <button 
+                  onClick={() => setIsMobileFiltersOpen(true)}
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#1c211f] text-white rounded-xl text-xs font-black tracking-widest uppercase hover:bg-black transition-all shadow-[0_4px_12px_rgba(28,33,31,0.15)] active:scale-95 shrink-0"
+                >
+                  <Package size={16} />
+                  Products
+                </button>
+                <div className="relative flex-1 sm:w-64">
+                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search products..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2 pl-9 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#3da85b]/20 focus:border-[#3da85b] transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 text-gray-500 font-medium text-sm">
+                Showing <span className="text-[#1c211f] font-black">{displayedProducts.length}</span> results
+                {showingLocal && !selectedCountry && <span className="text-[10px] font-black text-[#3da85b] bg-[#3da85b]/10 px-2 py-0.5 rounded-full ml-1 uppercase tracking-wider">Near You</span>}
+              </div>
             </div>
           </div>
 
@@ -528,8 +620,34 @@ function ProductsPageContent() {
             </div>
           )}
 
+          {/* Empty State */}
+          {displayedProducts.length === 0 && !loading && (
+            <div className="flex flex-col items-center justify-center py-20 px-4 text-center bg-white rounded-3xl border border-gray-100 shadow-sm mt-4">
+              <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                <Search size={32} className="text-gray-300" />
+              </div>
+              <h3 className="text-xl font-black text-[#1c211f] mb-2">No products found</h3>
+              <p className="text-gray-500 font-medium text-sm max-w-md">
+                We couldn't find any products matching your current filters. Try adjusting your search or clearing some filters to see more results.
+              </p>
+              <button 
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedCategories([]);
+                  setSelectedCountry("");
+                  setMinPrice(0);
+                  setMaxPrice(5000);
+                }}
+                className="mt-6 px-6 py-2.5 bg-[#3da85b] text-white rounded-xl font-bold text-sm hover:bg-[#32904d] transition-all shadow-md hover:shadow-lg active:scale-95"
+              >
+                Clear All Filters
+              </button>
+            </div>
+          )}
+
           {/* Product Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 sm:gap-x-8 gap-y-8 sm:gap-y-12">
+          {displayedProducts.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 sm:gap-x-8 gap-y-8 sm:gap-y-12">
             {displayedProducts.map((product) => (
               <div key={product.id} className="flex flex-col group hover:-translate-y-1 transition-transform duration-500">
                 <div className="relative aspect-square rounded-2xl sm:rounded-[2rem] bg-white border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] mb-4 p-[2px] overflow-hidden">
@@ -611,10 +729,11 @@ function ProductsPageContent() {
                   >
                     View Details
                   </Link>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
         </div>
       </main>
