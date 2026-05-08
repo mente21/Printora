@@ -1388,7 +1388,7 @@ export default function Home() {
                 <img
                   src="/logo-white.png"
                   alt="Stenvo"
-                  className="h-[44px] md:h-[52px] w-auto mb-2 object-contain"
+                  className="h-[64px] md:h-[96px] w-auto mb-2 object-contain"
                 />
               </div>
 
