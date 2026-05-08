@@ -11,6 +11,7 @@ import TshirtMockup from './TshirtMockup';
 import HoodieMockup from './HoodieMockup';
 import SweaterMockup from './SweaterMockup';
 import HatMockup from './HatMockup';
+import MugMockup from './MugMockup';
 import {
     Type,
     UploadCloud,
@@ -1324,6 +1325,7 @@ export default function EditorUI() {
             case 'premium-hoodie': return <HoodieMockup {...props} />;
             case 'crewneck-sweater': return <SweaterMockup {...props} />;
             case 'classic-cap': return <HatMockup {...props} />;
+            case 'ceramic-mug': return <MugMockup {...props} />;
             default: return <TshirtMockup {...props} />;
         }
     };
@@ -1668,6 +1670,9 @@ export default function EditorUI() {
                             })}
                         </div>
                     </div>
+                    {selectedProduct.id === 'ceramic-mug' && (
+                        <div id="mug-3d-preview-portal" />
+                    )}
                 </div>
 
             </div>

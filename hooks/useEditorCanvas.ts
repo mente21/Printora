@@ -383,6 +383,7 @@ export function useEditorCanvas({ printArea, canvasSize, onSelectionChange, init
             fill: '#000000',
             fontWeight: 'bold',
             textAlign: 'center',
+            lockUniScaling: false,
             ...options
         });
 
@@ -428,6 +429,7 @@ export function useEditorCanvas({ printArea, canvasSize, onSelectionChange, init
             originX: 'center',
             originY: 'center',
             fill: '#000000',
+            lockUniScaling: false,
         };
 
         let shape: fabric.Object | null = null;
@@ -498,6 +500,7 @@ export function useEditorCanvas({ printArea, canvasSize, onSelectionChange, init
                 top: centerY,
                 originX: 'center',
                 originY: 'center',
+                lockUniScaling: false,
             });
 
             canvas.add(img);
