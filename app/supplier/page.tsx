@@ -106,7 +106,7 @@ function SupplierDashboardContent() {
   // ── Custom modal state (replaces all native confirm/alert) ──────────────
   type ModalAction = (() => Promise<void>) | (() => void);
   const [confirmModal, setConfirmModal] = useState<{ open: boolean; title: string; message: string; confirmLabel?: string; variant?: any; onConfirm: ModalAction }>(
-    { open: false, title: "", message: "", onConfirm: () => {} }
+    { open: false, title: "", message: "", onConfirm: () => { } }
   );
   const [alertModal, setAlertModal] = useState<{ open: boolean; title?: string; message: string; variant?: "error" | "info" | "success" }>(
     { open: false, message: "" }
@@ -131,7 +131,7 @@ function SupplierDashboardContent() {
       setLoading(true);
       setSupplierImgError(false);
       const { data: { user }, error: authError } = await supabase.auth.getUser();
-      
+
       if (authError || !user) {
         console.error("Auth error:", authError);
         window.location.href = "/login";
@@ -160,7 +160,7 @@ function SupplierDashboardContent() {
       }
 
       setProfile({ ...prof, avatar_url: user.user_metadata?.avatar_url });
-      
+
       // Initialize profile form
       setProfileForm({
         full_name: prof.full_name || "",
@@ -170,12 +170,12 @@ function SupplierDashboardContent() {
         company_name: prof.company_name || "",
         country: prof.country || "",
       });
-      
+
       // Pre-fill supplier_country from profile
       if (prof.country) {
         setForm(f => ({ ...f, supplier_country: prof.country }));
       }
-      
+
       await Promise.all([
         fetchProducts(user.id),
         fetchOrders(user.id)
@@ -194,7 +194,7 @@ function SupplierDashboardContent() {
         .select("*")
         .eq("supplier_id", uid)
         .order("created_at", { ascending: false });
-      
+
       if (error) {
         console.error("Fetch products error:", error);
         setProducts([]);
@@ -215,10 +215,10 @@ function SupplierDashboardContent() {
         .eq("supplier_id", uid)
         .order("created_at", { ascending: false });
 
-      if (error) { 
-        console.error("Fetch orders error:", error); 
-        setOrders([]); 
-        return; 
+      if (error) {
+        console.error("Fetch orders error:", error);
+        setOrders([]);
+        return;
       }
 
       setOrders(data || []);
@@ -284,7 +284,7 @@ function SupplierDashboardContent() {
     } else {
       setForm(f => ({ ...f, [field]: publicUrl }));
     }
-    
+
     return publicUrl;
   };
 
@@ -332,32 +332,31 @@ function SupplierDashboardContent() {
       }
     };
 
-    const images = multiple 
+    const images = multiple
       ? (value ? value.split(',').map((s: string) => s.trim()).filter(Boolean) : [])
       : (value ? [value] : []);
 
     return (
       <div className="flex flex-col gap-2">
         <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest block">{label}</label>
-        
-        <div 
+
+        <div
           onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
           onDragLeave={() => setDragging(false)}
           onDrop={onDrop}
-          className={`relative border-2 border-dashed rounded-2xl p-6 transition-all flex flex-col items-center justify-center gap-2 group cursor-pointer ${
-            dragging ? 'border-[#A1FF4D] bg-[#A1FF4D]/5' : 'border-gray-200 bg-gray-50 hover:border-gray-300'
-          }`}
+          className={`relative border-2 border-dashed rounded-2xl p-6 transition-all flex flex-col items-center justify-center gap-2 group cursor-pointer ${dragging ? 'border-[#A1FF4D] bg-[#A1FF4D]/5' : 'border-gray-200 bg-gray-50 hover:border-gray-300'
+            }`}
           onClick={() => document.getElementById(`file-input-${field}`)?.click()}
         >
-          <input 
+          <input
             id={`file-input-${field}`}
-            type="file" 
-            multiple={multiple} 
-            accept="image/*" 
-            className="hidden" 
+            type="file"
+            multiple={multiple}
+            accept="image/*"
+            className="hidden"
             onChange={onFileSelect}
           />
-          
+
           {localLoading ? (
             <Loader2 className="animate-spin text-gray-400" size={24} />
           ) : (
@@ -374,7 +373,7 @@ function SupplierDashboardContent() {
             {images.map((img: string, i: number) => (
               <div key={i} className="relative w-16 h-16 rounded-xl overflow-hidden border border-gray-200 bg-white group">
                 <img src={img} className="w-full h-full object-cover" alt="Preview" />
-                <button 
+                <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); removeImage(field, img); }}
                   className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white"
@@ -402,11 +401,11 @@ function SupplierDashboardContent() {
     let bulk_threshold = "";
     let bulk_discount = "";
     if (p.bulk_pricing) {
-        try {
-            const bp = JSON.parse(p.bulk_pricing);
-            bulk_threshold = bp.threshold?.toString() || "";
-            bulk_discount = bp.value?.toString() || "";
-        } catch(e) {}
+      try {
+        const bp = JSON.parse(p.bulk_pricing);
+        bulk_threshold = bp.threshold?.toString() || "";
+        bulk_discount = bp.value?.toString() || "";
+      } catch (e) { }
     }
 
     setForm({
@@ -457,10 +456,10 @@ function SupplierDashboardContent() {
 
     let bulk_pricing = "";
     if (form.bulk_threshold && form.bulk_discount) {
-        bulk_pricing = JSON.stringify({
-            threshold: parseInt(form.bulk_threshold) || 0,
-            value: parseFloat(form.bulk_discount) || 0
-        });
+      bulk_pricing = JSON.stringify({
+        threshold: parseInt(form.bulk_threshold) || 0,
+        value: parseFloat(form.bulk_discount) || 0
+      });
     }
 
     const payload = {
@@ -541,9 +540,9 @@ function SupplierDashboardContent() {
         return { kind: 'text', index: i, text: obj.text, font: obj.fontFamily || 'sans-serif', size: Math.round(obj.fontSize || 16), color: obj.fill || '#000', bold: obj.fontWeight === 'bold', italic: obj.fontStyle === 'italic' };
       }
       if (obj.type === 'image') {
-        return { kind: 'image', index: i, src: obj.src, w: Math.round(obj.width * (obj.scaleX||1)), h: Math.round(obj.height * (obj.scaleY||1)) };
+        return { kind: 'image', index: i, src: obj.src, w: Math.round(obj.width * (obj.scaleX || 1)), h: Math.round(obj.height * (obj.scaleY || 1)) };
       }
-      return { kind: 'shape', index: i, type: obj.type, color: obj.fill || obj.stroke || '#000', w: Math.round((obj.width||0) * (obj.scaleX||1)), h: Math.round((obj.height||0) * (obj.scaleY||1)) };
+      return { kind: 'shape', index: i, type: obj.type, color: obj.fill || obj.stroke || '#000', w: Math.round((obj.width || 0) * (obj.scaleX || 1)), h: Math.round((obj.height || 0) * (obj.scaleY || 1)) };
     });
   };
 
@@ -587,14 +586,14 @@ function SupplierDashboardContent() {
     const ctx = offscreen.getContext('2d')!;
 
     if (layer.kind === 'text') {
-      const weight  = layer.bold   ? 'bold '   : '';
-      const style   = layer.italic ? 'italic ' : '';
-      const fs      = (layer.size || 16) * SCALE;
+      const weight = layer.bold ? 'bold ' : '';
+      const style = layer.italic ? 'italic ' : '';
+      const fs = (layer.size || 16) * SCALE;
       ctx.font = `${style}${weight}${fs}px ${layer.font}`;
       const metrics = ctx.measureText(layer.text);
       const tw = Math.ceil(metrics.width) + 20 * SCALE;
       const th = Math.ceil(fs * 1.6) + 10 * SCALE;
-      offscreen.width  = tw;
+      offscreen.width = tw;
       offscreen.height = th;
       ctx.clearRect(0, 0, tw, th);
       ctx.font = `${style}${weight}${fs}px ${layer.font}`;
@@ -604,7 +603,7 @@ function SupplierDashboardContent() {
       // Shape: just export a colour swatch at correct proportions
       const W = Math.max(layer.w * SCALE, 10);
       const H = Math.max(layer.h * SCALE, 10);
-      offscreen.width  = W;
+      offscreen.width = W;
       offscreen.height = H;
       ctx.fillStyle = layer.color || '#000000';
       ctx.fillRect(0, 0, W, H);
@@ -648,7 +647,7 @@ function SupplierDashboardContent() {
         .eq("id", profile.id);
 
       if (error) throw error;
-      
+
       setProfileSuccess(true);
       setProfile({ ...profile, ...profileForm });
       setTimeout(() => setProfileSuccess(false), 3000);
@@ -688,7 +687,7 @@ function SupplierDashboardContent() {
 
   return (
     <div className="min-h-screen bg-[#fafafa] flex flex-col md:flex-row font-sans">
-      
+
       {/* Mobile Header (Solid Background, Logo Only) */}
       <header className="md:hidden flex items-center px-5 py-3 bg-white border-b border-gray-100 sticky top-0 z-30 shrink-0 shadow-sm">
         <img src="/logo.png" alt="Logo" className="h-14 w-auto object-contain" />
@@ -696,7 +695,7 @@ function SupplierDashboardContent() {
 
 
       {mobileMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[40] md:hidden"
           onClick={() => setMobileMenuOpen(false)}
         />
@@ -716,11 +715,11 @@ function SupplierDashboardContent() {
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-[#A1FF4D] flex items-center justify-center text-[#1B2412] font-black text-sm overflow-hidden">
                 {(profile.avatar_url && !supplierImgError) ? (
-                  <img 
-                    src={profile.avatar_url} 
-                    alt="Supplier" 
+                  <img
+                    src={profile.avatar_url}
+                    alt="Supplier"
                     onError={() => setSupplierImgError(true)}
-                    className="w-full h-full object-cover" 
+                    className="w-full h-full object-cover"
                   />
                 ) : (
                   profile.full_name?.[0]?.toUpperCase() || 'S'
@@ -735,16 +734,16 @@ function SupplierDashboardContent() {
         )}
 
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto scrollbar-hide">
-          <button 
+          <button
             onClick={() => { setActiveTab("my-products"); setMobileMenuOpen(false); }}
             className={`flex items-center gap-3 px-4 py-3 w-full text-left rounded-xl text-sm font-bold transition-all ${activeTab === "my-products" ? "bg-[#A1FF4D]/10 text-[#2B3220]" : "text-gray-400 hover:bg-gray-50"}`}
           >
             <BarChart3 size={18} /> My Products
           </button>
-          
+
           <div className="pt-2">
             <p className="px-4 text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Products</p>
-            <button 
+            <button
               onClick={() => { setActiveTab("add-product"); setMobileMenuOpen(false); }}
               className={`flex items-center gap-3 px-4 py-3 w-full text-left rounded-xl text-sm font-bold transition-all ${activeTab === "add-product" ? "bg-[#A1FF4D]/10 text-[#2B3220]" : "text-gray-400 hover:bg-gray-50"}`}
             >
@@ -754,7 +753,7 @@ function SupplierDashboardContent() {
 
           <div className="pt-2">
             <p className="px-4 text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Orders</p>
-            <button 
+            <button
               onClick={() => { setActiveTab("orders"); setMobileMenuOpen(false); }}
               className={`flex items-center justify-between px-4 py-3 w-full text-left rounded-xl text-sm font-bold transition-all ${activeTab === "orders" ? "bg-[#1B2412] text-[#A1FF4D]" : "text-gray-400 hover:bg-gray-50"}`}
             >
@@ -765,7 +764,7 @@ function SupplierDashboardContent() {
                 </span>
               )}
             </button>
-            <button 
+            <button
               onClick={() => { setActiveTab("resubmissions"); setMobileMenuOpen(false); }}
               className={`flex items-center justify-between px-4 py-3 w-full text-left rounded-xl text-sm font-bold transition-all ${activeTab === "resubmissions" ? "bg-red-500 text-white shadow-lg shadow-red-500/20" : "text-red-400 hover:bg-red-50"}`}
             >
@@ -778,7 +777,7 @@ function SupplierDashboardContent() {
                 </span>
               )}
             </button>
-            <button 
+            <button
               onClick={() => { setActiveTab("pending-approvals"); setMobileMenuOpen(false); }}
               className={`flex items-center justify-between px-4 py-3 w-full text-left rounded-xl text-sm font-bold transition-all ${activeTab === "pending-approvals" ? "bg-[#A1FF4D]/10 text-[#2B3220]" : "text-gray-400 hover:bg-gray-50"}`}
             >
@@ -789,7 +788,7 @@ function SupplierDashboardContent() {
                 </span>
               )}
             </button>
-            <button 
+            <button
               onClick={() => { setActiveTab("in-production"); setMobileMenuOpen(false); }}
               className={`flex items-center justify-between px-4 py-3 w-full text-left rounded-xl text-sm font-bold transition-all ${activeTab === "in-production" ? "bg-blue-500/10 text-blue-700" : "text-gray-400 hover:bg-gray-50"}`}
             >
@@ -800,7 +799,7 @@ function SupplierDashboardContent() {
                 </span>
               )}
             </button>
-            <button 
+            <button
               onClick={() => { setActiveTab("completed"); setMobileMenuOpen(false); }}
               className={`flex items-center justify-between px-4 py-3 w-full text-left rounded-xl text-sm font-bold transition-all ${activeTab === "completed" ? "bg-[#A1FF4D]/10 text-[#2B3220]" : "text-gray-400 hover:bg-gray-50"}`}
             >
@@ -815,7 +814,7 @@ function SupplierDashboardContent() {
 
           <div className="pt-2">
             <p className="px-4 text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Account</p>
-            <button 
+            <button
               onClick={() => { setActiveTab("profile"); setMobileMenuOpen(false); }}
               className={`flex items-center gap-3 px-4 py-3 w-full text-left rounded-xl text-sm font-bold transition-all ${activeTab === "profile" ? "bg-[#A1FF4D]/10 text-[#2B3220]" : "text-gray-400 hover:bg-gray-50"}`}
             >
@@ -844,9 +843,9 @@ function SupplierDashboardContent() {
               }}
             >
               <svg width="20" height="15" viewBox="0 0 20 15" fill="none">
-                <rect y="0" width="20" height="2.5" rx="1.25" fill="#1B2412"/>
-                <rect y="6.25" width="14" height="2.5" rx="1.25" fill="#1B2412"/>
-                <rect y="12.5" width="20" height="2.5" rx="1.25" fill="#1B2412"/>
+                <rect y="0" width="20" height="2.5" rx="1.25" fill="#1B2412" />
+                <rect y="6.25" width="14" height="2.5" rx="1.25" fill="#1B2412" />
+                <rect y="12.5" width="20" height="2.5" rx="1.25" fill="#1B2412" />
               </svg>
             </button>
             <div>
@@ -862,14 +861,14 @@ function SupplierDashboardContent() {
           <>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
               {stats.map((stat, i) => (
-                <Card key={i} className="border-none shadow-sm hover:shadow-md transition-shadow rounded-2xl">
+                <Card key={i} className="border border-gray-100 bg-white shadow-md hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 rounded-2xl cursor-default">
                   <CardContent className="p-5 flex items-center gap-4">
-                    <div className={`${stat.color} p-3 rounded-xl text-white flex-shrink-0`}>
+                    <div className={`${stat.color} p-3 rounded-xl text-white flex-shrink-0 shadow-sm`}>
                       <stat.icon size={20} />
                     </div>
                     <div>
-                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{stat.label}</p>
-                      <p className="text-2xl font-black text-[#2B3220]">{stat.value}</p>
+                      <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{stat.label}</p>
+                      <p className="text-2xl font-black text-[#1B2412]">{stat.value}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -894,7 +893,7 @@ function SupplierDashboardContent() {
             ) : (
               <div className="space-y-4">
                 {products.map((product) => (
-                  <div key={product.id} className="bg-white rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-md transition-all p-4 flex items-center gap-6 group">
+                  <div key={product.id} style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.07)' }} className="bg-white rounded-[2rem] border border-gray-150 hover:border-[#A1FF4D] hover:-translate-y-2 hover:shadow-[0_16px_40px_rgba(161,255,77,0.18)] transition-all duration-300 p-4 flex items-center gap-6 group cursor-pointer">
                     {/* Thumbnail */}
                     <div className="w-32 h-32 bg-gray-50 rounded-[1.5rem] flex-shrink-0 overflow-hidden flex items-center justify-center p-3">
                       <img src={product.image_url} alt={product.name} className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500" />
@@ -904,15 +903,14 @@ function SupplierDashboardContent() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 mb-1">
                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{product.product_type}</p>
-                        <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider ${
-                          product.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-600' : 
-                          product.status === 'REJECTED' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600'
-                        }`}>
+                        <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider ${product.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-600' :
+                            product.status === 'REJECTED' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600'
+                          }`}>
                           {product.status}
                         </span>
                       </div>
                       <h3 className="font-black text-[#1B2412] text-lg truncate mb-1">{product.name}</h3>
-                      <p className="text-xs text-gray-400 font-medium line-clamp-1">{product.description || 'No description provided.'}</p>
+                      <p className="text-xs text-gray-600 font-semibold line-clamp-1">{product.description || 'No description provided.'}</p>
                     </div>
 
                     {/* Colors & Price */}
@@ -937,18 +935,17 @@ function SupplierDashboardContent() {
 
                     {/* Actions */}
                     <div className="flex items-center gap-2 pr-2">
-                      <button 
+                      <button
                         onClick={() => handleEditProduct(product)}
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-sm active:scale-90 ${
-                          product.status === 'APPROVED' 
-                            ? 'bg-amber-50 text-amber-500 hover:bg-amber-100' 
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-sm active:scale-90 ${product.status === 'APPROVED'
+                            ? 'bg-amber-50 text-amber-500 hover:bg-amber-100'
                             : 'bg-gray-50 text-gray-400 hover:bg-[#1B2412] hover:text-[#A1FF4D]'
-                        }`}
+                          }`}
                         title={product.status === 'APPROVED' ? "Locked (Live Product)" : "Edit Product"}
                       >
                         {product.status === 'APPROVED' ? <Lock size={16} /> : <Edit2 size={16} />}
                       </button>
-                      <button 
+                      <button
                         onClick={() => handleDeleteProduct(product.id)}
                         className="w-10 h-10 rounded-xl bg-red-50 text-red-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm active:scale-90"
                       >
@@ -963,13 +960,13 @@ function SupplierDashboardContent() {
         )}
 
         {activeTab === "add-product" && (
-          <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-10 max-w-5xl">
+          <div className="bg-white rounded-[2.5rem] shadow-lg border border-gray-100 p-10 max-w-5xl">
             <div className="flex items-center justify-between mb-10">
               <div>
                 <h2 className="text-2xl font-black text-[#2B3220] uppercase tracking-tight" style={{ fontFamily: 'Impact, sans-serif' }}>
                   {editingProductId ? "Edit Product" : "Add New Product"}
                 </h2>
-                <p className="text-gray-400 text-xs font-bold mt-1">Configure your product catalog listing details.</p>
+                <p className="text-gray-500 text-sm font-bold mt-1">Configure your product catalog listing details.</p>
               </div>
               {editingProductId && (
                 <button onClick={() => { setEditingProductId(null); setForm(INITIAL_FORM); }} className="text-xs font-black text-red-500 uppercase tracking-widest border-b-2 border-red-100 pb-1 hover:border-red-500 transition-all">
@@ -982,19 +979,19 @@ function SupplierDashboardContent() {
             <form onSubmit={handleSubmitProduct} className="space-y-10">
               {/* Basic Details Section */}
               <div className="space-y-6">
-                <p className="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em] border-b pb-2">01. Basic Identity</p>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] border-b-2 border-gray-100 pb-2">01. Basic Identity</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="md:col-span-2">
                     <label className="text-[11px] font-black text-[#1B2412] uppercase block mb-2 tracking-widest">Product Display Name *</label>
-                    <input required type="text" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="e.g. Premium Cotton Heavyweight Tee" className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-[#A1FF4C]/20 focus:border-[#A1FF4C] outline-none text-sm font-black transition-all" />
+                    <input required type="text" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="e.g. Premium Cotton Heavyweight Tee" className="w-full bg-gray-50 border-2 border-gray-200 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-[#A1FF4D] focus:border-[#A1FF4D] hover:border-[#A1FF4D] outline-none text-sm font-bold text-[#1B2412] placeholder:text-gray-400 transition-all duration-300" />
                   </div>
                   <div>
                     <label className="text-[11px] font-black text-[#1B2412] uppercase block mb-2 tracking-widest">Short Summary</label>
-                    <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Brief pitch for the product list page..." className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 text-sm font-bold min-h-[100px] outline-none focus:border-[#A1FF4C]" />
+                    <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Brief pitch for the product list page..." className="w-full bg-gray-50 border-2 border-gray-200 rounded-2xl px-5 py-4 text-sm font-bold text-[#1B2412] placeholder:text-gray-400 min-h-[110px] outline-none focus:ring-2 focus:ring-[#A1FF4D] focus:border-[#A1FF4D] hover:border-[#A1FF4D] transition-all duration-300" />
                   </div>
                   <div>
                     <label className="text-[11px] font-black text-[#1B2412] uppercase block mb-2 tracking-widest">Full Technical Specs</label>
-                    <textarea value={form.long_description} onChange={e => setForm(f => ({ ...f, long_description: e.target.value }))} placeholder="Detailed fabric composition, care instructions, etc..." className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 text-sm font-bold min-h-[100px] outline-none focus:border-[#A1FF4C]" />
+                    <textarea value={form.long_description} onChange={e => setForm(f => ({ ...f, long_description: e.target.value }))} placeholder="Detailed fabric composition, care instructions, etc..." className="w-full bg-gray-50 border-2 border-gray-200 rounded-2xl px-5 py-4 text-sm font-bold text-[#1B2412] placeholder:text-gray-400 min-h-[110px] outline-none focus:ring-2 focus:ring-[#A1FF4D] focus:border-[#A1FF4D] hover:border-[#A1FF4D] transition-all duration-300" />
                   </div>
                 </div>
                 {/* Shipping Origin */}
@@ -1010,11 +1007,11 @@ function SupplierDashboardContent() {
                         setForm(f => ({ ...f, supplier_country: newRegion }));
                         const { data: { user } } = await supabase.auth.getUser();
                         if (user) {
-                           await supabase.from('profiles').update({ 
-                             country: newRegion,
-                             location: newRegion // Sync with region for compatibility
-                           }).eq('id', user.id);
-                           setProfile((p: any) => ({...p, country: newRegion, location: newRegion}));
+                          await supabase.from('profiles').update({
+                            country: newRegion,
+                            location: newRegion // Sync with region for compatibility
+                          }).eq('id', user.id);
+                          setProfile((p: any) => ({ ...p, country: newRegion, location: newRegion }));
                         }
                       }}
                     />
@@ -1024,7 +1021,7 @@ function SupplierDashboardContent() {
 
               {/* Attributes Section */}
               <div className="space-y-6">
-                <p className="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em] border-b pb-2">02. Attributes & Logistics</p>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] border-b-2 border-gray-100 pb-2">02. Attributes & Logistics</p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
                     <label className="text-[11px] font-black text-[#1B2412] uppercase block mb-2 tracking-widest">Category</label>
@@ -1041,16 +1038,16 @@ function SupplierDashboardContent() {
                         const val = e.target.value;
                         const sanitized = val === "" ? "" : Number(val).toString();
                         setForm(f => ({ ...f, price: sanitized }));
-                      }} placeholder="600" className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 text-sm font-black outline-none focus:border-[#A1FF4C]" />
+                      }} placeholder="600" className="w-full bg-gray-50 border-2 border-gray-200 rounded-2xl px-5 py-4 text-sm font-bold text-[#1B2412] placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-[#A1FF4D] focus:border-[#A1FF4D] hover:border-[#A1FF4D] transition-all duration-300" />
                       <span className="absolute right-5 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-400">ETB</span>
                     </div>
                   </div>
                   <div>
                     <label className="text-[11px] font-black text-[#1B2412] uppercase block mb-2 tracking-widest">Lead Time</label>
-                    <input type="text" value={form.turnaround_time} onChange={e => setForm(f => ({ ...f, turnaround_time: e.target.value }))} className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 text-sm font-black outline-none focus:border-[#A1FF4C]" />
+                    <input type="text" value={form.turnaround_time} onChange={e => setForm(f => ({ ...f, turnaround_time: e.target.value }))} className="w-full bg-gray-50 border-2 border-gray-200 rounded-2xl px-5 py-4 text-sm font-bold text-[#1B2412] placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-[#A1FF4D] focus:border-[#A1FF4D] hover:border-[#A1FF4D] transition-all duration-300" />
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                   <div>
                     <label className="text-[11px] font-black text-[#1B2412] uppercase block mb-2 tracking-widest">Bulk Discount Threshold (Min Items)</label>
@@ -1058,7 +1055,7 @@ function SupplierDashboardContent() {
                       const val = e.target.value;
                       const sanitized = val === "" ? "" : Number(val).toString();
                       setForm(f => ({ ...f, bulk_threshold: sanitized }));
-                    }} placeholder="e.g. 10" className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 text-sm font-black outline-none focus:border-[#A1FF4C]" />
+                    }} placeholder="e.g. 10" className="w-full bg-gray-50 border-2 border-gray-200 rounded-2xl px-5 py-4 text-sm font-bold text-[#1B2412] placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-[#A1FF4D] focus:border-[#A1FF4D] hover:border-[#A1FF4D] transition-all duration-300" />
                   </div>
                   <div>
                     <label className="text-[11px] font-black text-[#1B2412] uppercase block mb-2 tracking-widest">Bulk Discount Value (%)</label>
@@ -1067,7 +1064,7 @@ function SupplierDashboardContent() {
                         const val = e.target.value;
                         const sanitized = val === "" ? "" : Number(val).toString();
                         setForm(f => ({ ...f, bulk_discount: sanitized }));
-                      }} placeholder="e.g. 15" className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 text-sm font-black outline-none focus:border-[#A1FF4C]" />
+                      }} placeholder="e.g. 15" className="w-full bg-gray-50 border-2 border-gray-200 rounded-2xl px-5 py-4 text-sm font-bold text-[#1B2412] placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-[#A1FF4D] focus:border-[#A1FF4D] hover:border-[#A1FF4D] transition-all duration-300" />
                       <span className="absolute right-5 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-400">%</span>
                     </div>
                   </div>
@@ -1111,9 +1108,8 @@ function SupplierDashboardContent() {
                           key={s}
                           type="button"
                           onClick={() => handleSizeToggle(s)}
-                          className={`px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${
-                            isSelected ? 'bg-[#1B2412] text-[#A1FF4D] shadow-lg scale-105' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
-                          }`}
+                          className={`px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${isSelected ? 'bg-[#1B2412] text-[#A1FF4D] shadow-lg scale-105' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+                            }`}
                         >
                           {s}
                         </button>
@@ -1173,14 +1169,14 @@ function SupplierDashboardContent() {
                     <p className="text-2xl font-black text-[#1B2412]">{order.variants?.quantity || 1} <span className="text-xs text-gray-400 uppercase">Units</span></p>
                   </div>
                   <div className="pr-4">
-                    <button 
+                    <button
                       onClick={() => {
                         setProcessingId(order.id);
                         setTimeout(() => {
                           setSelectedOrder(order);
                           setProcessingId(null);
                         }, 500);
-                      }} 
+                      }}
                       disabled={processingId === order.id}
                       className="bg-[#1B2412] text-white px-8 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-[#A1FF4D] hover:text-[#1B2412] transition-all shadow-lg active:scale-95 flex items-center gap-2 group/btn disabled:opacity-50"
                     >
@@ -1192,7 +1188,7 @@ function SupplierDashboardContent() {
               ))}
               {orders.filter(o => o.status === "ASSIGNED_TO_SUPPLIER").length === 0 && (
                 <div className="p-12 text-center bg-white rounded-[2rem] border border-dashed border-gray-100">
-                   <p className="text-gray-400 font-bold">No pending assignments</p>
+                  <p className="text-gray-400 font-bold">No pending assignments</p>
                 </div>
               )}
             </div>
@@ -1202,69 +1198,69 @@ function SupplierDashboardContent() {
         {activeTab === "resubmissions" && (
           <div>
             <div className="flex items-center justify-between mb-8">
-                <h2 className="text-xl font-black text-[#2B3220] uppercase" style={{ fontFamily: 'Impact, sans-serif' }}>Needs Resubmission</h2>
-                <div className="bg-red-50 text-red-600 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-red-100 animate-pulse">Action Required</div>
+              <h2 className="text-xl font-black text-[#2B3220] uppercase" style={{ fontFamily: 'Impact, sans-serif' }}>Needs Resubmission</h2>
+              <div className="bg-red-50 text-red-600 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-red-100 animate-pulse">Action Required</div>
             </div>
             <div className="space-y-6">
               {orders.filter(o => o.status === 'SAMPLE_REJECTED').map(order => (
                 <div key={order.id} className="bg-white rounded-[2.5rem] border border-red-100 shadow-xl shadow-red-500/5 p-6 flex flex-col gap-6 relative overflow-hidden group">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/5 rounded-full -mr-16 -mt-16 blur-2xl" />
-                  
+
                   <div className="flex items-center gap-8 relative z-10">
                     <div className="w-32 h-32 bg-gray-50 rounded-[2rem] flex-shrink-0 overflow-hidden flex items-center justify-center p-3 border border-gray-100">
-                        <img src={getPrimaryMockup(order)!} alt="Order" className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700" />
+                      <img src={getPrimaryMockup(order)!} alt="Order" className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700" />
                     </div>
-                    
+
                     <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-3 mb-2">
-                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{order.product_type}</span>
-                            <div className="h-px w-8 bg-gray-200" />
-                            <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">Sample Rejected</span>
-                        </div>
-                        <h3 className="font-black text-[#1B2412] text-2xl uppercase tracking-tight mb-2">Order #{order.id.slice(0, 8)}</h3>
-                        <div className="flex items-center gap-5">
-                            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full border border-gray-100" style={{ backgroundColor: order.variants?.color?.toLowerCase() }} /><span className="text-xs font-bold text-gray-600">{order.variants?.color}</span></div>
-                            <div className="text-xs font-bold text-gray-400">Qty: {order.variants?.quantity || 1} Units</div>
-                        </div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{order.product_type}</span>
+                        <div className="h-px w-8 bg-gray-200" />
+                        <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">Sample Rejected</span>
+                      </div>
+                      <h3 className="font-black text-[#1B2412] text-2xl uppercase tracking-tight mb-2">Order #{order.id.slice(0, 8)}</h3>
+                      <div className="flex items-center gap-5">
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full border border-gray-100" style={{ backgroundColor: order.variants?.color?.toLowerCase() }} /><span className="text-xs font-bold text-gray-600">{order.variants?.color}</span></div>
+                        <div className="text-xs font-bold text-gray-400">Qty: {order.variants?.quantity || 1} Units</div>
+                      </div>
                     </div>
 
                     <div className="pr-2">
-                        <button 
-                          onClick={() => {
-                            setProcessingId(order.id);
-                            setTimeout(() => {
-                              setSelectedOrder(order);
-                              setProcessingId(null);
-                            }, 500);
-                          }} 
-                          disabled={processingId === order.id}
-                          className="bg-[#1B2412] text-white px-10 py-5 rounded-[2rem] font-black text-xs uppercase tracking-widest hover:bg-red-500 transition-all shadow-xl active:scale-95 flex items-center gap-3 group/btn disabled:opacity-50"
-                        >
-                          {processingId === order.id ? <Loader2 size={16} className="animate-spin" /> : <UploadCloud size={16} className="group-hover/btn:-translate-y-1 transition-transform" />}
-                          {processingId === order.id ? 'Loading...' : 'Correct & Resubmit'}
-                        </button>
+                      <button
+                        onClick={() => {
+                          setProcessingId(order.id);
+                          setTimeout(() => {
+                            setSelectedOrder(order);
+                            setProcessingId(null);
+                          }, 500);
+                        }}
+                        disabled={processingId === order.id}
+                        className="bg-[#1B2412] text-white px-10 py-5 rounded-[2rem] font-black text-xs uppercase tracking-widest hover:bg-red-500 transition-all shadow-xl active:scale-95 flex items-center gap-3 group/btn disabled:opacity-50"
+                      >
+                        {processingId === order.id ? <Loader2 size={16} className="animate-spin" /> : <UploadCloud size={16} className="group-hover/btn:-translate-y-1 transition-transform" />}
+                        {processingId === order.id ? 'Loading...' : 'Correct & Resubmit'}
+                      </button>
                     </div>
                   </div>
 
                   {/* Customer Feedback Block */}
                   <div className="bg-red-50 rounded-3xl p-6 border border-red-100 relative">
                     <div className="flex items-center gap-2 mb-3">
-                        <XCircle size={14} className="text-red-500" />
-                        <p className="text-[10px] font-black text-red-600 uppercase tracking-[0.2em]">Customer Feedback</p>
+                      <XCircle size={14} className="text-red-500" />
+                      <p className="text-[10px] font-black text-red-600 uppercase tracking-[0.2em]">Customer Feedback</p>
                     </div>
                     <p className="text-sm font-bold text-red-900 leading-relaxed italic">
-                        &ldquo;{order.variants?.sample_rejection_message || "No specific feedback provided. Please review the design specs carefully."}&rdquo;
+                      &ldquo;{order.variants?.sample_rejection_message || "No specific feedback provided. Please review the design specs carefully."}&rdquo;
                     </p>
                   </div>
                 </div>
               ))}
               {orders.filter(o => o.status === 'SAMPLE_REJECTED').length === 0 && (
                 <div className="p-24 text-center bg-white rounded-[3rem] border-2 border-dashed border-gray-100">
-                    <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-gray-300">
-                        <CheckCircle size={32} />
-                    </div>
-                    <h3 className="text-lg font-black text-[#2B3220] uppercase mb-1">Clean Slate</h3>
-                    <p className="text-sm text-gray-400 font-medium">No samples need resubmission at this time.</p>
+                  <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-gray-300">
+                    <CheckCircle size={32} />
+                  </div>
+                  <h3 className="text-lg font-black text-[#2B3220] uppercase mb-1">Clean Slate</h3>
+                  <p className="text-sm text-gray-400 font-medium">No samples need resubmission at this time.</p>
                 </div>
               )}
 
@@ -1300,14 +1296,14 @@ function SupplierDashboardContent() {
                     </div>
                   </div>
                   <div className="pr-4">
-                    <button 
+                    <button
                       onClick={() => {
                         setProcessingId(order.id);
                         setTimeout(() => {
                           setSelectedOrder(order);
                           setProcessingId(null);
                         }, 500);
-                      }} 
+                      }}
                       disabled={processingId === order.id}
                       className="bg-gray-100 text-gray-600 px-8 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-[#1B2412] hover:text-white transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50"
                     >
@@ -1366,7 +1362,7 @@ function SupplierDashboardContent() {
                       disabled={processingId === order.id}
                       className="bg-[#1B2412] text-white px-6 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-[#A1FF4D] hover:text-[#1B2412] transition-all shadow-lg active:scale-95 flex items-center gap-2 disabled:opacity-50"
                     >
-                      {processingId === order.id ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />} 
+                      {processingId === order.id ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />}
                       {processingId === order.id ? 'Processing...' : 'Mark Completed'}
                     </button>
                   </div>
@@ -1447,7 +1443,7 @@ function SupplierDashboardContent() {
             </div>
           </div>
         )}
-        
+
         {activeTab === "profile" && (
           <div className="max-w-4xl">
             <div className="flex items-center gap-3 mb-8">
@@ -1462,23 +1458,23 @@ function SupplierDashboardContent() {
               <div className="h-32 bg-[#1B2412] relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-[#A1FF4D]/10 rounded-full blur-3xl -mr-32 -mt-32" />
               </div>
-              
+
               {/* Profile Avatar */}
               <div className="absolute top-16 left-10 w-24 h-24 bg-white rounded-3xl flex items-center justify-center border-4 border-white shadow-lg overflow-hidden z-10">
                 <div className="w-full h-full bg-gray-50 flex items-center justify-center text-[#1B2412]">
                   {(profile?.avatar_url && !supplierImgError) ? (
-                    <img 
-                      src={profile.avatar_url} 
-                      alt="Profile" 
+                    <img
+                      src={profile.avatar_url}
+                      alt="Profile"
                       onError={() => setSupplierImgError(true)}
-                      className="w-full h-full object-cover" 
+                      className="w-full h-full object-cover"
                     />
                   ) : (
                     <span className="text-2xl font-black uppercase">{profile?.full_name?.[0] || profile?.email?.[0] || 'S'}</span>
                   )}
                 </div>
               </div>
-              
+
               <div className="px-8 pt-12 pb-8">
                 <form onSubmit={handleSaveProfile} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1489,8 +1485,8 @@ function SupplierDashboardContent() {
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#A1FF4D] transition-colors">
                           <User size={18} />
                         </div>
-                        <input 
-                          type="text" 
+                        <input
+                          type="text"
                           name="full_name"
                           value={profileForm.full_name}
                           onChange={handleProfileInputChange}
@@ -1507,8 +1503,8 @@ function SupplierDashboardContent() {
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                           <Mail size={18} />
                         </div>
-                        <input 
-                          type="email" 
+                        <input
+                          type="email"
                           name="email"
                           value={profileForm.email}
                           disabled
@@ -1524,8 +1520,8 @@ function SupplierDashboardContent() {
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#A1FF4D] transition-colors">
                           <Phone size={18} />
                         </div>
-                        <input 
-                          type="tel" 
+                        <input
+                          type="tel"
                           name="phone_number"
                           value={profileForm.phone_number}
                           onChange={handleProfileInputChange}
@@ -1556,8 +1552,8 @@ function SupplierDashboardContent() {
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#A1FF4D] transition-colors">
                           <Building size={18} />
                         </div>
-                        <input 
-                          type="text" 
+                        <input
+                          type="text"
                           name="company_name"
                           value={profileForm.company_name}
                           onChange={handleProfileInputChange}
@@ -1584,13 +1580,13 @@ function SupplierDashboardContent() {
                         </span>
                       )}
                     </div>
-                    
-                    <button 
+
+                    <button
                       type="submit"
                       disabled={profileSaving}
                       className={`flex items-center gap-3 px-8 py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all
-                        ${profileSaving 
-                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                        ${profileSaving
+                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                           : 'bg-[#A1FF4D] text-[#1B2412] hover:shadow-lg shadow-[#A1FF4D]/20 active:scale-95'}`
                       }
                     >
@@ -1619,8 +1615,8 @@ function SupplierDashboardContent() {
         const views: any[] = selectedOrder.design_views || [];
         const hasViews = views.length > 0;
         const activeViewData = hasViews ? views[Math.min(activeViewIdx, views.length - 1)] : null;
-        const activeDesign  = activeViewData?.design || selectedOrder.design_data;
-        const activeMockup  = activeViewData?.mockup_url || getPrimaryMockup(selectedOrder);
+        const activeDesign = activeViewData?.design || selectedOrder.design_data;
+        const activeMockup = activeViewData?.mockup_url || getPrimaryMockup(selectedOrder);
         const layers = extractLayers(activeDesign);
 
         const supplierProduct = selectedOrder.supplier_product || {};
@@ -1628,17 +1624,17 @@ function SupplierDashboardContent() {
         let unitPrice = basePrice;
         const qty = selectedOrder.variants?.quantity || 1;
         let bulkDiscountPercentage = 0;
-        
+
         if (supplierProduct.bulk_pricing) {
-            try {
-                const bp = typeof supplierProduct.bulk_pricing === 'string' ? JSON.parse(supplierProduct.bulk_pricing) : supplierProduct.bulk_pricing;
-                if (bp && qty >= bp.threshold) {
-                    bulkDiscountPercentage = bp.value;
-                    unitPrice = basePrice * (1 - bp.value / 100);
-                }
-            } catch(e) {}
+          try {
+            const bp = typeof supplierProduct.bulk_pricing === 'string' ? JSON.parse(supplierProduct.bulk_pricing) : supplierProduct.bulk_pricing;
+            if (bp && qty >= bp.threshold) {
+              bulkDiscountPercentage = bp.value;
+              unitPrice = basePrice * (1 - bp.value / 100);
+            }
+          } catch (e) { }
         }
-        
+
         const totalValue = unitPrice * qty;
 
         return (
@@ -1667,7 +1663,7 @@ function SupplierDashboardContent() {
 
               <div className="p-8 overflow-y-auto max-h-[85vh]">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-                  
+
                   {/* Left Column: Design & Layers (7 cols) */}
                   <div className="lg:col-span-7 space-y-6">
                     {/* View tabs */}
@@ -1677,11 +1673,10 @@ function SupplierDashboardContent() {
                           <button
                             key={v.viewId}
                             onClick={() => setActiveViewIdx(i)}
-                            className={`px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all ${
-                              activeViewIdx === i
+                            className={`px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all ${activeViewIdx === i
                                 ? 'bg-[#1B2412] text-[#A1FF4D]'
                                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                            }`}
+                              }`}
                           >
                             {v.viewName}
                           </button>
@@ -1694,7 +1689,7 @@ function SupplierDashboardContent() {
                       <div className="relative w-full aspect-square bg-gray-50 rounded-[2.5rem] overflow-hidden border border-gray-100 group shadow-inner">
                         <img src={activeMockup} alt="Mockup" className="w-full h-full object-contain p-4" />
                         <button
-                          onClick={() => downloadFile(activeMockup, `mockup-${activeViewData?.viewName || 'front'}-${selectedOrder.id.slice(0,8)}.jpg`)}
+                          onClick={() => downloadFile(activeMockup, `mockup-${activeViewData?.viewName || 'front'}-${selectedOrder.id.slice(0, 8)}.jpg`)}
                           title="Download mockup image"
                           className="absolute bottom-6 right-6 flex items-center gap-1.5 bg-[#1B2412]/90 hover:bg-[#1B2412] text-white text-[11px] font-black px-4 py-2 rounded-xl backdrop-blur-sm transition-all active:scale-95 opacity-0 group-hover:opacity-100 shadow-xl"
                         >
@@ -1715,10 +1710,9 @@ function SupplierDashboardContent() {
                         <div className="grid grid-cols-1 gap-3">
                           {layers.map((layer: any, i: number) => (
                             <div key={i} className="flex items-center gap-4 p-4 bg-gray-50 hover:bg-gray-100 rounded-2xl border border-gray-100 transition-colors group/layer">
-                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-white text-sm font-black shadow-sm ${
-                                layer.kind === 'text'  ? 'bg-blue-500'   :
-                                layer.kind === 'image' ? 'bg-purple-500' : 'bg-orange-400'
-                              }`}>
+                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-white text-sm font-black shadow-sm ${layer.kind === 'text' ? 'bg-blue-500' :
+                                  layer.kind === 'image' ? 'bg-purple-500' : 'bg-orange-400'
+                                }`}>
                                 {layer.kind === 'text' ? 'T' : layer.kind === 'image' ? '🖼' : '◼'}
                               </div>
                               <div className="flex-1 min-w-0">
@@ -1764,7 +1758,7 @@ function SupplierDashboardContent() {
 
                   {/* Right Column: Order Details & Fulfillment (5 cols) */}
                   <div className="lg:col-span-5 space-y-8">
-                    
+
                     {/* Primary Order Metrics */}
                     <div className="grid grid-cols-2 gap-4">
                       <div className="bg-[#1B2412] rounded-[2rem] p-6 text-[#A1FF4D]">
@@ -1787,20 +1781,20 @@ function SupplierDashboardContent() {
                           <span className="text-xs font-bold text-gray-500">Unit Price</span>
                           <span className="text-sm font-black text-gray-800">
                             {bulkDiscountPercentage > 0 ? (
-                                <>
-                                    <span className="line-through text-gray-400 mr-2">{basePrice.toLocaleString()} ETB</span>
-                                    <span>{unitPrice.toLocaleString()} ETB</span>
-                                </>
+                              <>
+                                <span className="line-through text-gray-400 mr-2">{basePrice.toLocaleString()} ETB</span>
+                                <span>{unitPrice.toLocaleString()} ETB</span>
+                              </>
                             ) : (
-                                `${basePrice.toLocaleString()} ETB`
+                              `${basePrice.toLocaleString()} ETB`
                             )}
                           </span>
                         </div>
                         {bulkDiscountPercentage > 0 && (
-                            <div className="flex justify-between items-center text-xs font-bold text-emerald-600">
-                                <span>Bulk Discount Applied</span>
-                                <span>{bulkDiscountPercentage}% Off</span>
-                            </div>
+                          <div className="flex justify-between items-center text-xs font-bold text-emerald-600">
+                            <span>Bulk Discount Applied</span>
+                            <span>{bulkDiscountPercentage}% Off</span>
+                          </div>
                         )}
                         <div className="flex justify-between items-center">
                           <span className="text-xs font-bold text-gray-500">Total Value</span>
@@ -1827,11 +1821,11 @@ function SupplierDashboardContent() {
 
                     {/* Order Meta info - No customer contact for privacy */}
                     <div className="bg-gray-50 rounded-[2.5rem] p-6 border border-gray-100">
-                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Internal Fulfillment Note</p>
-                       <p className="text-[11px] text-gray-500 font-bold leading-relaxed">
-                         Please follow the design specifications provided in the layout view. 
-                         Ensure all high-resolution assets are correctly scaled before printing.
-                       </p>
+                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Internal Fulfillment Note</p>
+                      <p className="text-[11px] text-gray-500 font-bold leading-relaxed">
+                        Please follow the design specifications provided in the layout view.
+                        Ensure all high-resolution assets are correctly scaled before printing.
+                      </p>
                     </div>
 
                     {/* Fulfillment Section */}
@@ -1843,9 +1837,8 @@ function SupplierDashboardContent() {
 
                       {/* Drop Zone - Hidden when waiting for customer approval */}
                       {selectedOrder.status !== 'SAMPLE_AWAITING_APPROVAL' && (
-                        <label className={`flex flex-col items-center justify-center gap-3 border-2 border-dashed rounded-[2rem] cursor-pointer transition-all p-6 ${
-                          proofPreview ? 'border-[#A1FF4D] bg-[#A1FF4D]/5 shadow-inner' : 'border-gray-200 bg-gray-50 hover:border-gray-300'
-                        }`}>
+                        <label className={`flex flex-col items-center justify-center gap-3 border-2 border-dashed rounded-[2rem] cursor-pointer transition-all p-6 ${proofPreview ? 'border-[#A1FF4D] bg-[#A1FF4D]/5 shadow-inner' : 'border-gray-200 bg-gray-50 hover:border-gray-300'
+                          }`}>
                           {proofPreview ? (
                             <div className="relative w-full group">
                               <img src={proofPreview} alt="Proof preview" className="w-full max-h-52 object-contain rounded-2xl" />
@@ -1888,7 +1881,7 @@ function SupplierDashboardContent() {
                       {/* Actions */}
                       {selectedOrder.status === 'SAMPLE_AWAITING_APPROVAL' ? (
                         <div className="bg-yellow-50 border border-yellow-100 text-yellow-800 p-5 rounded-[2rem] text-xs font-black text-center leading-relaxed">
-                          ⚠️ Sample Proof Submitted.<br/>Waiting for customer approval before continuing.
+                          ⚠️ Sample Proof Submitted.<br />Waiting for customer approval before continuing.
                         </div>
                       ) : (
                         <div className="flex flex-col gap-3">
