@@ -23,7 +23,7 @@ export default function HelpPage() {
       <main className="max-w-[1100px] mx-auto px-6 md:px-12 pt-16 md:pt-24 pb-24">
         
         {/* Header Section */}
-        <div className="max-w-3xl mb-16 md:mb-24">
+        <div className="max-w-3xl mb-16 md:mb-24 flex flex-col items-center md:items-start text-center md:text-left">
           <div className="inline-flex items-center justify-center px-5 py-1.5 rounded-full border border-green-100 bg-green-50/50 text-green-600 text-xs font-bold tracking-widest uppercase mb-8">
             / HELP CENTER
           </div>

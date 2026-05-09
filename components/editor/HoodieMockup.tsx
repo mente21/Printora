@@ -282,7 +282,7 @@ export default function HoodieMockup({ selectedView, selectedColor, printArea, c
     };
 
     return (
-        <div className="relative flex-shrink-0" style={{ width: 500, height: 540 }}>
+        <div className="relative w-full" style={{ maxWidth: 500, aspectRatio: '500/540' }}>
             <div className="absolute inset-0 pointer-events-none flex items-start justify-center pt-8" style={{ zIndex: 0 }}>
                 {(selectedView.id === 'left-hand' || selectedView.id === 'right-hand') ? (
                     <div style={{ height: '92%', aspectRatio: '271 / 580' }}>

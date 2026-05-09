@@ -182,7 +182,7 @@ export default function SweaterMockup({ selectedView, selectedColor, printArea, 
     };
 
     return (
-        <div className="relative flex-shrink-0" style={{ width: 500, height: 540 }}>
+        <div className="relative w-full" style={{ maxWidth: 500, aspectRatio: '500/540' }}>
             <div className="absolute inset-0 pointer-events-none flex items-start justify-center pt-8" style={{ zIndex: 0 }}>
                 <div className="w-[83%] h-[83%]">
                     {getViewComponent()}
