@@ -41,7 +41,7 @@ function ProductsPageContent() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [minPrice, setMinPrice] = useState<number>(0);
-  const [maxPrice, setMaxPrice] = useState<number>(5000);
+  const [maxPrice, setMaxPrice] = useState<number>(10000);
   const [sortBy, setSortBy] = useState<string>("newest");
   const [searchQuery, setSearchQuery] = useState("");
   const searchParams = useSearchParams();
@@ -322,7 +322,7 @@ function ProductsPageContent() {
                   type="range" 
                   className="w-full accent-[#3da85b]" 
                   min="0" 
-                  max="5000" 
+                  max="10000" 
                   step="50"
                   value={maxPrice}
                   onChange={(e) => setMaxPrice(Number(e.target.value))}
@@ -343,7 +343,7 @@ function ProductsPageContent() {
                     <span className="text-gray-400 text-[10px] font-bold">MAX</span>
                     <input 
                       type="number" 
-                      placeholder="5000" 
+                      placeholder="10000" 
                       value={maxPrice}
                       onChange={(e) => setMaxPrice(Number(e.target.value))}
                       className="bg-transparent w-full text-sm font-bold text-gray-700 outline-none" 

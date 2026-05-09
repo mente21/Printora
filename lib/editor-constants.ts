@@ -266,5 +266,33 @@ export const PRODUCT_TEMPLATES: ProductTemplate[] = [
                 ]
             }
         ]
+    },
+    {
+        id: 'ceramic-mug',
+        name: 'Ceramic Mug 11oz',
+        description: 'Classic 11oz ceramic mug with full wrap print.',
+        category: 'mugs',
+        defaultViewId: 'wrap',
+        defaultColorHex: '#ffffff',
+        variants: [
+            { id: 'white', colorHex: '#ffffff', colorName: 'White' },
+            { id: 'black', colorHex: '#0f172a', colorName: 'Black' }
+        ],
+        views: [
+            {
+                id: 'wrap',
+                name: 'Full Wrap',
+                mockupUrl: '',
+                printAreas: [
+                    {
+                        id: 'mug-wrap',
+                        width: 1024,
+                        height: 512,
+                        left: 0,
+                        top: 0
+                    }
+                ]
+            }
+        ]
     }
 ];

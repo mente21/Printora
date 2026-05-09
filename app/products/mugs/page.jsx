@@ -109,7 +109,7 @@ const mugsData = [
     providers: 11,
     isBestseller: true,
     supplierSpecs: { material: "Ceramic", printArea: '9.5" x 3.2"', technique: "Sublimation" },
-    image: (require("../../Images/mugs/_Finally, a mug that gets it! 😂    This sleek….jpg").default?.src || require("../../Images/mugs/_Finally, a mug that gets it! 😂    This sleek….jpg").default || require("../../Images/mugs/_Finally, a mug that gets it! 😂    This sleek….jpg")),
+    image: (require("../../Images/mugs/mug.jpg").default?.src || require("../../Images/mugs/mug.jpg").default || require("../../Images/mugs/mug.jpg")),
   },
   {
     id: 8,
