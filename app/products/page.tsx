@@ -19,7 +19,8 @@ import {
   ChevronDown,
   Star,
   Search,
-  Package
+  Package,
+  Menu
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import CustomSelect from "@/components/ui/CustomSelect";
@@ -400,7 +401,12 @@ function ProductsPageContent() {
                       type="checkbox"
                       className="w-4 h-4 rounded border-gray-300 text-[#3da85b] focus:ring-[#3da85b] cursor-pointer"
                       checked={selectedCategories.length === 0}
-                      onChange={() => setSelectedCategories([])}
+                      onChange={() => {
+                        setSelectedCategories([]);
+                        if (window.innerWidth < 1024) {
+                          setTimeout(() => setIsMobileFiltersOpen(false), 200);
+                        }
+                      }}
                     />
                     <span className="text-sm font-medium text-gray-700 group-hover:text-[#1c211f]">All Products</span>
                   </div>
@@ -429,6 +435,9 @@ function ProductsPageContent() {
                                 ? prev.filter(c => c !== cat.name)
                                 : [...prev, cat.name]
                             );
+                            if (window.innerWidth < 1024) {
+                              setTimeout(() => setIsMobileFiltersOpen(false), 200);
+                            }
                           }}
                         />
                         <span className="text-sm font-medium text-gray-600 group-hover:text-[#1c211f]">{cat.name}</span>
@@ -584,10 +593,10 @@ function ProductsPageContent() {
               <div className="flex items-center gap-3 w-full sm:w-auto">
                 <button 
                   onClick={() => setIsMobileFiltersOpen(true)}
-                  className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#1c211f] text-white rounded-xl text-xs font-black tracking-widest uppercase hover:bg-black transition-all shadow-[0_4px_12px_rgba(28,33,31,0.15)] active:scale-95 shrink-0"
+                  className="flex items-center justify-center w-[42px] h-[42px] bg-[#1c211f] text-white rounded-xl hover:bg-black transition-all shadow-[0_4px_12px_rgba(28,33,31,0.15)] active:scale-95 shrink-0"
+                  aria-label="Open Menu"
                 >
-                  <Package size={16} />
-                  Products
+                  <Menu size={20} />
                 </button>
                 <div className="relative flex-1 sm:w-64">
                   <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
