@@ -91,10 +91,10 @@ export default function HatMockup({ selectedView, selectedColor, printArea, canv
             <div
                 className="print-area-placeholder absolute border border-dashed border-gray-400/40 pointer-events-none z-30 flex items-center justify-center text-[10px] text-black/15 uppercase tracking-widest font-medium"
                 style={{
-                    left: printArea?.left ?? 150,
-                    top: printArea?.top ?? 140,
-                    width: printArea?.width ?? 100,
-                    height: printArea?.height ?? 180
+                    left:   `${((printArea?.left ?? 150) / 500) * 100}%`,
+                    top:    `${((printArea?.top ?? 140) / 540) * 100}%`,
+                    width:  `${((printArea?.width ?? 100) / 500) * 100}%`,
+                    height: `${((printArea?.height ?? 180) / 540) * 100}%`,
                 }}
             >
                 PRINT AREA

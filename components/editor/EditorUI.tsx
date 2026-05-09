@@ -1445,6 +1445,7 @@ export default function EditorUI() {
                             </>
                         ) : dbOrderId ? <><span className="hidden md:inline">Update </span>Order</> : 'Order'}
                     </button>
+                    {/* Save Template — icon on mobile, full button on desktop */}
                     <button
                         onClick={() => {
                             if (!canvas) return;
@@ -1469,9 +1470,11 @@ export default function EditorUI() {
                             setShowTemplatesPanel(true);
                             setActiveLeftTool('templates');
                         }}
-                        className="hidden md:block bg-white border border-gray-300 text-gray-700 font-bold px-4 py-1.5 rounded text-sm uppercase transition-colors hover:bg-gray-50 shadow-sm"
+                        title={loadedTemplateId ? 'Update Template' : 'Save Template'}
+                        className="flex items-center justify-center gap-1.5 bg-white border border-gray-300 text-gray-700 font-bold rounded text-sm uppercase transition-colors hover:bg-gray-50 shadow-sm px-2 py-1.5 md:px-4"
                     >
-                        {loadedTemplateId ? 'Update Template' : 'Save Template'}
+                        <LayoutTemplate className="w-4 h-4 flex-shrink-0" />
+                        <span className="hidden md:inline">{loadedTemplateId ? 'Update Template' : 'Save Template'}</span>
                     </button>
                 </div>
             </div>
@@ -1645,20 +1648,23 @@ export default function EditorUI() {
                         </div>
                     </div>
 
-                    {/* View Pills */}
-                    <div className="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-3 z-30">
-                        {selectedProduct.views.map(view => (
-                            <button
-                                key={view.id}
-                                onClick={() => handleViewChange(view.id)}
-                                className={`px-5 py-2 rounded-full text-[13px] font-medium transition-all shadow-sm ${selectedView.id === view.id
-                                    ? 'bg-[#64645A] text-white'
-                                    : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                    {/* View Pills — scrollable on mobile */}
+                    <div className="absolute bottom-2 md:bottom-6 left-0 right-0 z-30 flex justify-center">
+                        <div className="flex items-center gap-2 overflow-x-auto px-3 pb-1 max-w-full scrollbar-none" style={{ scrollbarWidth: 'none' }}>
+                            {selectedProduct.views.map(view => (
+                                <button
+                                    key={view.id}
+                                    onClick={() => handleViewChange(view.id)}
+                                    className={`flex-shrink-0 px-3 md:px-5 py-1.5 md:py-2 rounded-full text-[11px] md:text-[13px] font-semibold transition-all shadow-sm whitespace-nowrap ${
+                                        selectedView.id === view.id
+                                            ? 'bg-[#64645A] text-white'
+                                            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
                                     }`}
-                            >
-                                {view.name}
-                            </button>
-                        ))}
+                                >
+                                    {view.name}
+                                </button>
+                            ))}
+                        </div>
                     </div>
 
                 </div>

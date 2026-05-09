@@ -200,10 +200,10 @@ export default function TshirtMockup({
             <div 
                 className="print-area-placeholder absolute border border-dashed border-gray-400/40 pointer-events-none z-30 flex items-center justify-center text-[10px] text-black/15 uppercase tracking-widest font-medium"
                 style={{
-                    left:   printArea?.left   ?? 145,
-                    top:    printArea?.top    ?? 140,
-                    width:  printArea?.width  ?? 210,
-                    height: printArea?.height ?? 300,
+                    left:   `${((printArea?.left   ?? 145) / 500) * 100}%`,
+                    top:    `${((printArea?.top    ?? 140) / 540) * 100}%`,
+                    width:  `${((printArea?.width  ?? 210) / 500) * 100}%`,
+                    height: `${((printArea?.height ?? 300) / 540) * 100}%`,
                 }}
             >
                 PRINT AREA
