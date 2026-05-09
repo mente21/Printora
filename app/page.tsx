@@ -57,7 +57,7 @@ export default function Home() {
               {/* Left Content */}
               <div className="max-w-xl z-20 sm:ml-4 md:ml-8 lg:ml-12 xl:ml-16">
                 <h1
-                  className="text-6xl lg:text-[76px] font-black uppercase tracking-normal leading-[1.15] mb-6"
+                  className="text-5xl sm:text-6xl lg:text-[76px] font-black uppercase tracking-normal leading-[1.15] mb-6"
                   style={{
                     color: "#2B3220",
                     fontFamily:
@@ -201,6 +201,28 @@ export default function Home() {
                       How it works
                     </Link>
                   </div>
+                </div>
+              </div>
+
+              {/* Mobile Hero Image - Visible only on small screens */}
+              <div className="w-full h-[320px] sm:h-[400px] mt-8 lg:hidden rounded-3xl overflow-hidden relative shadow-lg">
+                <img
+                  src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=600&fit=crop"
+                  alt="Creative Design"
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+                {/* Floating Badge */}
+                <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-md rounded-xl p-3 shadow-xl flex items-center gap-3">
+                   <div className="w-10 h-10 bg-[#9DF542] rounded-full flex items-center justify-center font-bold text-[#111]">
+                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                       <path d="M12 2L15 9l7 1-5 5.5L15.5 22 12 18.5 8.5 22 10 15.5 5 10l7-1z" />
+                     </svg>
+                   </div>
+                   <div className="flex flex-col">
+                     <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Premium</span>
+                     <span className="text-sm font-black text-[#111]">100% Quality</span>
+                   </div>
                 </div>
               </div>
 
@@ -1136,7 +1158,7 @@ export default function Home() {
 
               {/* Large Title */}
               <h2
-                className="text-[60px] md:text-[88px] lg:text-[104px] font-black text-[#111] leading-[1.0] tracking-normal mb-10 md:mb-16 uppercase"
+                className="text-[48px] sm:text-[60px] md:text-[88px] lg:text-[104px] font-black text-[#111] leading-[1.0] tracking-normal mb-10 md:mb-16 uppercase"
                 style={{
                   fontFamily: "Impact, sans-serif",
                   fontStretch: "condensed",
