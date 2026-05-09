@@ -246,7 +246,7 @@ function OrdersContent() {
                     <h1 className="text-3xl lg:text-4xl font-black text-[#111] uppercase tracking-widest" style={{ fontFamily: "Impact, sans-serif" }}>
                         My Orders
                     </h1>
-                    <p className="text-gray-600 font-bold text-sm lg:text-base mt-1">
+                    <p className="text-gray-500 font-medium text-xs lg:text-sm mt-1">
                         Track all your custom designs from submission to delivery.
                     </p>
                 </div>
@@ -346,8 +346,8 @@ function OrdersContent() {
                                                             : <div className="w-full h-full flex items-center justify-center text-gray-200"><Package size={20} /></div>}
                                                     </div>
                                                     <div className="flex-1 min-w-0">
-                                                        <p className="font-black text-[#111] text-[15px] truncate">{order.product_type}</p>
-                                                        <p className="text-[11px] text-gray-500 font-black truncate">{order.variants?.color} • {order.variants?.view}</p>
+                                                        <p className="font-black text-[#111] text-sm truncate">{order.product_type}</p>
+                                                        <p className="text-[10px] text-gray-400 font-bold truncate">{order.variants?.color} • {order.variants?.view}</p>
                                                         <div className={`inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${cfg.bg} ${cfg.color}`}>
                                                             <Icon size={9} />{cfg.label}
                                                         </div>
@@ -442,7 +442,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
     const editUrl = `/editor?edit_order=${order.id}&template=${templateId}`;
 
     return (
-        <div className="bg-white rounded-3xl lg:rounded-[3.5rem] border border-gray-100/50 overflow-hidden shadow-2xl shadow-black/5 ring-1 ring-black/[0.02] relative">
+        <div className="bg-white rounded-2xl lg:rounded-[3.5rem] border border-gray-100/50 overflow-hidden shadow-2xl shadow-black/5 ring-1 ring-black/[0.02] relative">
 
             {/* ── Lightbox Overlay ── */}
             {lightbox && (
@@ -501,7 +501,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                         <p className="text-[10px] lg:text-xs font-black text-gray-600 font-mono bg-white px-2 lg:px-3 py-1 rounded-full border border-gray-100">#{order.id.slice(0, 8).toUpperCase()}</p>
                     </div>
                 </div>
-                <p className="text-[13px] lg:text-[14px] text-gray-600 font-black mt-4 leading-relaxed max-w-2xl">{cfg.description}</p>
+                <p className="text-xs text-gray-500 font-bold mt-4 leading-relaxed max-w-2xl">{cfg.description}</p>
                 {order.status === "REJECTED" && order.variants?.admin_rejection_reason && (
                     <div className="mt-4 bg-red-100/50 p-4 rounded-xl border border-red-200">
                         <p className="text-[10px] font-black uppercase tracking-widest text-red-600 mb-1">Reason for Rejection</p>
@@ -543,7 +543,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                 </div>
             )}
 
-            <div className="p-6 space-y-6">
+            <div className="p-4 lg:p-6 space-y-6">
                 {/* 2-Column Balanced Layout — Gallery & Details Stack */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
                     {/* Mockup Gallery */}
@@ -592,7 +592,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                     {/* ── Details Stack (Specs + Financial) ── */}
                     <div className="flex flex-col gap-4">
                         {/* ── Specifications Card ── */}
-                        <div className="group/spec relative bg-white rounded-3xl border border-gray-100 p-5 flex flex-col gap-3 overflow-hidden
+                        <div className="group/spec relative bg-white rounded-3xl border border-gray-100 p-4 lg:p-5 flex flex-col gap-3 overflow-hidden
                             hover:border-gray-200 hover:shadow-[0_24px_48px_-10px_rgba(0,0,0,0.10)] transition-all duration-500 ease-out flex-1">
 
 
@@ -707,14 +707,14 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                         />
                                         {/* Gliding content */}
                                         <div className={`spec-row-inner delay-${i} flex items-center justify-between w-full`}>
-                                            <span className="spec-label text-[11px] font-black text-gray-500 uppercase tracking-widest">{row.label}</span>
+                                            <span className="spec-label text-[10px] font-black text-gray-400 uppercase tracking-widest">{row.label}</span>
                                             <div className="flex items-center gap-2">
                                                 {row.swatch && (
                                                     <div className="w-3.5 h-3.5 rounded-full border border-gray-200 shadow-sm"
                                                         style={{ backgroundColor: row.swatch.toLowerCase() }} />
                                                 )}
-                                                <span className={`text-sm font-black tracking-tight transition-all duration-500 ${row.highlight
-                                                    ? 'bg-[#111] text-white px-3 py-1 rounded-full group-hover/spec:bg-[#A1FF4D] group-hover/spec:text-[#111] group-hover/spec:shadow-[0_0_16px_rgba(161,255,77,0.5)]'
+                                                <span className={`text-xs font-black tracking-tight transition-all duration-500 ${row.highlight
+                                                    ? 'bg-[#111] text-white px-2.5 lg:px-3 py-1 rounded-full group-hover/spec:bg-[#A1FF4D] group-hover/spec:text-[#111] group-hover/spec:shadow-[0_0_16px_rgba(161,255,77,0.5)]'
                                                     : 'text-[#111]'
                                                 }`}>{row.value}</span>
                                             </div>
