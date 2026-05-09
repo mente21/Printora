@@ -77,7 +77,7 @@ export default function HatMockup({ selectedView, selectedColor, printArea, canv
     const strokeColor = isDarkColor(selectedColor) ? 'rgba(255,255,255,0.45)' : '#222222';
 
     return (
-        <div className="relative flex-shrink-0" style={{ width: 500, height: 540 }}>
+        <div className="relative w-full" style={{ maxWidth: 500, aspectRatio: '500/540' }}>
             <div className="absolute inset-0 pointer-events-none flex items-start justify-center pt-8" style={{ zIndex: 0 }}>
                 <div className="w-[78%] h-[78%]">
                     <FrontHat color={selectedColor} strokeColor={strokeColor} />

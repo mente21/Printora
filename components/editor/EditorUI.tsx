@@ -1630,7 +1630,7 @@ export default function EditorUI() {
                         </div>
                     )}
 
-                    <div className="flex-1 flex flex-col items-center justify-center relative p-4 overflow-hidden">
+                    <div className="flex-1 flex flex-col items-center justify-center relative p-2 md:p-4 overflow-hidden">
                         <style>{`
                             .has-design .print-area-placeholder {
                                 opacity: 0;
@@ -1639,7 +1639,9 @@ export default function EditorUI() {
                             }
                         `}</style>
                         <div id="product-capture-area" className={`relative z-10 w-full h-full max-w-2xl flex justify-center items-center drop-shadow-md ${(canvas?.getObjects().length || 0) > 0 ? 'has-design' : ''}`}>
-                            {renderMockup()}
+                            <div className="w-full flex justify-center items-center">
+                                {renderMockup()}
+                            </div>
                         </div>
                     </div>
 
