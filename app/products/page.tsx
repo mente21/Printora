@@ -19,7 +19,8 @@ import {
   ChevronDown,
   Star,
   Search,
-  Package
+  Package,
+  Menu
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import CustomSelect from "@/components/ui/CustomSelect";
@@ -400,7 +401,12 @@ function ProductsPageContent() {
                       type="checkbox"
                       className="w-4 h-4 rounded border-gray-300 text-[#3da85b] focus:ring-[#3da85b] cursor-pointer"
                       checked={selectedCategories.length === 0}
-                      onChange={() => setSelectedCategories([])}
+                      onChange={() => {
+                        setSelectedCategories([]);
+                        if (window.innerWidth < 1024) {
+                          setTimeout(() => setIsMobileFiltersOpen(false), 200);
+                        }
+                      }}
                     />
                     <span className="text-sm font-medium text-gray-700 group-hover:text-[#1c211f]">All Products</span>
                   </div>
@@ -429,6 +435,9 @@ function ProductsPageContent() {
                                 ? prev.filter(c => c !== cat.name)
                                 : [...prev, cat.name]
                             );
+                            if (window.innerWidth < 1024) {
+                              setTimeout(() => setIsMobileFiltersOpen(false), 200);
+                            }
                           }}
                         />
                         <span className="text-sm font-medium text-gray-600 group-hover:text-[#1c211f]">{cat.name}</span>
@@ -581,14 +590,7 @@ function ProductsPageContent() {
 
             {/* Mobile View */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full px-2 gap-4 lg:hidden">
-              <div className="flex items-center gap-3 w-full sm:w-auto">
-                <button 
-                  onClick={() => setIsMobileFiltersOpen(true)}
-                  className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#1c211f] text-white rounded-xl text-xs font-black tracking-widest uppercase hover:bg-black transition-all shadow-[0_4px_12px_rgba(28,33,31,0.15)] active:scale-95 shrink-0"
-                >
-                  <Package size={16} />
-                  Products
-                </button>
+              <div className="flex items-center gap-2 w-full sm:w-auto">
                 <div className="relative flex-1 sm:w-64">
                   <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input
@@ -596,9 +598,16 @@ function ProductsPageContent() {
                     placeholder="Search products..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2 pl-9 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#3da85b]/20 focus:border-[#3da85b] transition-all"
+                    className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#3da85b]/20 focus:border-[#3da85b] transition-all"
                   />
                 </div>
+                <button 
+                  onClick={() => setIsMobileFiltersOpen(true)}
+                  className="flex items-center justify-center p-2 text-[#1c211f] bg-transparent hover:bg-gray-100 rounded-xl transition-all active:scale-95 shrink-0"
+                  aria-label="Open Menu"
+                >
+                  <Menu size={28} strokeWidth={2.5} />
+                </button>
               </div>
 
               <div className="flex items-center gap-2 text-gray-500 font-medium text-sm">
@@ -688,27 +697,27 @@ function ProductsPageContent() {
                 </div>
 
                 <div className="flex-1 space-y-2 px-1">
-                  <h3 className="font-black text-[16px] text-[#1c211f] line-clamp-1">
+                  <h3 className="font-black text-[14px] sm:text-[16px] text-[#1c211f] line-clamp-1">
                     <Link href={`/products/${product.id}`} className="hover:text-[#3da85b] transition-colors">{product.name}</Link>
                   </h3>
-                  <p className="text-[13px] text-gray-400 font-medium leading-relaxed line-clamp-2 min-h-[40px]">
+                  <p className="text-[11px] sm:text-[13px] text-gray-400 font-medium leading-relaxed line-clamp-2 min-h-[34px] sm:min-h-[40px]">
                     {product.description || "Customized premium quality product, perfect for your unique designs."}
                   </p>
                   <div className="flex items-center justify-between pt-1">
-                    <p className="text-[20px] font-black text-[#3da85b] tracking-tight">ETB {product.price}</p>
+                    <p className="text-[16px] sm:text-[20px] font-black text-[#3da85b] tracking-tight">ETB {product.price}</p>
                     <div className="flex items-center gap-1.5">
                       <div className="flex -space-x-1.5">
                         <div className="w-3.5 h-3.5 rounded-full bg-[#1c211f] border-2 border-white"></div>
                         <div className="w-3.5 h-3.5 rounded-full bg-gray-300 border-2 border-white"></div>
                         <div className="w-3.5 h-3.5 rounded-full bg-blue-800 border-2 border-white"></div>
                       </div>
-                      <span className="text-[11px] text-gray-400 font-bold ml-1">{product.colors?.length || 3} colors</span>
+                      <span className="text-[9px] sm:text-[11px] text-gray-400 font-bold ml-1">{product.colors?.length || 3} colors</span>
                     </div>
                   </div>
                   {(product.supplier_country || product.supplier?.country) && (
                     <div className="flex items-center gap-1.5 pt-1">
-                      <span className="text-[10px] text-gray-400 font-medium">📍 Ships from:</span>
-                      <span className="text-[10px] font-black text-gray-500">{product.supplier_country || product.supplier?.country}</span>
+                      <span className="text-[9px] sm:text-[10px] text-gray-400 font-medium">📍 Ships from:</span>
+                      <span className="text-[9px] sm:text-[10px] font-black text-gray-500">{product.supplier_country || product.supplier?.country}</span>
                       {(product.supplier_country || product.supplier?.country) === userCountry && (
                         <span className="text-[8px] font-black text-[#3da85b] bg-[#3da85b]/10 px-1.5 py-0.5 rounded-full uppercase tracking-wider">Local</span>
                       )}
