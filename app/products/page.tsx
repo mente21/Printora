@@ -18,7 +18,8 @@ import {
   SlidersHorizontal,
   ChevronDown,
   Star,
-  Search
+  Search,
+  Package
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import CustomSelect from "@/components/ui/CustomSelect";
@@ -44,11 +45,11 @@ function ProductsPageContent() {
   const [minPrice, setMinPrice] = useState<number>(0);
   const [maxPrice, setMaxPrice] = useState<number>(10000);
   const [sortBy, setSortBy] = useState<string>("newest");
-  const [isSortOpen, setIsSortOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [userCountry, setUserCountry] = useState<string>("");
   const [selectedCountry, setSelectedCountry] = useState<string>("");
   const [isCountryOpen, setIsCountryOpen] = useState(false);
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const searchParams = useSearchParams();
 
   const carouselItems = useMemo(() => [
@@ -101,15 +102,36 @@ function ProductsPageContent() {
   }, [searchParams]);
 
   useEffect(() => {
-    supabase
-      .from("supplier_products")
-      .select("*, supplier:profiles(full_name, country)")
-      .eq("status", "APPROVED")
-      .order("created_at", { ascending: false })
-      .then(({ data }) => {
-        setSupplierProducts(data || []);
-        setLoading(false);
-      });
+    const fetchProducts = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id ?? null;
+
+      const { data: approvedData } = await supabase
+        .from("supplier_products")
+        .select("*, supplier:profiles(full_name, country)")
+        .eq("status", "APPROVED")
+        .order("created_at", { ascending: false });
+
+      let allProducts: any[] = approvedData || [];
+
+      if (userId) {
+        const { data: ownData, error: ownError } = await supabase
+          .from("supplier_products")
+          .select("*, supplier:profiles(full_name, country)")
+          .eq("supplier_id", userId)
+          .neq("status", "APPROVED")
+          .order("created_at", { ascending: false });
+
+        if (ownError) console.warn("Own products fetch warning:", ownError);
+        if (ownData && ownData.length > 0) {
+          allProducts = [...allProducts, ...ownData];
+        }
+      }
+
+      setSupplierProducts(allProducts);
+      setLoading(false);
+    };
+    fetchProducts();
   }, []);
 
   // Detect Region: logged-in profile first, then fallback to Addis Ababa
@@ -231,16 +253,26 @@ function ProductsPageContent() {
 
             {/* Full background image - object-cover to fit width/height */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <img src={item.image} alt={item.title} className={`w-full h-full object-cover opacity-100 ${item.imagePos || 'object-center'}`} />
+              {/* Mobile image - right aligned to preserve subjects */}
+              <img src={item.image} alt={item.title} className="w-full h-full object-cover object-right md:hidden opacity-100" />
+              {/* Desktop image - uses original positioning */}
+              <img src={item.image} alt={item.title} className={`hidden md:block w-full h-full object-cover opacity-100 ${item.imagePos || 'object-center'}`} />
             </div>
 
             {/* Text content overlay */}
-            <div className="relative z-10 h-full flex items-center px-10 md:px-20 lg:px-28 w-full md:w-2/3 lg:w-1/2">
-              <div className="max-w-xl space-y-4">
+            <div className="relative z-10 h-full flex items-center px-5 sm:px-10 md:px-20 lg:px-28 w-full md:w-2/3 lg:w-1/2">
+              <div 
+                className="max-w-[85%] sm:max-w-xl space-y-2 sm:space-y-4 p-4 md:p-0 rounded-2xl md:rounded-none backdrop-blur-md md:!backdrop-blur-none border border-white/20 md:!border-none shadow-2xl md:!shadow-none md:!bg-transparent transition-all"
+                style={{ 
+                  backgroundColor: item.textColor === '#000000' 
+                    ? 'rgba(255,255,255,0.65)' 
+                    : 'rgba(0,0,0,0.45)' 
+                }}
+              >
 
                 {/* ONE unified bold Impact heading across all slides */}
                 <h2
-                  className={`text-4xl md:text-5xl lg:text-[58px] leading-[1.0] ${item.textColor ? "" : "text-white drop-shadow-lg"}`}
+                  className={`text-[22px] sm:text-4xl md:text-5xl lg:text-[58px] leading-[1.05] md:leading-[1.0] ${item.textColor ? "" : "text-white drop-shadow-lg"}`}
                   style={{
                     fontFamily: 'Impact, "Arial Black", "Segoe UI Black", sans-serif',
                     letterSpacing: '0.01em',
@@ -250,7 +282,7 @@ function ProductsPageContent() {
                   {item.title}
                 </h2>
                 <p
-                  className={`text-[15px] md:text-[17px] font-medium leading-relaxed max-w-md ${item.textColor ? "" : "text-white/90 drop-shadow-sm"}`}
+                  className={`text-[12px] sm:text-[15px] md:text-[17px] font-medium leading-snug md:leading-relaxed max-w-[180px] sm:max-w-md ${item.textColor ? "" : "text-white/90 drop-shadow-sm"}`}
                   style={{ color: item.textColor ? `${item.textColor}e6` : undefined }}
                 >
                   {item.subtitle}
@@ -293,14 +325,70 @@ function ProductsPageContent() {
       {/* Main Layout with Sidebar */}
       <main className="max-w-[1600px] mx-auto px-6 md:px-12 py-12 flex flex-col lg:flex-row gap-10">
 
-        {/* Sidebar */}
-        <aside className="w-full lg:w-[280px] flex-shrink-0 space-y-8">
+        {/* Mobile Filter Overlay */}
+        {isMobileFiltersOpen && (
+          <div 
+            className="fixed inset-0 bg-black/60 z-[60] lg:hidden backdrop-blur-sm transition-opacity"
+            onClick={() => setIsMobileFiltersOpen(false)}
+          />
+        )}
 
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
-            <div className="flex items-center gap-2 mb-6 text-[#1c211f]">
+        {/* Sidebar */}
+        <aside className={`
+          fixed inset-y-0 left-0 z-[70] w-[300px] sm:w-[320px] bg-white overflow-y-auto transition-transform duration-300 ease-out 
+          lg:relative lg:translate-x-0 lg:z-auto lg:w-[280px] lg:flex-shrink-0 lg:bg-transparent lg:overflow-visible
+          ${isMobileFiltersOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full lg:shadow-none"}
+          flex flex-col h-full lg:h-auto space-y-0 lg:space-y-8
+        `}>
+          {/* Mobile Header */}
+          <div className="flex lg:hidden items-center justify-between p-6 border-b border-gray-100 bg-white sticky top-0 z-10">
+            <div className="flex items-center gap-2 text-[#1c211f]">
+              <Package size={20} className="text-[#3da85b]" />
+              <h2 className="text-lg font-black tracking-tight">Products & Filters</h2>
+            </div>
+            <button 
+              onClick={() => setIsMobileFiltersOpen(false)} 
+              className="p-2 -mr-2 text-gray-400 hover:text-black hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <ChevronLeft size={20} />
+            </button>
+          </div>
+
+          <div className="p-6 lg:p-6 bg-white lg:rounded-3xl lg:shadow-sm lg:border lg:border-gray-100 flex-1 overflow-y-auto lg:overflow-visible">
+            <div className="hidden lg:flex items-center gap-2 mb-6 text-[#1c211f]">
               <Filter size={20} className="text-[#3da85b]" />
               <h2 className="text-lg font-black tracking-tight">Filters</h2>
             </div>
+
+            {/* Quick Actions (Mobile Only) */}
+            <div className="space-y-4 mb-6 lg:hidden">
+              <Link
+                href="/orders"
+                className="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-[#1c211f] text-white rounded-xl text-sm font-bold hover:bg-black transition-colors shadow-sm"
+              >
+                <ShoppingBag size={16} />
+                My Orders
+              </Link>
+            </div>
+
+            <hr className="my-6 border-gray-100 lg:hidden" />
+
+            {/* Sort Options (Mobile Only) */}
+            <div className="space-y-4 mb-6 lg:hidden">
+              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Sort By</h3>
+              <CustomSelect
+                value={sortBy === "newest" ? "Sort: Newest" : sortBy === "price-low" ? "Price: Low to High" : "Price: High to Low"}
+                options={["Sort: Newest", "Price: Low to High", "Price: High to Low"]}
+                onChange={(val) => {
+                  if (val === "Sort: Newest") setSortBy("newest");
+                  else if (val === "Price: Low to High") setSortBy("price-low");
+                  else setSortBy("price-high");
+                }}
+                className="w-full"
+              />
+            </div>
+
+            <hr className="my-6 border-gray-100 lg:hidden" />
 
             {/* Categories in Sidebar */}
             <div className="space-y-4">
@@ -433,15 +521,17 @@ function ProductsPageContent() {
 
           </div>
 
-          <div className="bg-[#3f566a] rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
-            <div className="relative z-10 space-y-3">
-              <h3 className="font-black text-xl leading-tight">Supplier<br />Discounts</h3>
-              <p className="text-white/70 text-sm">Get up to 20% off on bulk orders.</p>
-              <button className="bg-white text-[#3f566a] px-4 py-2 rounded-xl text-xs font-bold mt-2 shadow-lg w-full hover:bg-gray-50 transition-colors">
-                Learn More
-              </button>
+          <div className="p-6 lg:p-0 mt-auto">
+            <div className="bg-[#3f566a] rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
+              <div className="relative z-10 space-y-3">
+                <h3 className="font-black text-xl leading-tight">Supplier<br />Discounts</h3>
+                <p className="text-white/70 text-sm">Get up to 20% off on bulk orders.</p>
+                <button className="bg-white text-[#3f566a] px-4 py-2 rounded-xl text-xs font-bold mt-2 shadow-lg w-full hover:bg-gray-50 transition-colors">
+                  Learn More
+                </button>
+              </div>
+              <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
             </div>
-            <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
           </div>
         </aside>
 
@@ -449,65 +539,71 @@ function ProductsPageContent() {
         <div className="flex-1 min-w-0 space-y-10">
 
           {/* Top Bar above categories */}
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-4 rounded-3xl border border-gray-100 shadow-sm">
-            <div className="flex items-center gap-2 text-gray-500 font-medium text-sm px-2">
-              Showing <span className="text-[#1c211f] font-black">{displayedProducts.length}</span> results
-              {showingLocal && !selectedCountry && <span className="text-[10px] font-black text-[#3da85b] bg-[#3da85b]/10 px-2 py-0.5 rounded-full ml-1 uppercase tracking-wider">Near You</span>}
-            </div>
-            <div className="flex items-center gap-3 w-full sm:w-auto">
-              <Link
-                href="/orders"
-                className="flex items-center justify-center gap-2 px-4 py-2 bg-[#1c211f] text-white rounded-xl text-sm font-bold hover:bg-black transition-colors shadow-[0_4px_12px_rgba(28,33,31,0.1)] shrink-0"
-                title="View My Orders"
-              >
-                <ShoppingBag size={16} />
-                <span className="hidden sm:inline">My Orders</span>
-              </Link>
-              <div className="relative flex-1 sm:w-64">
-                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2 pl-9 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#3da85b]/20 focus:border-[#3da85b] transition-all"
+          <div className="flex flex-col gap-4 bg-white p-4 rounded-3xl border border-gray-100 shadow-sm">
+            
+            {/* Desktop View */}
+            <div className="hidden lg:flex items-center justify-between w-full px-2">
+              <div className="flex items-center gap-2 text-gray-500 font-medium text-sm">
+                Showing <span className="text-[#1c211f] font-black">{displayedProducts.length}</span> results
+                {showingLocal && !selectedCountry && <span className="text-[10px] font-black text-[#3da85b] bg-[#3da85b]/10 px-2 py-0.5 rounded-full ml-1 uppercase tracking-wider">Near You</span>}
+              </div>
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/orders"
+                  className="flex items-center justify-center gap-2 px-4 py-2 bg-[#1c211f] text-white rounded-xl text-sm font-bold hover:bg-black transition-colors shadow-[0_4px_12px_rgba(28,33,31,0.1)] shrink-0"
+                  title="View My Orders"
+                >
+                  <ShoppingBag size={16} />
+                  <span>My Orders</span>
+                </Link>
+                <div className="relative w-64">
+                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search products..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2 pl-9 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#3da85b]/20 focus:border-[#3da85b] transition-all"
+                  />
+                </div>
+                <CustomSelect
+                  value={sortBy === "newest" ? "Sort: Newest" : sortBy === "price-low" ? "Price: Low to High" : "Price: High to Low"}
+                  options={["Sort: Newest", "Price: Low to High", "Price: High to Low"]}
+                  onChange={(val) => {
+                    if (val === "Sort: Newest") setSortBy("newest");
+                    else if (val === "Price: Low to High") setSortBy("price-low");
+                    else setSortBy("price-high");
+                  }}
+                  className="w-[180px]"
                 />
               </div>
-              <div className="relative">
-                <button
-                  onClick={() => setIsSortOpen(!isSortOpen)}
-                  className="w-full sm:w-[170px] appearance-none bg-gray-50 border border-gray-100 rounded-xl py-2 pl-4 pr-10 text-sm font-bold text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer outline-none focus:ring-2 focus:ring-[#3da85b]/20 text-left relative"
-                >
-                  {sortBy === 'newest' ? 'Sort: Newest' : sortBy === 'price-low' ? 'Price: Low to High' : 'Price: High to Low'}
-                  <ChevronDown size={14} className={`absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none transition-transform duration-200 ${isSortOpen ? 'rotate-180' : ''}`} />
-                </button>
+            </div>
 
-                {isSortOpen && (
-                  <>
-                    {/* Invisible backdrop to dismiss dropdown */}
-                    <div className="fixed inset-0 z-40" onClick={() => setIsSortOpen(false)}></div>
-                    <div className="absolute right-0 sm:left-0 mt-2 w-[170px] bg-white border border-gray-100 rounded-[14px] shadow-[0_10px_40px_rgb(0,0,0,0.06)] z-50 overflow-hidden text-sm font-bold py-1.5 transform origin-top-right transition-all animate-in fade-in slide-in-from-top-2">
-                      <button
-                        onClick={() => { setSortBy('newest'); setIsSortOpen(false); }}
-                        className={`w-full text-left px-4 py-2.5 transition-colors ${sortBy === 'newest' ? 'text-[#3da85b] bg-[#3da85b]/[0.04]' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}`}
-                      >
-                        Sort: Newest
-                      </button>
-                      <button
-                        onClick={() => { setSortBy('price-low'); setIsSortOpen(false); }}
-                        className={`w-full text-left px-4 py-2.5 transition-colors ${sortBy === 'price-low' ? 'text-[#3da85b] bg-[#3da85b]/[0.04]' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}`}
-                      >
-                        Price: Low to High
-                      </button>
-                      <button
-                        onClick={() => { setSortBy('price-high'); setIsSortOpen(false); }}
-                        className={`w-full text-left px-4 py-2.5 transition-colors ${sortBy === 'price-high' ? 'text-[#3da85b] bg-[#3da85b]/[0.04]' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}`}
-                      >
-                        Price: High to Low
-                      </button>
-                    </div>
-                  </>
-                )}
+            {/* Mobile View */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full px-2 gap-4 lg:hidden">
+              <div className="flex items-center gap-3 w-full sm:w-auto">
+                <button 
+                  onClick={() => setIsMobileFiltersOpen(true)}
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#1c211f] text-white rounded-xl text-xs font-black tracking-widest uppercase hover:bg-black transition-all shadow-[0_4px_12px_rgba(28,33,31,0.15)] active:scale-95 shrink-0"
+                >
+                  <Package size={16} />
+                  Products
+                </button>
+                <div className="relative flex-1 sm:w-64">
+                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search products..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2 pl-9 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#3da85b]/20 focus:border-[#3da85b] transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 text-gray-500 font-medium text-sm">
+                Showing <span className="text-[#1c211f] font-black">{displayedProducts.length}</span> results
+                {showingLocal && !selectedCountry && <span className="text-[10px] font-black text-[#3da85b] bg-[#3da85b]/10 px-2 py-0.5 rounded-full ml-1 uppercase tracking-wider">Near You</span>}
               </div>
             </div>
           </div>
@@ -524,12 +620,38 @@ function ProductsPageContent() {
             </div>
           )}
 
+          {/* Empty State */}
+          {displayedProducts.length === 0 && !loading && (
+            <div className="flex flex-col items-center justify-center py-20 px-4 text-center bg-white rounded-3xl border border-gray-100 shadow-sm mt-4">
+              <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                <Search size={32} className="text-gray-300" />
+              </div>
+              <h3 className="text-xl font-black text-[#1c211f] mb-2">No products found</h3>
+              <p className="text-gray-500 font-medium text-sm max-w-md">
+                We couldn't find any products matching your current filters. Try adjusting your search or clearing some filters to see more results.
+              </p>
+              <button 
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedCategories([]);
+                  setSelectedCountry("");
+                  setMinPrice(0);
+                  setMaxPrice(5000);
+                }}
+                className="mt-6 px-6 py-2.5 bg-[#3da85b] text-white rounded-xl font-bold text-sm hover:bg-[#32904d] transition-all shadow-md hover:shadow-lg active:scale-95"
+              >
+                Clear All Filters
+              </button>
+            </div>
+          )}
+
           {/* Product Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12">
+          {displayedProducts.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 sm:gap-x-8 gap-y-8 sm:gap-y-12">
             {displayedProducts.map((product) => (
-              <div key={product.id} className="flex flex-col group hover:-translate-y-2 transition-transform duration-500">
-                <div className="relative aspect-[4/5] rounded-[2rem] bg-white border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] mb-5 p-[2px]">
-                  <Link href={`/products/${product.id}`} className="block w-full h-full relative rounded-[calc(2rem-4px)] overflow-hidden bg-[#f8f9fa] group/img cursor-pointer">
+              <div key={product.id} className="flex flex-col group hover:-translate-y-1 transition-transform duration-500">
+                <div className="relative aspect-square rounded-2xl sm:rounded-[2rem] bg-white border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] mb-4 p-[2px] overflow-hidden">
+                  <Link href={`/products/${product.id}`} className="block w-full h-full relative rounded-[calc(1.5rem-4px)] sm:rounded-[calc(2rem-4px)] overflow-hidden bg-[#f8f9fa] group/img cursor-pointer">
                     {/* Promotion Tags */}
                     {product.tags && Array.isArray(product.tags) && product.tags.length > 0 && (
                       <div className="absolute top-4 left-4 z-20 flex flex-wrap gap-1.5 pointer-events-none">
@@ -607,10 +729,11 @@ function ProductsPageContent() {
                   >
                     View Details
                   </Link>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
         </div>
       </main>

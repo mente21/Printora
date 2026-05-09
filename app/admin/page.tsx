@@ -5,7 +5,8 @@ import { useState, useEffect } from "react";
 import {
   ShoppingBag, CheckCircle, Clock, XCircle, BarChart3, Users,
   User, Box, Truck, ShieldCheck, AlertCircle,
-  Package, Palette, Loader2, LogOut, Eye, Download, Sparkles, Phone, MapPin
+  Package, Palette, Loader2, LogOut, Eye, Download, Sparkles, Phone, MapPin,
+  Menu, X
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/lib/supabase";
@@ -26,6 +27,7 @@ export default function AdminDashboard() {
   const [allOrders, setAllOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [adminImgError, setAdminImgError] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Modals
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
@@ -392,19 +394,36 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#fafafa] flex font-sans">
+    <div className="min-h-screen bg-[#fafafa] flex font-sans overflow-x-hidden">
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 z-[60] md:hidden backdrop-blur-sm transition-opacity"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 bg-white text-gray-800 border-r border-gray-100 hidden md:flex flex-col sticky top-0 h-screen">
-        <div className="p-6 border-b border-gray-100">
-          <img src="/logo.png" alt="Logo" className="h-10 w-auto" />
-          <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 mt-2 block">Admin Panel</span>
+      <aside className={`
+        fixed inset-y-0 left-0 z-[70] w-[280px] bg-white text-gray-800 border-r border-gray-100 flex flex-col h-screen transition-transform duration-300 ease-out
+        md:relative md:translate-x-0 md:w-64 md:flex md:z-auto
+        ${isMobileMenuOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"}
+      `}>
+        <div className="p-6 border-b border-gray-100 flex justify-between items-start">
+          <div>
+            <img src="/logo.png" alt="Logo" className="h-10 w-auto" />
+            <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 mt-2 block">Admin Panel</span>
+          </div>
+          <button onClick={() => setIsMobileMenuOpen(false)} className="md:hidden p-2 -mr-2 text-gray-400 hover:text-black hover:bg-gray-100 rounded-full transition-colors">
+            <X size={20} />
+          </button>
         </div>
 
         {/* Admin Profile */}
         {adminProfile && (
-          <div className="p-4 mx-4 my-4 bg-[#A1FF4D]/10 rounded-2xl border border-[#A1FF4D]/20">
+          <div className="p-4 mx-4 my-4 bg-[#A1FF4D]/10 rounded-2xl border border-[#A1FF4D]/20 shrink-0">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-[#A1FF4D] flex items-center justify-center text-[#1B2412] font-black text-sm overflow-hidden">
+              <div className="w-9 h-9 rounded-full bg-[#A1FF4D] flex items-center justify-center text-[#1B2412] font-black text-sm overflow-hidden shrink-0">
                 {(adminProfile.avatar_url && !adminImgError) ? (
                   <img 
                     src={adminProfile.avatar_url} 
@@ -416,17 +435,17 @@ export default function AdminDashboard() {
                   adminProfile.full_name?.[0]?.toUpperCase() || 'A'
                 )}
               </div>
-              <div>
-                <p className="text-[12px] font-black text-[#2B3220] leading-none">{adminProfile.full_name || 'Admin'}</p>
+              <div className="min-w-0">
+                <p className="text-[12px] font-black text-[#2B3220] leading-none truncate">{adminProfile.full_name || 'Admin'}</p>
                 <p className="text-[9px] font-bold text-[#567a28] mt-0.5 tracking-widest uppercase">Administrator</p>
               </div>
             </div>
           </div>
         )}
 
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto scrollbar-hide">
           <button
-            onClick={() => setActiveTab("orders")}
+            onClick={() => { setActiveTab("orders"); setIsMobileMenuOpen(false); }}
             className={`flex items-center justify-between px-4 py-3 w-full rounded-xl transition-all text-sm font-bold ${activeTab === "orders" ? "bg-[#A1FF4D]/10 text-[#2B3220]" : "text-gray-400 hover:bg-gray-50"}`}
           >
             <span className="flex items-center gap-3"><ShoppingBag size={16} /> New Orders</span>
@@ -437,7 +456,7 @@ export default function AdminDashboard() {
             )}
           </button>
           <button
-            onClick={() => setActiveTab("processing")}
+            onClick={() => { setActiveTab("processing"); setIsMobileMenuOpen(false); }}
             className={`flex items-center justify-between px-4 py-3 w-full rounded-xl transition-all text-sm font-bold ${activeTab === "processing" ? "bg-[#A1FF4D]/10 text-[#2B3220]" : "text-gray-400 hover:bg-gray-50"}`}
           >
             <span className="flex items-center gap-3"><Truck size={16} /> In Production</span>
@@ -448,7 +467,7 @@ export default function AdminDashboard() {
             )}
           </button>
           <button
-            onClick={() => setActiveTab("receipts")}
+            onClick={() => { setActiveTab("receipts"); setIsMobileMenuOpen(false); }}
             className={`flex items-center justify-between px-4 py-3 w-full rounded-xl transition-all text-sm font-bold ${activeTab === "receipts" ? "bg-[#A1FF4D]/10 text-[#2B3220]" : "text-gray-400 hover:bg-gray-50"}`}
           >
             <span className="flex items-center gap-3"><ShieldCheck size={16} /> Final Payment</span>
@@ -459,7 +478,7 @@ export default function AdminDashboard() {
             )}
           </button>
           <button
-            onClick={() => setActiveTab("completed")}
+            onClick={() => { setActiveTab("completed"); setIsMobileMenuOpen(false); }}
             className={`flex items-center justify-between px-4 py-3 w-full rounded-xl transition-all text-sm font-bold ${activeTab === "completed" ? "bg-teal-500/10 text-teal-700" : "text-gray-400 hover:bg-gray-50"}`}
           >
             <span className="flex items-center gap-3"><CheckCircle size={16} /> Completed</span>
@@ -470,7 +489,7 @@ export default function AdminDashboard() {
             )}
           </button>
           <button
-            onClick={() => setActiveTab("rejected")}
+            onClick={() => { setActiveTab("rejected"); setIsMobileMenuOpen(false); }}
             className={`flex items-center justify-between px-4 py-3 w-full rounded-xl transition-all text-sm font-bold ${activeTab === "rejected" ? "bg-red-500/10 text-red-600" : "text-gray-400 hover:bg-gray-50"}`}
           >
             <span className="flex items-center gap-3"><XCircle size={16} /> Rejected</span>
@@ -481,7 +500,7 @@ export default function AdminDashboard() {
             )}
           </button>
           <button
-            onClick={() => setActiveTab("products")}
+            onClick={() => { setActiveTab("products"); setIsMobileMenuOpen(false); }}
             className={`flex items-center justify-between px-4 py-3 w-full rounded-xl transition-all text-sm font-bold ${activeTab === "products" ? "bg-[#A1FF4D]/10 text-[#2B3220]" : "text-gray-400 hover:bg-gray-50"}`}
           >
             <span className="flex items-center gap-3"><Package size={16} /> Product Reviews</span>
@@ -492,13 +511,13 @@ export default function AdminDashboard() {
           <div className="pt-2">
             <p className="px-4 text-[9px] font-black text-gray-600 uppercase tracking-widest mb-2">Users</p>
             <button
-              onClick={() => setActiveTab("suppliers")}
+              onClick={() => { setActiveTab("suppliers"); setIsMobileMenuOpen(false); }}
               className={`flex items-center gap-3 px-4 py-3 w-full text-left rounded-xl text-sm font-bold transition-all ${activeTab === "suppliers" ? "bg-[#A1FF4D]/10 text-[#2B3220]" : "text-gray-400 hover:bg-gray-50"}`}
             >
               <Users size={16} /> Suppliers ({suppliers.length})
             </button>
             <button
-              onClick={() => setActiveTab("customers")}
+              onClick={() => { setActiveTab("customers"); setIsMobileMenuOpen(false); }}
               className={`flex items-center gap-3 px-4 py-3 w-full text-left rounded-xl text-sm font-bold transition-all ${activeTab === "customers" ? "bg-[#A1FF4D]/10 text-[#2B3220]" : "text-gray-400 hover:bg-gray-50"}`}
             >
               <User size={16} /> Customers ({customers.length})
@@ -515,17 +534,25 @@ export default function AdminDashboard() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-6 md:p-10 overflow-y-auto">
-        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-10">
+      <main className="flex-1 p-4 md:p-10 overflow-y-auto w-full max-w-full">
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-8 md:mb-10">
           <div className="flex items-start justify-between w-full">
-            <div>
-              <h1 className="text-4xl font-black text-[#111] leading-none uppercase tracking-widest" style={{ fontFamily: 'Impact, sans-serif', wordSpacing: '0.15em' }}>
-                System Control
-              </h1>
-              <p className="text-gray-400 font-bold tracking-widest uppercase text-[10px] mt-1">Platform Overview & Administrative Actions</p>
+            <div className="flex items-center gap-3">
+              <button 
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="md:hidden p-2 -ml-2 text-[#111] hover:bg-gray-100 rounded-xl transition-colors active:scale-95"
+              >
+                <Menu size={28} strokeWidth={2.5} />
+              </button>
+              <div>
+                <h1 className="text-2xl sm:text-4xl font-black text-[#111] leading-none uppercase tracking-widest" style={{ fontFamily: 'Impact, sans-serif', wordSpacing: '0.15em' }}>
+                  System Control
+                </h1>
+                <p className="text-gray-400 font-bold tracking-widest uppercase text-[9px] sm:text-[10px] mt-1">Platform Overview & Actions</p>
+              </div>
             </div>
             
-            <div className="flex flex-col items-end gap-3">
+            <div className="flex flex-col items-end gap-2 md:gap-3">
               <button 
                 onClick={() => setShowOrderHistory(true)}
                 className="flex items-center gap-2 border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white px-4 py-2 rounded-xl text-sm font-black uppercase tracking-widest transition-all shadow-sm active:scale-95"

@@ -222,10 +222,10 @@ function OrdersContent() {
                 </div>
             </header>
 
-            <main className="max-w-6xl mx-auto px-6 py-10">
+            <main className="max-w-6xl mx-auto px-4 lg:px-6 py-10">
                 {/* Success Banner */}
                 {showSuccess && (
-                    <div className="mb-8 bg-[#A1FF4D] rounded-3xl p-6 flex items-center gap-5 shadow-lg shadow-[#A1FF4D]/20 animate-in slide-in-from-top-4 fade-in duration-500">
+                    <div className="mb-8 bg-[#A1FF4D] rounded-3xl p-4 lg:p-6 flex items-center gap-3 lg:gap-5 shadow-lg shadow-[#A1FF4D]/20 animate-in slide-in-from-top-4 fade-in duration-500">
                         <div className="w-14 h-14 bg-white/40 rounded-2xl flex items-center justify-center flex-shrink-0">
                             <Sparkles size={28} className="text-[#1B2412]" />
                         </div>
@@ -242,11 +242,11 @@ function OrdersContent() {
                 )}
 
                 {/* Page Header */}
-                <div className="mb-8">
-                    <h1 className="text-4xl font-black text-[#111] uppercase tracking-widest" style={{ fontFamily: "Impact, sans-serif" }}>
+                <div className="mb-6 lg:mb-8">
+                    <h1 className="text-3xl lg:text-4xl font-black text-[#111] uppercase tracking-widest" style={{ fontFamily: "Impact, sans-serif" }}>
                         My Orders
                     </h1>
-                    <p className="text-gray-500 font-medium text-sm mt-1">
+                    <p className="text-gray-500 font-medium text-xs lg:text-sm mt-1">
                         Track all your custom designs from submission to delivery.
                     </p>
                 </div>
@@ -269,16 +269,16 @@ function OrdersContent() {
                         </Link>
                     </div>
                 ) : (
-                    <div className="flex gap-4 items-start">
+                    <div className="flex flex-col lg:flex-row gap-6 items-start">
                         {/* ── Sidebar ── */}
                         <div
                             className={`flex-shrink-0 transition-all duration-500 ease-in-out ${
                                 !selectedOrder
-                                    ? "w-full max-w-lg"          /* no order selected — full width list */
+                                    ? "w-full lg:max-w-lg"          /* no order selected — full width list */
                                     : sidebarExpanded
-                                        ? "w-72"                  /* expanded sidebar */
-                                        : "w-[88px]"              /* collapsed icon-rail */
-                            }`}
+                                        ? "w-full lg:w-72"                  /* expanded sidebar */
+                                        : "hidden lg:block lg:w-[88px]"              /* collapsed icon-rail (hide on mobile if order selected) */
+                            } ${selectedOrder ? "hidden lg:block" : "block"}`}
                         >
                             {/* ── Sidebar header ── */}
                             <div className="flex items-center justify-between mb-3">
@@ -383,7 +383,17 @@ function OrdersContent() {
                             }`}
                         >
                             {selectedOrder
-                                ? <OrderDetail order={selectedOrder} onRefresh={initPage} />
+                                ? (
+                                    <div className="flex flex-col gap-4">
+                                        <button 
+                                            onClick={() => setSelectedOrder(null)}
+                                            className="lg:hidden flex items-center gap-2 text-gray-500 font-black text-[10px] uppercase tracking-widest hover:text-[#111] transition-colors mb-2 w-fit px-4 py-2 bg-white border border-gray-100 rounded-full"
+                                        >
+                                            <ChevronLeft size={14} /> Back to Orders
+                                        </button>
+                                        <OrderDetail order={selectedOrder} onRefresh={initPage} />
+                                    </div>
+                                )
                                 : null}
                         </div>
                     </div>
@@ -432,7 +442,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
     const editUrl = `/editor?edit_order=${order.id}&template=${templateId}`;
 
     return (
-        <div className="bg-white rounded-[3.5rem] border border-gray-100/50 overflow-hidden shadow-2xl shadow-black/5 ring-1 ring-black/[0.02] relative">
+        <div className="bg-white rounded-2xl lg:rounded-[3.5rem] border border-gray-100/50 overflow-hidden shadow-2xl shadow-black/5 ring-1 ring-black/[0.02] relative">
 
             {/* ── Lightbox Overlay ── */}
             {lightbox && (
@@ -477,18 +487,18 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                 </div>
             )}
             {/* Status Header */}
-            <div className={`p-8 ${cfg.bg} border-b ${cfg.border}`}>
+            <div className={`p-6 lg:p-8 ${cfg.bg} border-b ${cfg.border}`}>
                 <div className="flex items-center gap-4">
-                    <div className={`w-14 h-14 rounded-2xl ${cfg.bg} border ${cfg.border} flex items-center justify-center shadow-inner`}>
-                        <Icon size={26} className={cfg.color} />
+                    <div className={`w-12 h-12 lg:w-14 lg:h-14 rounded-2xl ${cfg.bg} border ${cfg.border} flex items-center justify-center shadow-inner flex-shrink-0`}>
+                        <Icon size={22} className={cfg.color} />
                     </div>
-                    <div>
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Current Status</p>
-                        <h3 className={`text-2xl font-black ${cfg.color} uppercase tracking-wider`} style={{ fontFamily: 'Impact, sans-serif' }}>{cfg.label}</h3>
+                    <div className="min-w-0">
+                        <p className="text-[9px] lg:text-[10px] font-black text-gray-400 uppercase tracking-[0.1em] lg:tracking-[0.2em]">Current Status</p>
+                        <h3 className={`text-xl lg:text-2xl font-black ${cfg.color} uppercase tracking-wider truncate`} style={{ fontFamily: 'Impact, sans-serif' }}>{cfg.label}</h3>
                     </div>
-                    <div className="ml-auto text-right">
-                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Order ID</p>
-                        <p className="text-xs font-black text-gray-600 font-mono bg-white px-3 py-1 rounded-full border border-gray-100">#{order.id.slice(0, 8).toUpperCase()}</p>
+                    <div className="ml-auto text-right flex-shrink-0">
+                        <p className="text-[8px] lg:text-[9px] font-black text-gray-400 uppercase tracking-widest">Order ID</p>
+                        <p className="text-[10px] lg:text-xs font-black text-gray-600 font-mono bg-white px-2 lg:px-3 py-1 rounded-full border border-gray-100">#{order.id.slice(0, 8).toUpperCase()}</p>
                     </div>
                 </div>
                 <p className="text-xs text-gray-500 font-bold mt-4 leading-relaxed max-w-2xl">{cfg.description}</p>
@@ -502,8 +512,8 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
 
             {/* Progress Stepper */}
             {order.status !== "REJECTED" && (
-                <div className="px-8 py-6 border-b border-gray-50 bg-[#fafafa]/50">
-                    <div className="flex items-center justify-between gap-4">
+                <div className="px-6 lg:px-8 py-6 border-b border-gray-50 bg-[#fafafa]/50 overflow-x-auto custom-scrollbar">
+                    <div className="flex items-center justify-between gap-8 min-w-[500px] lg:min-w-0 lg:gap-4">
                         {STEPS.map((step, idx) => {
                             const done = currentStep >= step.id;
                             const active = currentStep + 1 === step.id;
@@ -519,7 +529,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                             }`}>
                                             {done ? <CheckCircle size={18} /> : <StepIcon size={16} />}
                                         </div>
-                                        <span className={`text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap ${done ? "text-[#2B3220]" : active ? "text-[#A1FF4D]" : "text-gray-300"}`}>
+                                        <span className={`text-[11px] font-black uppercase tracking-widest text-center whitespace-nowrap ${done ? "text-[#2B3220]" : active ? "text-[#A1FF4D]" : "text-gray-400"}`}>
                                             {step.label}
                                         </span>
                                     </div>
@@ -533,7 +543,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                 </div>
             )}
 
-            <div className="p-6 space-y-6">
+            <div className="p-3 lg:p-6 space-y-6">
                 {/* 2-Column Balanced Layout — Gallery & Details Stack */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
                     {/* Mockup Gallery */}
@@ -582,7 +592,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                     {/* ── Details Stack (Specs + Financial) ── */}
                     <div className="flex flex-col gap-4">
                         {/* ── Specifications Card ── */}
-                        <div className="group/spec relative bg-white rounded-3xl border border-gray-100 p-5 flex flex-col gap-3 overflow-hidden
+                        <div className="group/spec relative bg-white rounded-3xl border border-gray-100 p-3 lg:p-5 flex flex-col gap-3 overflow-hidden
                             hover:border-gray-200 hover:shadow-[0_24px_48px_-10px_rgba(0,0,0,0.10)] transition-all duration-500 ease-out flex-1">
 
 
@@ -667,7 +677,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                             <div className="flex items-start justify-between relative z-10">
                                 <div>
                                     <p className="text-[9px] font-black text-gray-300 uppercase tracking-[0.3em] mb-1">Product Details</p>
-                                    <h4 className="text-xl font-black text-[#111] leading-tight tracking-tighter">
+                                    <h4 className="text-base lg:text-xl font-black text-[#111] leading-tight tracking-tighter">
                                         {order.product_type}
                                     </h4>
                                 </div>
@@ -689,7 +699,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                     { label: 'Quantity', value: `${order.variants?.quantity || 1} units`, highlight: true },
                                     ...(order.delivery_location ? [{ label: 'Delivery', value: order.delivery_location }] : []),
                                 ].map((row, i) => (
-                                    <div key={i} className="relative flex items-center justify-between py-2.5 pl-3">
+                                    <div key={i} className="relative flex items-center justify-between py-1.5 lg:py-2.5 pl-3">
                                         {/* Glowing left accent bar */}
                                         <div
                                             className={`spec-row-accent delay-${i} absolute left-0 top-1 bottom-1 w-[3px] rounded-full`}
@@ -697,14 +707,14 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                         />
                                         {/* Gliding content */}
                                         <div className={`spec-row-inner delay-${i} flex items-center justify-between w-full`}>
-                                            <span className="spec-label text-[10px] font-black text-gray-400 uppercase tracking-widest">{row.label}</span>
+                                            <span className="spec-label text-[9px] lg:text-[10px] font-black text-gray-400 uppercase tracking-widest">{row.label}</span>
                                             <div className="flex items-center gap-2">
                                                 {row.swatch && (
                                                     <div className="w-3.5 h-3.5 rounded-full border border-gray-200 shadow-sm"
                                                         style={{ backgroundColor: row.swatch.toLowerCase() }} />
                                                 )}
                                                 <span className={`text-xs font-black tracking-tight transition-all duration-500 ${row.highlight
-                                                    ? 'bg-[#111] text-white px-3 py-1 rounded-full group-hover/spec:bg-[#A1FF4D] group-hover/spec:text-[#111] group-hover/spec:shadow-[0_0_16px_rgba(161,255,77,0.5)]'
+                                                    ? 'bg-[#111] text-white px-2.5 lg:px-3 py-1 rounded-full group-hover/spec:bg-[#A1FF4D] group-hover/spec:text-[#111] group-hover/spec:shadow-[0_0_16px_rgba(161,255,77,0.5)]'
                                                     : 'text-[#111]'
                                                 }`}>{row.value}</span>
                                             </div>
@@ -716,7 +726,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
 
 
                         {/* ── Financial Card ── */}
-                        <div className="group/fin relative bg-gradient-to-br from-[#0c1a12] to-[#122618] rounded-3xl p-5 flex flex-col gap-3 overflow-hidden
+                        <div className="group/fin relative bg-gradient-to-br from-[#0c1a12] to-[#122618] rounded-3xl p-3 lg:p-5 flex flex-col gap-3 overflow-hidden
                             hover:shadow-[0_24px_64px_-12px_rgba(161,255,77,0.2)] hover:-translate-y-1 transition-all duration-500 ease-out flex-1 border border-[#1b3624]">
 
                             {/* Sweeping shimmer on hover */}
@@ -733,9 +743,9 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                             <div className="flex items-start justify-between">
                                 <div>
                                     <p className="text-[9px] font-black text-[#8ec8a2] uppercase tracking-[0.3em] mb-1">Order Total</p>
-                                    <p className="text-3xl font-black text-white leading-none tracking-tighter">
+                                    <p className="text-2xl lg:text-3xl font-black text-white leading-none tracking-tighter">
                                         {(() => { const b = order.supplier_product?.price || 600; return (b * (order.variants?.quantity || 1)).toLocaleString(); })()}
-                                        <span className="text-base font-bold text-[#8ec8a2] ml-1.5">ETB</span>
+                                        <span className="text-sm lg:text-base font-bold text-[#8ec8a2] ml-1.5">ETB</span>
                                     </p>
                                 </div>
                                 {/* Live dot */}
@@ -750,16 +760,16 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                             {/* Breakdown rows */}
                             <div className="space-y-2.5 flex-1">
                                 {/* Deposit */}
-                                <div className="flex items-center justify-between rounded-2xl px-4 py-3 bg-[#162d1d] border border-[#1e3b26]
+                                <div className="flex items-center justify-between rounded-2xl px-3 lg:px-4 py-3 bg-[#162d1d] border border-[#1e3b26]
                                     hover:bg-[#193622] hover:border-[#25462e] transition-all duration-300 group/row">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-7 h-7 rounded-lg bg-[#1e3b26] flex items-center justify-center group-hover/row:bg-[#25462e] transition-colors duration-300">
-                                            <CheckCircle size={13} className="text-[#A1FF4D] opacity-90 group-hover/row:opacity-100 transition-opacity duration-300" />
+                                        <div className="w-6 h-6 lg:w-7 lg:h-7 rounded-lg bg-[#1e3b26] flex items-center justify-center group-hover/row:bg-[#25462e] transition-colors duration-300">
+                                            <CheckCircle size={12} className="text-[#A1FF4D] opacity-90 group-hover/row:opacity-100 transition-opacity duration-300" />
                                         </div>
                                         <div>
-                                            <p className="text-[8px] font-black text-[#8ec8a2] uppercase tracking-widest">Deposit Paid</p>
-                                            <p className="text-sm font-black text-white mt-0.5">
-                                                {(() => { const b = order.supplier_product?.price || 600; return (b * (order.variants?.quantity || 1) / 2).toLocaleString(); })()} <span className="text-[9px] font-bold text-[#8ec8a2]">ETB</span>
+                                            <p className="text-[9px] lg:text-[10px] font-black text-[#A1FF4D] uppercase tracking-widest">Deposit Paid</p>
+                                            <p className="text-sm lg:text-base font-black text-white mt-0.5">
+                                                {(() => { const b = order.supplier_product?.price || 600; return (b * (order.variants?.quantity || 1) / 2).toLocaleString(); })()} <span className="text-[10px] lg:text-[11px] font-bold text-[#A1FF4D]">ETB</span>
                                             </p>
                                         </div>
                                     </div>
@@ -769,24 +779,24 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                 </div>
 
                                 {/* Balance Due / Paid */}
-                                <div className="flex items-center justify-between rounded-2xl px-4 py-3 bg-[#162d1d] border border-[#1e3b26]
+                                <div className="flex items-center justify-between rounded-2xl px-3 lg:px-4 py-3 bg-[#162d1d] border border-[#1e3b26]
                                     hover:bg-[#193622] hover:border-[#25462e] transition-all duration-300 group/row2">
                                     <div className="flex items-center gap-3">
-                                        <div className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors duration-300 ${['PRODUCTION_APPROVED_AND_PAID', 'COMPLETED_BY_SUPPLIER', 'DELIVERED', 'COMPLETED'].includes(order.status) ? 'bg-[#A1FF4D]/20' : 'bg-[#1e3b26] group-hover/row2:bg-[#25462e]'}`}>
+                                        <div className={`w-6 h-6 lg:w-7 lg:h-7 rounded-lg flex items-center justify-center transition-colors duration-300 ${['PRODUCTION_APPROVED_AND_PAID', 'COMPLETED_BY_SUPPLIER', 'DELIVERED', 'COMPLETED'].includes(order.status) ? 'bg-[#A1FF4D]/20' : 'bg-[#1e3b26] group-hover/row2:bg-[#25462e]'}`}>
                                             {['PRODUCTION_APPROVED_AND_PAID', 'COMPLETED_BY_SUPPLIER', 'DELIVERED', 'COMPLETED'].includes(order.status) ? (
-                                                <CheckCircle size={13} className="text-[#A1FF4D]" />
+                                                <CheckCircle size={12} className="text-[#A1FF4D]" />
                                             ) : order.status === 'FINAL_PAYMENT_PENDING' ? (
-                                                <Loader2 size={13} className="text-amber-400 animate-spin" />
+                                                <Loader2 size={12} className="text-amber-400 animate-spin" />
                                             ) : (
-                                                <span className="text-[#8ec8a2] text-xs group-hover/row2:text-white transition-colors duration-300">→</span>
+                                                <span className="text-[#8ec8a2] text-[10px] group-hover/row2:text-white transition-colors duration-300">→</span>
                                             )}
                                         </div>
                                         <div>
-                                            <p className={`text-[8px] font-black uppercase tracking-widest ${['PRODUCTION_APPROVED_AND_PAID', 'COMPLETED_BY_SUPPLIER', 'DELIVERED', 'COMPLETED'].includes(order.status) ? 'text-[#A1FF4D]' : 'text-[#8ec8a2]'}`}>
+                                            <p className={`text-[9px] lg:text-[10px] font-black uppercase tracking-widest ${['PRODUCTION_APPROVED_AND_PAID', 'COMPLETED_BY_SUPPLIER', 'DELIVERED', 'COMPLETED'].includes(order.status) ? 'text-[#A1FF4D]' : 'text-[#8ec8a2]'}`}>
                                                 {['PRODUCTION_APPROVED_AND_PAID', 'COMPLETED_BY_SUPPLIER', 'DELIVERED', 'COMPLETED'].includes(order.status) ? 'Balance Paid' : order.status === 'FINAL_PAYMENT_PENDING' ? 'Verifying Payment' : 'Balance Due'}
                                             </p>
-                                            <p className="text-sm font-black text-white mt-0.5 group-hover/fin:text-[#A1FF4D] transition-colors duration-500">
-                                                {(() => { const b = order.supplier_product?.price || 600; return (b * (order.variants?.quantity || 1) / 2).toLocaleString(); })()} <span className="text-[9px] font-bold text-[#8ec8a2] group-hover/fin:text-[#A1FF4D]/70 transition-colors duration-500">ETB</span>
+                                            <p className="text-sm lg:text-base font-black text-white mt-0.5 group-hover/fin:text-[#A1FF4D] transition-colors duration-500">
+                                                {(() => { const b = order.supplier_product?.price || 600; return (b * (order.variants?.quantity || 1) / 2).toLocaleString(); })()} <span className="text-[10px] lg:text-[11px] font-bold text-[#8ec8a2] group-hover/fin:text-[#A1FF4D]/70 transition-colors duration-500">ETB</span>
                                             </p>
                                         </div>
                                     </div>
@@ -805,14 +815,14 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                 <div className="pt-8">
                     {/* Supplier proof & Approval Logic */}
                     {order.supplier_proof_image_url && (
-                        <div className="bg-emerald-50/40 border border-emerald-100 rounded-[3rem] p-10 shadow-sm relative overflow-hidden">
+                        <div className="bg-emerald-50/40 border border-emerald-100 rounded-3xl lg:rounded-[3rem] p-5 lg:p-10 shadow-sm relative overflow-hidden">
                             {/* Decorative Background */}
                             <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-200/20 rounded-full blur-3xl -mr-32 -mt-32" />
                             
                             <div className="flex flex-col sm:flex-row gap-6 relative z-10">
                                 {/* Proof Image Container */}
                                 <div className="w-full sm:w-48 flex-shrink-0 group">
-                                    <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white aspect-[4/3]">
+                                    <div className="relative rounded-3xl lg:rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white aspect-[4/3]">
                                         <img src={order.supplier_proof_image_url} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Proof" />
                                         <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                             <a
@@ -838,7 +848,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                     {!order.variants?.finalReceiptUrl ? (
                                         <div className="space-y-6">
                                             {order.variants?.finalReceiptRejected && (
-                                                <div className="bg-red-50 border-2 border-red-100 rounded-3xl p-6 mb-4 animate-in fade-in slide-in-from-top-4">
+                                                <div className="bg-red-50 border-2 border-red-100 rounded-3xl p-4 lg:p-6 mb-4 animate-in fade-in slide-in-from-top-4">
                                                     <div className="flex items-center gap-3 mb-2 text-red-600">
                                                         <AlertCircle size={20} />
                                                         <p className="text-sm font-black uppercase tracking-widest">Payment Receipt Rejected</p>
@@ -869,7 +879,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                                     )}
 
                                                     {activeAction === 'decline' && (
-                                                        <div className="bg-white/80 p-6 rounded-3xl border border-red-100 animate-in fade-in slide-in-from-bottom-2">
+                                                        <div className="bg-white/80 p-5 lg:p-6 rounded-3xl border border-red-100 animate-in fade-in slide-in-from-bottom-2">
                                                             <div className="flex justify-between items-center mb-3">
                                                                 <label className="text-[11px] font-black text-red-600 uppercase tracking-widest">Rejection Feedback</label>
                                                                 <button onClick={() => setActiveAction('none')} className="text-[10px] font-black text-gray-400 hover:text-gray-600">Cancel</button>
@@ -898,12 +908,12 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                                     )}
 
                                                     {activeAction === 'approve' && (
-                                                        <div className="bg-white/80 p-8 rounded-[3rem] border border-emerald-100 animate-in fade-in slide-in-from-bottom-2">
+                                                        <div className="bg-white/80 p-5 lg:p-8 rounded-3xl lg:rounded-[3rem] border border-emerald-100 animate-in fade-in slide-in-from-bottom-2">
                                                             <div className="flex justify-between items-center mb-6">
                                                                 <label className="text-[11px] font-black text-emerald-700 uppercase tracking-widest">Final Batch Payment Receipt</label>
                                                                 <button onClick={() => setActiveAction('none')} className="text-[10px] font-black text-gray-400 hover:text-gray-600">Cancel</button>
                                                             </div>
-                                                            <div className="relative border-4 border-dashed border-emerald-100 rounded-[2rem] p-10 bg-emerald-50/30 flex flex-col items-center group/upload">
+                                                            <div className="relative border-4 border-dashed border-emerald-100 rounded-[2rem] p-6 lg:p-10 bg-emerald-50/30 flex flex-col items-center group/upload">
                                                                 <input 
                                                                     type="file" 
                                                                     accept="image/*"
@@ -952,7 +962,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                             )}
 
                                             {order.status === 'SAMPLE_REJECTED' && (
-                                                <div className="bg-red-50 rounded-3xl p-8 border border-red-100 flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4">
+                                                <div className="bg-red-50 rounded-3xl p-5 lg:p-8 border border-red-100 flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4">
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center shadow-sm">
                                                             <XCircle className="text-red-500" size={20} />
@@ -970,7 +980,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                             )}
 
                                             {order.status === 'FINAL_PAYMENT_PENDING' && (
-                                                <div className="bg-amber-500/10 rounded-3xl p-8 border border-amber-500/20 animate-in fade-in slide-in-from-bottom-4">
+                                                <div className="bg-amber-500/10 rounded-3xl p-5 lg:p-8 border border-amber-500/20 animate-in fade-in slide-in-from-bottom-4">
                                                     <div className="flex items-center gap-4 mb-4">
                                                         <div className="w-12 h-12 rounded-2xl bg-amber-400 flex items-center justify-center shadow-lg shadow-amber-400/20">
                                                             <Clock className="text-[#1B2412]" size={24} />
@@ -995,7 +1005,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                             )}
 
                                             {['PRODUCTION_APPROVED_AND_PAID', 'COMPLETED_BY_SUPPLIER', 'DELIVERED'].includes(order.status) && (
-                                                <div className="bg-emerald-500/10 rounded-3xl p-8 border border-emerald-500/20 animate-in fade-in slide-in-from-bottom-4">
+                                                <div className="bg-emerald-500/10 rounded-3xl p-5 lg:p-8 border border-emerald-500/20 animate-in fade-in slide-in-from-bottom-4">
                                                     <div className="flex items-center gap-4 mb-4">
                                                         <div className="w-12 h-12 rounded-2xl bg-[#A1FF4D] flex items-center justify-center shadow-lg shadow-[#A1FF4D]/20">
                                                             <CheckCircle className="text-[#1B2412]" size={24} />
