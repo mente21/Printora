@@ -139,14 +139,6 @@ export default function MobileNav({ activePage }: MobileNavProps) {
             {/* Fixed bottom actions */}
             <div className="p-6 bg-gray-50 border-t border-gray-100 mt-auto shrink-0">
               <div className="flex flex-col gap-3">
-                <Link
-                  href="/products"
-                  onClick={() => setOpen(false)}
-                  className="w-full py-4 rounded-2xl bg-[#111] text-white font-bold text-center text-lg hover:bg-black transition-all active:scale-[0.98] shadow-xl"
-                >
-                  Explore Catalog
-                </Link>
-                
                 {!user && (
                   <>
                     <Link
