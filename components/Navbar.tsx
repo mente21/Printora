@@ -131,8 +131,7 @@ export default function Navbar() {
           </div>
         </nav>
 
-        <div className="flex-1 flex items-center justify-end gap-3">
-          <MobileNav activePage="" />
+        <div className="flex-1 flex items-center justify-end gap-2 sm:gap-3">
           {user ? (
             // --- LOGGED IN STATE ---
             <div className="relative">
@@ -272,18 +271,19 @@ export default function Navbar() {
           ) : (
             // --- LOGGED OUT STATE ---
             <>
-              <Link href="/login" className="hidden sm:flex items-center justify-center rounded-md px-6 h-11 text-[16px] font-extrabold tracking-wide text-[#1B2412] bg-white border border-[#e5e7eb] hover:border-[#d1d5db] hover:bg-gray-50 transition-colors">
+              <Link href="/login" className="hidden md:flex items-center justify-center rounded-md px-6 h-11 text-[16px] font-extrabold tracking-wide text-[#1B2412] bg-white border border-[#e5e7eb] hover:border-[#d1d5db] hover:bg-gray-50 transition-colors">
                 Log in
               </Link>
               <Link
                 href="/signup"
-                className="flex items-center justify-center rounded-xl px-6 sm:px-8 h-11 sm:h-12 text-[15px] sm:text-[16px] font-black tracking-tight transition-all duration-300 hover:scale-[1.05] hover:shadow-[0_0_25px_rgba(161,255,77,0.4)] active:scale-95"
+                className="hidden md:flex items-center justify-center rounded-xl px-8 h-12 text-[16px] font-black tracking-tight transition-all duration-300 hover:scale-[1.05] hover:shadow-[0_0_25px_rgba(161,255,77,0.4)] active:scale-95"
                 style={{ backgroundColor: '#A1FF4D', color: '#1B2412' }}
               >
                 Sign up
               </Link>
             </>
           )}
+          <MobileNav activePage="" />
         </div>
       </header>
     </div>
