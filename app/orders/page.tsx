@@ -246,7 +246,7 @@ function OrdersContent() {
                     <h1 className="text-3xl lg:text-4xl font-black text-[#111] uppercase tracking-widest" style={{ fontFamily: "Impact, sans-serif" }}>
                         My Orders
                     </h1>
-                    <p className="text-gray-500 font-medium text-xs lg:text-sm mt-1">
+                    <p className="text-gray-600 font-bold text-sm lg:text-base mt-1">
                         Track all your custom designs from submission to delivery.
                     </p>
                 </div>
@@ -346,8 +346,8 @@ function OrdersContent() {
                                                             : <div className="w-full h-full flex items-center justify-center text-gray-200"><Package size={20} /></div>}
                                                     </div>
                                                     <div className="flex-1 min-w-0">
-                                                        <p className="font-black text-[#111] text-sm truncate">{order.product_type}</p>
-                                                        <p className="text-[10px] text-gray-400 font-bold truncate">{order.variants?.color} • {order.variants?.view}</p>
+                                                        <p className="font-black text-[#111] text-[15px] truncate">{order.product_type}</p>
+                                                        <p className="text-[11px] text-gray-500 font-black truncate">{order.variants?.color} • {order.variants?.view}</p>
                                                         <div className={`inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${cfg.bg} ${cfg.color}`}>
                                                             <Icon size={9} />{cfg.label}
                                                         </div>
@@ -501,7 +501,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                         <p className="text-[10px] lg:text-xs font-black text-gray-600 font-mono bg-white px-2 lg:px-3 py-1 rounded-full border border-gray-100">#{order.id.slice(0, 8).toUpperCase()}</p>
                     </div>
                 </div>
-                <p className="text-xs text-gray-500 font-bold mt-4 leading-relaxed max-w-2xl">{cfg.description}</p>
+                <p className="text-[13px] lg:text-[14px] text-gray-600 font-black mt-4 leading-relaxed max-w-2xl">{cfg.description}</p>
                 {order.status === "REJECTED" && order.variants?.admin_rejection_reason && (
                     <div className="mt-4 bg-red-100/50 p-4 rounded-xl border border-red-200">
                         <p className="text-[10px] font-black uppercase tracking-widest text-red-600 mb-1">Reason for Rejection</p>
@@ -529,7 +529,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                             }`}>
                                             {done ? <CheckCircle size={18} /> : <StepIcon size={16} />}
                                         </div>
-                                        <span className={`text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap ${done ? "text-[#2B3220]" : active ? "text-[#A1FF4D]" : "text-gray-300"}`}>
+                                        <span className={`text-[11px] font-black uppercase tracking-widest text-center whitespace-nowrap ${done ? "text-[#2B3220]" : active ? "text-[#A1FF4D]" : "text-gray-400"}`}>
                                             {step.label}
                                         </span>
                                     </div>
@@ -707,13 +707,13 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                         />
                                         {/* Gliding content */}
                                         <div className={`spec-row-inner delay-${i} flex items-center justify-between w-full`}>
-                                            <span className="spec-label text-[10px] font-black text-gray-400 uppercase tracking-widest">{row.label}</span>
+                                            <span className="spec-label text-[11px] font-black text-gray-500 uppercase tracking-widest">{row.label}</span>
                                             <div className="flex items-center gap-2">
                                                 {row.swatch && (
                                                     <div className="w-3.5 h-3.5 rounded-full border border-gray-200 shadow-sm"
                                                         style={{ backgroundColor: row.swatch.toLowerCase() }} />
                                                 )}
-                                                <span className={`text-xs font-black tracking-tight transition-all duration-500 ${row.highlight
+                                                <span className={`text-sm font-black tracking-tight transition-all duration-500 ${row.highlight
                                                     ? 'bg-[#111] text-white px-3 py-1 rounded-full group-hover/spec:bg-[#A1FF4D] group-hover/spec:text-[#111] group-hover/spec:shadow-[0_0_16px_rgba(161,255,77,0.5)]'
                                                     : 'text-[#111]'
                                                 }`}>{row.value}</span>
@@ -767,9 +767,9 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                             <CheckCircle size={13} className="text-[#A1FF4D] opacity-90 group-hover/row:opacity-100 transition-opacity duration-300" />
                                         </div>
                                         <div>
-                                            <p className="text-[8px] font-black text-[#8ec8a2] uppercase tracking-widest">Deposit Paid</p>
-                                            <p className="text-sm font-black text-white mt-0.5">
-                                                {(() => { const b = order.supplier_product?.price || 600; return (b * (order.variants?.quantity || 1) / 2).toLocaleString(); })()} <span className="text-[9px] font-bold text-[#8ec8a2]">ETB</span>
+                                            <p className="text-[10px] font-black text-[#A1FF4D] uppercase tracking-widest">Deposit Paid</p>
+                                            <p className="text-base font-black text-white mt-0.5">
+                                                {(() => { const b = order.supplier_product?.price || 600; return (b * (order.variants?.quantity || 1) / 2).toLocaleString(); })()} <span className="text-[11px] font-bold text-[#A1FF4D]">ETB</span>
                                             </p>
                                         </div>
                                     </div>
@@ -792,11 +792,11 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                             )}
                                         </div>
                                         <div>
-                                            <p className={`text-[8px] font-black uppercase tracking-widest ${['PRODUCTION_APPROVED_AND_PAID', 'COMPLETED_BY_SUPPLIER', 'DELIVERED', 'COMPLETED'].includes(order.status) ? 'text-[#A1FF4D]' : 'text-[#8ec8a2]'}`}>
+                                            <p className={`text-[10px] font-black uppercase tracking-widest ${['PRODUCTION_APPROVED_AND_PAID', 'COMPLETED_BY_SUPPLIER', 'DELIVERED', 'COMPLETED'].includes(order.status) ? 'text-[#A1FF4D]' : 'text-[#8ec8a2]'}`}>
                                                 {['PRODUCTION_APPROVED_AND_PAID', 'COMPLETED_BY_SUPPLIER', 'DELIVERED', 'COMPLETED'].includes(order.status) ? 'Balance Paid' : order.status === 'FINAL_PAYMENT_PENDING' ? 'Verifying Payment' : 'Balance Due'}
                                             </p>
-                                            <p className="text-sm font-black text-white mt-0.5 group-hover/fin:text-[#A1FF4D] transition-colors duration-500">
-                                                {(() => { const b = order.supplier_product?.price || 600; return (b * (order.variants?.quantity || 1) / 2).toLocaleString(); })()} <span className="text-[9px] font-bold text-[#8ec8a2] group-hover/fin:text-[#A1FF4D]/70 transition-colors duration-500">ETB</span>
+                                            <p className="text-base font-black text-white mt-0.5 group-hover/fin:text-[#A1FF4D] transition-colors duration-500">
+                                                {(() => { const b = order.supplier_product?.price || 600; return (b * (order.variants?.quantity || 1) / 2).toLocaleString(); })()} <span className="text-[11px] font-bold text-[#8ec8a2] group-hover/fin:text-[#A1FF4D]/70 transition-colors duration-500">ETB</span>
                                             </p>
                                         </div>
                                     </div>
