@@ -590,14 +590,7 @@ function ProductsPageContent() {
 
             {/* Mobile View */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full px-2 gap-4 lg:hidden">
-              <div className="flex items-center gap-3 w-full sm:w-auto">
-                <button 
-                  onClick={() => setIsMobileFiltersOpen(true)}
-                  className="flex items-center justify-center w-[42px] h-[42px] bg-[#1c211f] text-white rounded-xl hover:bg-black transition-all shadow-[0_4px_12px_rgba(28,33,31,0.15)] active:scale-95 shrink-0"
-                  aria-label="Open Menu"
-                >
-                  <Menu size={20} />
-                </button>
+              <div className="flex items-center gap-2 w-full sm:w-auto">
                 <div className="relative flex-1 sm:w-64">
                   <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input
@@ -605,9 +598,16 @@ function ProductsPageContent() {
                     placeholder="Search products..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2 pl-9 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#3da85b]/20 focus:border-[#3da85b] transition-all"
+                    className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#3da85b]/20 focus:border-[#3da85b] transition-all"
                   />
                 </div>
+                <button 
+                  onClick={() => setIsMobileFiltersOpen(true)}
+                  className="flex items-center justify-center p-2 text-[#1c211f] bg-transparent hover:bg-gray-100 rounded-xl transition-all active:scale-95 shrink-0"
+                  aria-label="Open Menu"
+                >
+                  <Menu size={28} strokeWidth={2.5} />
+                </button>
               </div>
 
               <div className="flex items-center gap-2 text-gray-500 font-medium text-sm">
