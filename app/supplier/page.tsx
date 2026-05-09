@@ -690,8 +690,8 @@ function SupplierDashboardContent() {
     <div className="min-h-screen bg-[#fafafa] flex flex-col md:flex-row font-sans">
       
       {/* Mobile Header (Clear, Logo Only) */}
-      <header className="md:hidden flex items-center p-4 bg-transparent sticky top-0 z-30 shrink-0">
-        <img src="/logo.png" alt="Logo" className="h-10 w-auto object-contain" />
+      <header className="md:hidden flex items-center p-4 bg-transparent sticky top-0 z-30 shrink-0 pointer-events-none">
+        <img src="/logo.png" alt="Logo" className="h-16 w-auto object-contain pointer-events-auto drop-shadow-md" />
       </header>
 
       {/* Floating Bold Menu Button */}
