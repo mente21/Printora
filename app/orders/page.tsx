@@ -677,7 +677,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                             <div className="flex items-start justify-between relative z-10">
                                 <div>
                                     <p className="text-[9px] font-black text-gray-300 uppercase tracking-[0.3em] mb-1">Product Details</p>
-                                    <h4 className="text-xl font-black text-[#111] leading-tight tracking-tighter">
+                                    <h4 className="text-base lg:text-xl font-black text-[#111] leading-tight tracking-tighter">
                                         {order.product_type}
                                     </h4>
                                 </div>
@@ -699,7 +699,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                     { label: 'Quantity', value: `${order.variants?.quantity || 1} units`, highlight: true },
                                     ...(order.delivery_location ? [{ label: 'Delivery', value: order.delivery_location }] : []),
                                 ].map((row, i) => (
-                                    <div key={i} className="relative flex items-center justify-between py-2 lg:py-2.5 pl-3">
+                                    <div key={i} className="relative flex items-center justify-between py-1.5 lg:py-2.5 pl-3">
                                         {/* Glowing left accent bar */}
                                         <div
                                             className={`spec-row-accent delay-${i} absolute left-0 top-1 bottom-1 w-[3px] rounded-full`}
@@ -707,7 +707,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                         />
                                         {/* Gliding content */}
                                         <div className={`spec-row-inner delay-${i} flex items-center justify-between w-full`}>
-                                            <span className="spec-label text-[10px] font-black text-gray-400 uppercase tracking-widest">{row.label}</span>
+                                            <span className="spec-label text-[9px] lg:text-[10px] font-black text-gray-400 uppercase tracking-widest">{row.label}</span>
                                             <div className="flex items-center gap-2">
                                                 {row.swatch && (
                                                     <div className="w-3.5 h-3.5 rounded-full border border-gray-200 shadow-sm"
@@ -743,9 +743,9 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                             <div className="flex items-start justify-between">
                                 <div>
                                     <p className="text-[9px] font-black text-[#8ec8a2] uppercase tracking-[0.3em] mb-1">Order Total</p>
-                                    <p className="text-3xl font-black text-white leading-none tracking-tighter">
+                                    <p className="text-2xl lg:text-3xl font-black text-white leading-none tracking-tighter">
                                         {(() => { const b = order.supplier_product?.price || 600; return (b * (order.variants?.quantity || 1)).toLocaleString(); })()}
-                                        <span className="text-base font-bold text-[#8ec8a2] ml-1.5">ETB</span>
+                                        <span className="text-sm lg:text-base font-bold text-[#8ec8a2] ml-1.5">ETB</span>
                                     </p>
                                 </div>
                                 {/* Live dot */}
@@ -763,13 +763,13 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                 <div className="flex items-center justify-between rounded-2xl px-3 lg:px-4 py-3 bg-[#162d1d] border border-[#1e3b26]
                                     hover:bg-[#193622] hover:border-[#25462e] transition-all duration-300 group/row">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-7 h-7 rounded-lg bg-[#1e3b26] flex items-center justify-center group-hover/row:bg-[#25462e] transition-colors duration-300">
-                                            <CheckCircle size={13} className="text-[#A1FF4D] opacity-90 group-hover/row:opacity-100 transition-opacity duration-300" />
+                                        <div className="w-6 h-6 lg:w-7 lg:h-7 rounded-lg bg-[#1e3b26] flex items-center justify-center group-hover/row:bg-[#25462e] transition-colors duration-300">
+                                            <CheckCircle size={12} className="text-[#A1FF4D] opacity-90 group-hover/row:opacity-100 transition-opacity duration-300" />
                                         </div>
                                         <div>
-                                            <p className="text-[10px] font-black text-[#A1FF4D] uppercase tracking-widest">Deposit Paid</p>
-                                            <p className="text-base font-black text-white mt-0.5">
-                                                {(() => { const b = order.supplier_product?.price || 600; return (b * (order.variants?.quantity || 1) / 2).toLocaleString(); })()} <span className="text-[11px] font-bold text-[#A1FF4D]">ETB</span>
+                                            <p className="text-[9px] lg:text-[10px] font-black text-[#A1FF4D] uppercase tracking-widest">Deposit Paid</p>
+                                            <p className="text-sm lg:text-base font-black text-white mt-0.5">
+                                                {(() => { const b = order.supplier_product?.price || 600; return (b * (order.variants?.quantity || 1) / 2).toLocaleString(); })()} <span className="text-[10px] lg:text-[11px] font-bold text-[#A1FF4D]">ETB</span>
                                             </p>
                                         </div>
                                     </div>
@@ -782,21 +782,21 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                 <div className="flex items-center justify-between rounded-2xl px-3 lg:px-4 py-3 bg-[#162d1d] border border-[#1e3b26]
                                     hover:bg-[#193622] hover:border-[#25462e] transition-all duration-300 group/row2">
                                     <div className="flex items-center gap-3">
-                                        <div className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors duration-300 ${['PRODUCTION_APPROVED_AND_PAID', 'COMPLETED_BY_SUPPLIER', 'DELIVERED', 'COMPLETED'].includes(order.status) ? 'bg-[#A1FF4D]/20' : 'bg-[#1e3b26] group-hover/row2:bg-[#25462e]'}`}>
+                                        <div className={`w-6 h-6 lg:w-7 lg:h-7 rounded-lg flex items-center justify-center transition-colors duration-300 ${['PRODUCTION_APPROVED_AND_PAID', 'COMPLETED_BY_SUPPLIER', 'DELIVERED', 'COMPLETED'].includes(order.status) ? 'bg-[#A1FF4D]/20' : 'bg-[#1e3b26] group-hover/row2:bg-[#25462e]'}`}>
                                             {['PRODUCTION_APPROVED_AND_PAID', 'COMPLETED_BY_SUPPLIER', 'DELIVERED', 'COMPLETED'].includes(order.status) ? (
-                                                <CheckCircle size={13} className="text-[#A1FF4D]" />
+                                                <CheckCircle size={12} className="text-[#A1FF4D]" />
                                             ) : order.status === 'FINAL_PAYMENT_PENDING' ? (
-                                                <Loader2 size={13} className="text-amber-400 animate-spin" />
+                                                <Loader2 size={12} className="text-amber-400 animate-spin" />
                                             ) : (
-                                                <span className="text-[#8ec8a2] text-xs group-hover/row2:text-white transition-colors duration-300">→</span>
+                                                <span className="text-[#8ec8a2] text-[10px] group-hover/row2:text-white transition-colors duration-300">→</span>
                                             )}
                                         </div>
                                         <div>
-                                            <p className={`text-[10px] font-black uppercase tracking-widest ${['PRODUCTION_APPROVED_AND_PAID', 'COMPLETED_BY_SUPPLIER', 'DELIVERED', 'COMPLETED'].includes(order.status) ? 'text-[#A1FF4D]' : 'text-[#8ec8a2]'}`}>
+                                            <p className={`text-[9px] lg:text-[10px] font-black uppercase tracking-widest ${['PRODUCTION_APPROVED_AND_PAID', 'COMPLETED_BY_SUPPLIER', 'DELIVERED', 'COMPLETED'].includes(order.status) ? 'text-[#A1FF4D]' : 'text-[#8ec8a2]'}`}>
                                                 {['PRODUCTION_APPROVED_AND_PAID', 'COMPLETED_BY_SUPPLIER', 'DELIVERED', 'COMPLETED'].includes(order.status) ? 'Balance Paid' : order.status === 'FINAL_PAYMENT_PENDING' ? 'Verifying Payment' : 'Balance Due'}
                                             </p>
-                                            <p className="text-base font-black text-white mt-0.5 group-hover/fin:text-[#A1FF4D] transition-colors duration-500">
-                                                {(() => { const b = order.supplier_product?.price || 600; return (b * (order.variants?.quantity || 1) / 2).toLocaleString(); })()} <span className="text-[11px] font-bold text-[#8ec8a2] group-hover/fin:text-[#A1FF4D]/70 transition-colors duration-500">ETB</span>
+                                            <p className="text-sm lg:text-base font-black text-white mt-0.5 group-hover/fin:text-[#A1FF4D] transition-colors duration-500">
+                                                {(() => { const b = order.supplier_product?.price || 600; return (b * (order.variants?.quantity || 1) / 2).toLocaleString(); })()} <span className="text-[10px] lg:text-[11px] font-bold text-[#8ec8a2] group-hover/fin:text-[#A1FF4D]/70 transition-colors duration-500">ETB</span>
                                             </p>
                                         </div>
                                     </div>
