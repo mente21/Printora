@@ -225,7 +225,7 @@ function OrdersContent() {
             <main className="max-w-6xl mx-auto px-4 lg:px-6 py-10">
                 {/* Success Banner */}
                 {showSuccess && (
-                    <div className="mb-8 bg-[#A1FF4D] rounded-3xl p-6 flex items-center gap-5 shadow-lg shadow-[#A1FF4D]/20 animate-in slide-in-from-top-4 fade-in duration-500">
+                    <div className="mb-8 bg-[#A1FF4D] rounded-3xl p-4 lg:p-6 flex items-center gap-3 lg:gap-5 shadow-lg shadow-[#A1FF4D]/20 animate-in slide-in-from-top-4 fade-in duration-500">
                         <div className="w-14 h-14 bg-white/40 rounded-2xl flex items-center justify-center flex-shrink-0">
                             <Sparkles size={28} className="text-[#1B2412]" />
                         </div>
