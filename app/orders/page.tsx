@@ -815,14 +815,14 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                 <div className="pt-8">
                     {/* Supplier proof & Approval Logic */}
                     {order.supplier_proof_image_url && (
-                        <div className="bg-emerald-50/40 border border-emerald-100 rounded-[3rem] p-10 shadow-sm relative overflow-hidden">
+                        <div className="bg-emerald-50/40 border border-emerald-100 rounded-3xl lg:rounded-[3rem] p-5 lg:p-10 shadow-sm relative overflow-hidden">
                             {/* Decorative Background */}
                             <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-200/20 rounded-full blur-3xl -mr-32 -mt-32" />
                             
                             <div className="flex flex-col sm:flex-row gap-6 relative z-10">
                                 {/* Proof Image Container */}
                                 <div className="w-full sm:w-48 flex-shrink-0 group">
-                                    <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white aspect-[4/3]">
+                                    <div className="relative rounded-3xl lg:rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white aspect-[4/3]">
                                         <img src={order.supplier_proof_image_url} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Proof" />
                                         <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                             <a
@@ -848,7 +848,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                     {!order.variants?.finalReceiptUrl ? (
                                         <div className="space-y-6">
                                             {order.variants?.finalReceiptRejected && (
-                                                <div className="bg-red-50 border-2 border-red-100 rounded-3xl p-6 mb-4 animate-in fade-in slide-in-from-top-4">
+                                                <div className="bg-red-50 border-2 border-red-100 rounded-3xl p-4 lg:p-6 mb-4 animate-in fade-in slide-in-from-top-4">
                                                     <div className="flex items-center gap-3 mb-2 text-red-600">
                                                         <AlertCircle size={20} />
                                                         <p className="text-sm font-black uppercase tracking-widest">Payment Receipt Rejected</p>
@@ -879,7 +879,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                                     )}
 
                                                     {activeAction === 'decline' && (
-                                                        <div className="bg-white/80 p-6 rounded-3xl border border-red-100 animate-in fade-in slide-in-from-bottom-2">
+                                                        <div className="bg-white/80 p-5 lg:p-6 rounded-3xl border border-red-100 animate-in fade-in slide-in-from-bottom-2">
                                                             <div className="flex justify-between items-center mb-3">
                                                                 <label className="text-[11px] font-black text-red-600 uppercase tracking-widest">Rejection Feedback</label>
                                                                 <button onClick={() => setActiveAction('none')} className="text-[10px] font-black text-gray-400 hover:text-gray-600">Cancel</button>
@@ -908,12 +908,12 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                                     )}
 
                                                     {activeAction === 'approve' && (
-                                                        <div className="bg-white/80 p-8 rounded-[3rem] border border-emerald-100 animate-in fade-in slide-in-from-bottom-2">
+                                                        <div className="bg-white/80 p-5 lg:p-8 rounded-3xl lg:rounded-[3rem] border border-emerald-100 animate-in fade-in slide-in-from-bottom-2">
                                                             <div className="flex justify-between items-center mb-6">
                                                                 <label className="text-[11px] font-black text-emerald-700 uppercase tracking-widest">Final Batch Payment Receipt</label>
                                                                 <button onClick={() => setActiveAction('none')} className="text-[10px] font-black text-gray-400 hover:text-gray-600">Cancel</button>
                                                             </div>
-                                                            <div className="relative border-4 border-dashed border-emerald-100 rounded-[2rem] p-10 bg-emerald-50/30 flex flex-col items-center group/upload">
+                                                            <div className="relative border-4 border-dashed border-emerald-100 rounded-[2rem] p-6 lg:p-10 bg-emerald-50/30 flex flex-col items-center group/upload">
                                                                 <input 
                                                                     type="file" 
                                                                     accept="image/*"
@@ -962,7 +962,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                             )}
 
                                             {order.status === 'SAMPLE_REJECTED' && (
-                                                <div className="bg-red-50 rounded-3xl p-8 border border-red-100 flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4">
+                                                <div className="bg-red-50 rounded-3xl p-5 lg:p-8 border border-red-100 flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4">
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center shadow-sm">
                                                             <XCircle className="text-red-500" size={20} />
@@ -980,7 +980,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                             )}
 
                                             {order.status === 'FINAL_PAYMENT_PENDING' && (
-                                                <div className="bg-amber-500/10 rounded-3xl p-8 border border-amber-500/20 animate-in fade-in slide-in-from-bottom-4">
+                                                <div className="bg-amber-500/10 rounded-3xl p-5 lg:p-8 border border-amber-500/20 animate-in fade-in slide-in-from-bottom-4">
                                                     <div className="flex items-center gap-4 mb-4">
                                                         <div className="w-12 h-12 rounded-2xl bg-amber-400 flex items-center justify-center shadow-lg shadow-amber-400/20">
                                                             <Clock className="text-[#1B2412]" size={24} />
@@ -1005,7 +1005,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                             )}
 
                                             {['PRODUCTION_APPROVED_AND_PAID', 'COMPLETED_BY_SUPPLIER', 'DELIVERED'].includes(order.status) && (
-                                                <div className="bg-emerald-500/10 rounded-3xl p-8 border border-emerald-500/20 animate-in fade-in slide-in-from-bottom-4">
+                                                <div className="bg-emerald-500/10 rounded-3xl p-5 lg:p-8 border border-emerald-500/20 animate-in fade-in slide-in-from-bottom-4">
                                                     <div className="flex items-center gap-4 mb-4">
                                                         <div className="w-12 h-12 rounded-2xl bg-[#A1FF4D] flex items-center justify-center shadow-lg shadow-[#A1FF4D]/20">
                                                             <CheckCircle className="text-[#1B2412]" size={24} />
