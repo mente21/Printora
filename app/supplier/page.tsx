@@ -689,18 +689,18 @@ function SupplierDashboardContent() {
   return (
     <div className="min-h-screen bg-[#fafafa] flex flex-col md:flex-row font-sans">
       
-      {/* Mobile Header */}
-      <header className="md:hidden flex items-center justify-between p-4 bg-white border-b border-gray-100 sticky top-0 z-30 shrink-0 shadow-sm">
-        <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="Logo" className="h-8 w-auto object-contain" />
-        </div>
-        <button 
-          onClick={() => setMobileMenuOpen(true)}
-          className="p-2 -mr-2 text-[#1B2412] hover:bg-gray-100 rounded-lg transition-colors"
-        >
-          <Menu size={24} />
-        </button>
+      {/* Mobile Header (Clear, Logo Only) */}
+      <header className="md:hidden flex items-center p-4 bg-transparent sticky top-0 z-30 shrink-0">
+        <img src="/logo.png" alt="Logo" className="h-10 w-auto object-contain" />
       </header>
+
+      {/* Floating Bold Menu Button */}
+      <button 
+        onClick={() => setMobileMenuOpen(true)}
+        className="md:hidden fixed bottom-6 right-6 z-[60] bg-[#111] text-[#A1FF4D] p-4 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.3)] transition-transform active:scale-90 flex items-center justify-center border-2 border-[#A1FF4D]"
+      >
+        <Menu size={32} strokeWidth={3} />
+      </button>
 
       {/* Mobile Backdrop */}
       {mobileMenuOpen && (
