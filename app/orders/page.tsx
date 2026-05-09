@@ -242,11 +242,11 @@ function OrdersContent() {
                 )}
 
                 {/* Page Header */}
-                <div className="mb-8">
-                    <h1 className="text-4xl font-black text-[#111] uppercase tracking-widest" style={{ fontFamily: "Impact, sans-serif" }}>
+                <div className="mb-6 lg:mb-8">
+                    <h1 className="text-3xl lg:text-4xl font-black text-[#111] uppercase tracking-widest" style={{ fontFamily: "Impact, sans-serif" }}>
                         My Orders
                     </h1>
-                    <p className="text-gray-500 font-medium text-sm mt-1">
+                    <p className="text-gray-500 font-medium text-xs lg:text-sm mt-1">
                         Track all your custom designs from submission to delivery.
                     </p>
                 </div>
@@ -269,16 +269,16 @@ function OrdersContent() {
                         </Link>
                     </div>
                 ) : (
-                    <div className="flex gap-4 items-start">
+                    <div className="flex flex-col lg:flex-row gap-6 items-start">
                         {/* ── Sidebar ── */}
                         <div
                             className={`flex-shrink-0 transition-all duration-500 ease-in-out ${
                                 !selectedOrder
-                                    ? "w-full max-w-lg"          /* no order selected — full width list */
+                                    ? "w-full lg:max-w-lg"          /* no order selected — full width list */
                                     : sidebarExpanded
-                                        ? "w-72"                  /* expanded sidebar */
-                                        : "w-[88px]"              /* collapsed icon-rail */
-                            }`}
+                                        ? "w-full lg:w-72"                  /* expanded sidebar */
+                                        : "hidden lg:block lg:w-[88px]"              /* collapsed icon-rail (hide on mobile if order selected) */
+                            } ${selectedOrder ? "hidden lg:block" : "block"}`}
                         >
                             {/* ── Sidebar header ── */}
                             <div className="flex items-center justify-between mb-3">
@@ -383,7 +383,17 @@ function OrdersContent() {
                             }`}
                         >
                             {selectedOrder
-                                ? <OrderDetail order={selectedOrder} onRefresh={initPage} />
+                                ? (
+                                    <div className="flex flex-col gap-4">
+                                        <button 
+                                            onClick={() => setSelectedOrder(null)}
+                                            className="lg:hidden flex items-center gap-2 text-gray-500 font-black text-[10px] uppercase tracking-widest hover:text-[#111] transition-colors mb-2 w-fit px-4 py-2 bg-white border border-gray-100 rounded-full"
+                                        >
+                                            <ChevronLeft size={14} /> Back to Orders
+                                        </button>
+                                        <OrderDetail order={selectedOrder} onRefresh={initPage} />
+                                    </div>
+                                )
                                 : null}
                         </div>
                     </div>
@@ -432,7 +442,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
     const editUrl = `/editor?edit_order=${order.id}&template=${templateId}`;
 
     return (
-        <div className="bg-white rounded-[3.5rem] border border-gray-100/50 overflow-hidden shadow-2xl shadow-black/5 ring-1 ring-black/[0.02] relative">
+        <div className="bg-white rounded-3xl lg:rounded-[3.5rem] border border-gray-100/50 overflow-hidden shadow-2xl shadow-black/5 ring-1 ring-black/[0.02] relative">
 
             {/* ── Lightbox Overlay ── */}
             {lightbox && (
@@ -477,18 +487,18 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                 </div>
             )}
             {/* Status Header */}
-            <div className={`p-8 ${cfg.bg} border-b ${cfg.border}`}>
+            <div className={`p-6 lg:p-8 ${cfg.bg} border-b ${cfg.border}`}>
                 <div className="flex items-center gap-4">
-                    <div className={`w-14 h-14 rounded-2xl ${cfg.bg} border ${cfg.border} flex items-center justify-center shadow-inner`}>
-                        <Icon size={26} className={cfg.color} />
+                    <div className={`w-12 h-12 lg:w-14 lg:h-14 rounded-2xl ${cfg.bg} border ${cfg.border} flex items-center justify-center shadow-inner flex-shrink-0`}>
+                        <Icon size={22} className={cfg.color} />
                     </div>
-                    <div>
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Current Status</p>
-                        <h3 className={`text-2xl font-black ${cfg.color} uppercase tracking-wider`} style={{ fontFamily: 'Impact, sans-serif' }}>{cfg.label}</h3>
+                    <div className="min-w-0">
+                        <p className="text-[9px] lg:text-[10px] font-black text-gray-400 uppercase tracking-[0.1em] lg:tracking-[0.2em]">Current Status</p>
+                        <h3 className={`text-xl lg:text-2xl font-black ${cfg.color} uppercase tracking-wider truncate`} style={{ fontFamily: 'Impact, sans-serif' }}>{cfg.label}</h3>
                     </div>
-                    <div className="ml-auto text-right">
-                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Order ID</p>
-                        <p className="text-xs font-black text-gray-600 font-mono bg-white px-3 py-1 rounded-full border border-gray-100">#{order.id.slice(0, 8).toUpperCase()}</p>
+                    <div className="ml-auto text-right flex-shrink-0">
+                        <p className="text-[8px] lg:text-[9px] font-black text-gray-400 uppercase tracking-widest">Order ID</p>
+                        <p className="text-[10px] lg:text-xs font-black text-gray-600 font-mono bg-white px-2 lg:px-3 py-1 rounded-full border border-gray-100">#{order.id.slice(0, 8).toUpperCase()}</p>
                     </div>
                 </div>
                 <p className="text-xs text-gray-500 font-bold mt-4 leading-relaxed max-w-2xl">{cfg.description}</p>
@@ -502,8 +512,8 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
 
             {/* Progress Stepper */}
             {order.status !== "REJECTED" && (
-                <div className="px-8 py-6 border-b border-gray-50 bg-[#fafafa]/50">
-                    <div className="flex items-center justify-between gap-4">
+                <div className="px-6 lg:px-8 py-6 border-b border-gray-50 bg-[#fafafa]/50 overflow-x-auto custom-scrollbar">
+                    <div className="flex items-center justify-between gap-8 min-w-[500px] lg:min-w-0 lg:gap-4">
                         {STEPS.map((step, idx) => {
                             const done = currentStep >= step.id;
                             const active = currentStep + 1 === step.id;
