@@ -697,9 +697,9 @@ function SupplierDashboardContent() {
       {/* Floating Bold Menu Button */}
       <button 
         onClick={() => setMobileMenuOpen(true)}
-        className="md:hidden fixed bottom-6 right-6 z-[60] bg-[#111] text-[#A1FF4D] p-4 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.3)] transition-transform active:scale-90 flex items-center justify-center border-2 border-[#A1FF4D]"
+        className="md:hidden fixed top-4 right-4 z-[60] bg-[#111] text-[#A1FF4D] p-3 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.3)] transition-transform active:scale-90 flex items-center justify-center border-2 border-[#A1FF4D]"
       >
-        <Menu size={32} strokeWidth={3} />
+        <Menu size={28} strokeWidth={3} />
       </button>
 
       {/* Mobile Backdrop */}
