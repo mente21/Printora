@@ -9,7 +9,7 @@ import {
   BarChart3, Box, Image as ImageIcon, User, Palette, Tag,
   Package, Upload, Loader2, ChevronDown, UploadCloud, X, Trash2,
   Edit2, Lock, ShieldCheck, Layers, Timer, ShoppingBasket, CheckCircle2,
-  Phone, MapPin, Mail, Save, Building, Globe, AlertCircle, Map
+  Phone, MapPin, Mail, Save, Building, Globe, AlertCircle, Map, Menu
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConfirmModal, AlertModal } from "@/components/ui/AppModal";
@@ -100,6 +100,8 @@ function SupplierDashboardContent() {
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileSuccess, setProfileSuccess] = useState(false);
   const [profileError, setProfileError] = useState<string | null>(null);
+
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // ── Custom modal state (replaces all native confirm/alert) ──────────────
   type ModalAction = (() => Promise<void>) | (() => void);
@@ -685,11 +687,36 @@ function SupplierDashboardContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#fafafa] flex font-sans">
+    <div className="min-h-screen bg-[#fafafa] flex flex-col md:flex-row font-sans">
+      
+      {/* Mobile Header */}
+      <header className="md:hidden flex items-center justify-between p-4 bg-white border-b border-gray-100 sticky top-0 z-30 shrink-0 shadow-sm">
+        <div className="flex items-center gap-3">
+          <img src="/logo.png" alt="Logo" className="h-8 w-auto object-contain" />
+        </div>
+        <button 
+          onClick={() => setMobileMenuOpen(true)}
+          className="p-2 -mr-2 text-[#1B2412] hover:bg-gray-100 rounded-lg transition-colors"
+        >
+          <Menu size={24} />
+        </button>
+      </header>
+
+      {/* Mobile Backdrop */}
+      {mobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[40] md:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-gray-100 hidden md:flex flex-col sticky top-0 h-screen shadow-sm">
-        <div className="p-6 border-b border-gray-100 flex items-center gap-3">
-          <img src="/logo.png" alt="Logo" className="h-10 w-auto" />
+      <aside className={`fixed inset-y-0 left-0 z-[50] w-64 bg-white border-r border-gray-100 flex flex-col transform transition-transform duration-300 md:relative md:translate-x-0 h-[100dvh] ${mobileMenuOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"}`}>
+        <div className="p-6 border-b border-gray-100 flex items-center justify-between gap-3">
+          <img src="/logo.png" alt="Logo" className="h-10 w-auto object-contain" />
+          <button className="md:hidden p-2 -mr-2 text-gray-400 hover:bg-gray-100 rounded-lg transition-colors" onClick={() => setMobileMenuOpen(false)}>
+            <X size={20} />
+          </button>
         </div>
 
         {profile && (
@@ -717,7 +744,7 @@ function SupplierDashboardContent() {
 
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto scrollbar-hide">
           <button 
-            onClick={() => setActiveTab("my-products")}
+            onClick={() => { setActiveTab("my-products"); setMobileMenuOpen(false); }}
             className={`flex items-center gap-3 px-4 py-3 w-full text-left rounded-xl text-sm font-bold transition-all ${activeTab === "my-products" ? "bg-[#A1FF4D]/10 text-[#2B3220]" : "text-gray-400 hover:bg-gray-50"}`}
           >
             <BarChart3 size={18} /> My Products
@@ -726,7 +753,7 @@ function SupplierDashboardContent() {
           <div className="pt-2">
             <p className="px-4 text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Products</p>
             <button 
-              onClick={() => setActiveTab("add-product")}
+              onClick={() => { setActiveTab("add-product"); setMobileMenuOpen(false); }}
               className={`flex items-center gap-3 px-4 py-3 w-full text-left rounded-xl text-sm font-bold transition-all ${activeTab === "add-product" ? "bg-[#A1FF4D]/10 text-[#2B3220]" : "text-gray-400 hover:bg-gray-50"}`}
             >
               <Plus size={16} /> Add New Product
@@ -736,7 +763,7 @@ function SupplierDashboardContent() {
           <div className="pt-2">
             <p className="px-4 text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Orders</p>
             <button 
-              onClick={() => setActiveTab("orders")}
+              onClick={() => { setActiveTab("orders"); setMobileMenuOpen(false); }}
               className={`flex items-center justify-between px-4 py-3 w-full text-left rounded-xl text-sm font-bold transition-all ${activeTab === "orders" ? "bg-[#1B2412] text-[#A1FF4D]" : "text-gray-400 hover:bg-gray-50"}`}
             >
               <span className="flex items-center gap-3"><ShoppingBag size={16} /> New Order</span>
@@ -747,7 +774,7 @@ function SupplierDashboardContent() {
               )}
             </button>
             <button 
-              onClick={() => setActiveTab("resubmissions")}
+              onClick={() => { setActiveTab("resubmissions"); setMobileMenuOpen(false); }}
               className={`flex items-center justify-between px-4 py-3 w-full text-left rounded-xl text-sm font-bold transition-all ${activeTab === "resubmissions" ? "bg-red-500 text-white shadow-lg shadow-red-500/20" : "text-red-400 hover:bg-red-50"}`}
             >
               <div className="flex items-center gap-3">
@@ -760,7 +787,7 @@ function SupplierDashboardContent() {
               )}
             </button>
             <button 
-              onClick={() => setActiveTab("pending-approvals")}
+              onClick={() => { setActiveTab("pending-approvals"); setMobileMenuOpen(false); }}
               className={`flex items-center justify-between px-4 py-3 w-full text-left rounded-xl text-sm font-bold transition-all ${activeTab === "pending-approvals" ? "bg-[#A1FF4D]/10 text-[#2B3220]" : "text-gray-400 hover:bg-gray-50"}`}
             >
               <span className="flex items-center gap-3"><Clock size={16} /> Pending Approvals</span>
@@ -771,7 +798,7 @@ function SupplierDashboardContent() {
               )}
             </button>
             <button 
-              onClick={() => setActiveTab("in-production")}
+              onClick={() => { setActiveTab("in-production"); setMobileMenuOpen(false); }}
               className={`flex items-center justify-between px-4 py-3 w-full text-left rounded-xl text-sm font-bold transition-all ${activeTab === "in-production" ? "bg-blue-500/10 text-blue-700" : "text-gray-400 hover:bg-gray-50"}`}
             >
               <span className="flex items-center gap-3"><Package size={16} /> In Production</span>
@@ -782,7 +809,7 @@ function SupplierDashboardContent() {
               )}
             </button>
             <button 
-              onClick={() => setActiveTab("completed")}
+              onClick={() => { setActiveTab("completed"); setMobileMenuOpen(false); }}
               className={`flex items-center justify-between px-4 py-3 w-full text-left rounded-xl text-sm font-bold transition-all ${activeTab === "completed" ? "bg-[#A1FF4D]/10 text-[#2B3220]" : "text-gray-400 hover:bg-gray-50"}`}
             >
               <span className="flex items-center gap-3"><CheckCircle size={16} /> Completed</span>
@@ -797,7 +824,7 @@ function SupplierDashboardContent() {
           <div className="pt-2">
             <p className="px-4 text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Account</p>
             <button 
-              onClick={() => setActiveTab("profile")}
+              onClick={() => { setActiveTab("profile"); setMobileMenuOpen(false); }}
               className={`flex items-center gap-3 px-4 py-3 w-full text-left rounded-xl text-sm font-bold transition-all ${activeTab === "profile" ? "bg-[#A1FF4D]/10 text-[#2B3220]" : "text-gray-400 hover:bg-gray-50"}`}
             >
               <User size={16} /> Profile Settings
@@ -812,8 +839,8 @@ function SupplierDashboardContent() {
         </div>
       </aside>
 
-      <main className="flex-1 p-6 md:p-10 overflow-y-auto">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+      <main className="flex-1 p-4 sm:p-6 md:p-10 overflow-y-auto">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 md:mb-10">
           <div>
             <h1 className="text-3xl font-black text-[#2B3220] uppercase tracking-widest" style={{ fontFamily: 'Impact, sans-serif', wordSpacing: '0.15em' }}>
               Supplier Dashboard
