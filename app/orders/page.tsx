@@ -222,7 +222,7 @@ function OrdersContent() {
                 </div>
             </header>
 
-            <main className="max-w-6xl mx-auto px-6 py-10">
+            <main className="max-w-6xl mx-auto px-4 lg:px-6 py-10">
                 {/* Success Banner */}
                 {showSuccess && (
                     <div className="mb-8 bg-[#A1FF4D] rounded-3xl p-6 flex items-center gap-5 shadow-lg shadow-[#A1FF4D]/20 animate-in slide-in-from-top-4 fade-in duration-500">
@@ -543,7 +543,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                 </div>
             )}
 
-            <div className="p-4 lg:p-6 space-y-6">
+            <div className="p-3 lg:p-6 space-y-6">
                 {/* 2-Column Balanced Layout — Gallery & Details Stack */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
                     {/* Mockup Gallery */}
@@ -592,7 +592,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                     {/* ── Details Stack (Specs + Financial) ── */}
                     <div className="flex flex-col gap-4">
                         {/* ── Specifications Card ── */}
-                        <div className="group/spec relative bg-white rounded-3xl border border-gray-100 p-4 lg:p-5 flex flex-col gap-3 overflow-hidden
+                        <div className="group/spec relative bg-white rounded-3xl border border-gray-100 p-3 lg:p-5 flex flex-col gap-3 overflow-hidden
                             hover:border-gray-200 hover:shadow-[0_24px_48px_-10px_rgba(0,0,0,0.10)] transition-all duration-500 ease-out flex-1">
 
 
@@ -699,7 +699,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                     { label: 'Quantity', value: `${order.variants?.quantity || 1} units`, highlight: true },
                                     ...(order.delivery_location ? [{ label: 'Delivery', value: order.delivery_location }] : []),
                                 ].map((row, i) => (
-                                    <div key={i} className="relative flex items-center justify-between py-2.5 pl-3">
+                                    <div key={i} className="relative flex items-center justify-between py-2 lg:py-2.5 pl-3">
                                         {/* Glowing left accent bar */}
                                         <div
                                             className={`spec-row-accent delay-${i} absolute left-0 top-1 bottom-1 w-[3px] rounded-full`}
@@ -726,7 +726,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
 
 
                         {/* ── Financial Card ── */}
-                        <div className="group/fin relative bg-gradient-to-br from-[#0c1a12] to-[#122618] rounded-3xl p-5 flex flex-col gap-3 overflow-hidden
+                        <div className="group/fin relative bg-gradient-to-br from-[#0c1a12] to-[#122618] rounded-3xl p-3 lg:p-5 flex flex-col gap-3 overflow-hidden
                             hover:shadow-[0_24px_64px_-12px_rgba(161,255,77,0.2)] hover:-translate-y-1 transition-all duration-500 ease-out flex-1 border border-[#1b3624]">
 
                             {/* Sweeping shimmer on hover */}
@@ -760,7 +760,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                             {/* Breakdown rows */}
                             <div className="space-y-2.5 flex-1">
                                 {/* Deposit */}
-                                <div className="flex items-center justify-between rounded-2xl px-4 py-3 bg-[#162d1d] border border-[#1e3b26]
+                                <div className="flex items-center justify-between rounded-2xl px-3 lg:px-4 py-3 bg-[#162d1d] border border-[#1e3b26]
                                     hover:bg-[#193622] hover:border-[#25462e] transition-all duration-300 group/row">
                                     <div className="flex items-center gap-3">
                                         <div className="w-7 h-7 rounded-lg bg-[#1e3b26] flex items-center justify-center group-hover/row:bg-[#25462e] transition-colors duration-300">
@@ -779,7 +779,7 @@ function OrderDetail({ order, onRefresh }: { order: any, onRefresh: () => Promis
                                 </div>
 
                                 {/* Balance Due / Paid */}
-                                <div className="flex items-center justify-between rounded-2xl px-4 py-3 bg-[#162d1d] border border-[#1e3b26]
+                                <div className="flex items-center justify-between rounded-2xl px-3 lg:px-4 py-3 bg-[#162d1d] border border-[#1e3b26]
                                     hover:bg-[#193622] hover:border-[#25462e] transition-all duration-300 group/row2">
                                     <div className="flex items-center gap-3">
                                         <div className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors duration-300 ${['PRODUCTION_APPROVED_AND_PAID', 'COMPLETED_BY_SUPPLIER', 'DELIVERED', 'COMPLETED'].includes(order.status) ? 'bg-[#A1FF4D]/20' : 'bg-[#1e3b26] group-hover/row2:bg-[#25462e]'}`}>
