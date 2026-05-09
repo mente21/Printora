@@ -697,27 +697,27 @@ function ProductsPageContent() {
                 </div>
 
                 <div className="flex-1 space-y-2 px-1">
-                  <h3 className="font-black text-[16px] text-[#1c211f] line-clamp-1">
+                  <h3 className="font-black text-[14px] sm:text-[16px] text-[#1c211f] line-clamp-1">
                     <Link href={`/products/${product.id}`} className="hover:text-[#3da85b] transition-colors">{product.name}</Link>
                   </h3>
-                  <p className="text-[13px] text-gray-400 font-medium leading-relaxed line-clamp-2 min-h-[40px]">
+                  <p className="text-[11px] sm:text-[13px] text-gray-400 font-medium leading-relaxed line-clamp-2 min-h-[34px] sm:min-h-[40px]">
                     {product.description || "Customized premium quality product, perfect for your unique designs."}
                   </p>
                   <div className="flex items-center justify-between pt-1">
-                    <p className="text-[20px] font-black text-[#3da85b] tracking-tight">ETB {product.price}</p>
+                    <p className="text-[16px] sm:text-[20px] font-black text-[#3da85b] tracking-tight">ETB {product.price}</p>
                     <div className="flex items-center gap-1.5">
                       <div className="flex -space-x-1.5">
                         <div className="w-3.5 h-3.5 rounded-full bg-[#1c211f] border-2 border-white"></div>
                         <div className="w-3.5 h-3.5 rounded-full bg-gray-300 border-2 border-white"></div>
                         <div className="w-3.5 h-3.5 rounded-full bg-blue-800 border-2 border-white"></div>
                       </div>
-                      <span className="text-[11px] text-gray-400 font-bold ml-1">{product.colors?.length || 3} colors</span>
+                      <span className="text-[9px] sm:text-[11px] text-gray-400 font-bold ml-1">{product.colors?.length || 3} colors</span>
                     </div>
                   </div>
                   {(product.supplier_country || product.supplier?.country) && (
                     <div className="flex items-center gap-1.5 pt-1">
-                      <span className="text-[10px] text-gray-400 font-medium">📍 Ships from:</span>
-                      <span className="text-[10px] font-black text-gray-500">{product.supplier_country || product.supplier?.country}</span>
+                      <span className="text-[9px] sm:text-[10px] text-gray-400 font-medium">📍 Ships from:</span>
+                      <span className="text-[9px] sm:text-[10px] font-black text-gray-500">{product.supplier_country || product.supplier?.country}</span>
                       {(product.supplier_country || product.supplier?.country) === userCountry && (
                         <span className="text-[8px] font-black text-[#3da85b] bg-[#3da85b]/10 px-1.5 py-0.5 rounded-full uppercase tracking-wider">Local</span>
                       )}
