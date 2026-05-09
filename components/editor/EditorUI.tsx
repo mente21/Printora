@@ -157,7 +157,14 @@ function TextPanel({ onClose, onAddText, onAddCurvedText }: { onClose: () => voi
     });
 
     return (
-        <div className="absolute left-[88px] top-0 bottom-0 w-[340px] bg-white border-r border-gray-200 flex flex-col z-30 shadow-[2px_0_12px_rgba(0,0,0,0.06)] animate-in slide-in-from-left duration-300">
+        <>
+        {/* Mobile backdrop */}
+        <div className="md:hidden fixed inset-0 bg-black/30 z-[29]" onClick={onClose} />
+        <div className="absolute left-0 md:left-[88px] top-16 md:top-0 bottom-0 w-full md:w-[340px] bg-white border-r border-gray-200 flex flex-col z-30 shadow-[2px_0_12px_rgba(0,0,0,0.06)] animate-in slide-in-from-bottom md:slide-in-from-left duration-300">
+            {/* Mobile drag handle */}
+            <div className="md:hidden flex justify-center pt-3 pb-1 flex-shrink-0">
+                <div className="w-10 h-1 rounded-full bg-gray-300" />
+            </div>
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
                 <h2 className="text-[17px] font-bold text-gray-900 tracking-tight">Add text</h2>
@@ -281,6 +288,7 @@ function TextPanel({ onClose, onAddText, onAddCurvedText }: { onClose: () => voi
                 </section>
             </div>
         </div>
+        </>
     );
 }
 
@@ -359,7 +367,10 @@ function LibraryPanel({ onClose, onAddImage }: { onClose: () => void; onAddImage
     const filtered = assets.filter(a => a.file_name.toLowerCase().includes(search.toLowerCase()));
 
     return (
-        <div className="absolute left-[88px] top-0 bottom-0 w-[340px] bg-white border-r border-gray-200 flex flex-col z-30 shadow-[2px_0_12px_rgba(0,0,0,0.06)] animate-in slide-in-from-left duration-300">
+        <>
+        <div className="md:hidden fixed inset-0 bg-black/30 z-[29]" onClick={onClose} />
+        <div className="absolute left-0 md:left-[88px] top-16 md:top-0 bottom-0 w-full md:w-[340px] bg-white border-r border-gray-200 flex flex-col z-30 shadow-[2px_0_12px_rgba(0,0,0,0.06)] animate-in slide-in-from-bottom md:slide-in-from-left duration-300">
+            <div className="md:hidden flex justify-center pt-3 pb-1 flex-shrink-0"><div className="w-10 h-1 rounded-full bg-gray-300" /></div>
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
                 <h2 className="text-[17px] font-bold text-gray-900 tracking-tight">My library</h2>
@@ -511,6 +522,7 @@ function LibraryPanel({ onClose, onAddImage }: { onClose: () => void; onAddImage
                 )}
             </div>
         </div>
+        </>
     );
 }
 
@@ -532,7 +544,10 @@ function GraphicsPanel({ onClose, onAddShape, onAddCurvedText }: { onClose: () =
     ];
 
     return (
-        <div className="absolute left-[88px] top-0 bottom-0 w-[340px] bg-white border-r border-gray-200 flex flex-col z-30 shadow-[2px_0_12px_rgba(0,0,0,0.06)] animate-in slide-in-from-left duration-300">
+        <>
+        <div className="md:hidden fixed inset-0 bg-black/30 z-[29]" onClick={onClose} />
+        <div className="absolute left-0 md:left-[88px] top-16 md:top-0 bottom-0 w-full md:w-[340px] bg-white border-r border-gray-200 flex flex-col z-30 shadow-[2px_0_12px_rgba(0,0,0,0.06)] animate-in slide-in-from-bottom md:slide-in-from-left duration-300">
+            <div className="md:hidden flex justify-center pt-3 pb-1 flex-shrink-0"><div className="w-10 h-1 rounded-full bg-gray-300" /></div>
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
                 <h2 className="text-[17px] font-bold text-gray-900 tracking-tight">Graphics</h2>
@@ -598,6 +613,7 @@ function GraphicsPanel({ onClose, onAddShape, onAddCurvedText }: { onClose: () =
                 </section>
             </div>
         </div>
+        </>
     );
 }
 
@@ -619,7 +635,10 @@ function TemplatesPanel({ onClose, onLoadTemplate }: { onClose: () => void; onLo
     };
 
     return (
-        <div className="absolute left-[88px] top-0 bottom-0 w-[340px] bg-white border-r border-gray-200 flex flex-col z-30 shadow-[2px_0_12px_rgba(0,0,0,0.06)] animate-in slide-in-from-left duration-300">
+        <>
+        <div className="md:hidden fixed inset-0 bg-black/30 z-[29]" onClick={onClose} />
+        <div className="absolute left-0 md:left-[88px] top-16 md:top-0 bottom-0 w-full md:w-[340px] bg-white border-r border-gray-200 flex flex-col z-30 shadow-[2px_0_12px_rgba(0,0,0,0.06)] animate-in slide-in-from-bottom md:slide-in-from-left duration-300">
+            <div className="md:hidden flex justify-center pt-3 pb-1 flex-shrink-0"><div className="w-10 h-1 rounded-full bg-gray-300" /></div>
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
                 <h2 className="text-[17px] font-bold text-gray-900 tracking-tight">My templates</h2>
@@ -667,6 +686,7 @@ function TemplatesPanel({ onClose, onLoadTemplate }: { onClose: () => void; onLo
                 )}
             </div>
         </div>
+        </>
     );
 }
 
@@ -860,12 +880,16 @@ export default function EditorUI() {
 
     const printArea = selectedView.printAreas[0];
 
+    const canvasSize = selectedProduct.id === 'ceramic-mug' 
+        ? { width: 1024, height: 512 } 
+        : { width: 500, height: 540 };
+
     const {
         canvasRef, canvas, addText, addCurvedText, addShape, addImage, updateActiveObject, canvasRevision, liveProps,
         undo, redo, canUndo, canRedo
     } = useEditorCanvas({
         printArea,
-        canvasSize: { width: 500, height: 540 },
+        canvasSize,
         onSelectionChange: setActiveObject,
         initialState: viewStates[selectedView.id],
         viewId: selectedView.id,
@@ -1363,10 +1387,10 @@ export default function EditorUI() {
         <div className="flex-1 flex flex-col h-full bg-[#F4F4F4] text-gray-800 font-sans overflow-hidden">
 
             {/* Top Navigation Bar */}
-            <div className="h-14 bg-white flex items-center justify-between px-4 border-b border-gray-200 flex-shrink-0">
-                <div className="flex items-center gap-4">
+            <div className="h-14 bg-white flex items-center justify-between px-3 md:px-4 border-b border-gray-200 flex-shrink-0">
+                <div className="flex items-center gap-2 md:gap-4">
                     <button
-                        className="text-gray-600 hover:text-gray-900"
+                        className="text-gray-600 hover:text-gray-900 p-1"
                         onClick={() => {
                             if (canvasRevision > 0) {
                                 setShowExitDialog(true);
@@ -1378,7 +1402,7 @@ export default function EditorUI() {
                         <ArrowLeft className="w-5 h-5" />
                     </button>
                     <div className="h-5 w-[1px] bg-gray-300" />
-                    <div className="flex items-center gap-3">
+                    <div className="hidden md:flex items-center gap-3">
                         <HelpCircle className="w-5 h-5 text-gray-500" />
                         <button
                             onClick={undo}
@@ -1395,44 +1419,45 @@ export default function EditorUI() {
                             <Redo2 className="w-5 h-5" />
                         </button>
                     </div>
-                </div>
-                <div className="flex items-center gap-3">
-                    <div className="flex bg-gray-100 rounded-md p-1">
-                        <button className="px-6 py-1.5 text-sm font-semibold bg-[#64645C] text-white rounded shadow-sm">Edit</button>
-                        <button className="px-6 py-1.5 text-sm font-semibold text-gray-700 bg-white shadow-sm rounded ml-1">Preview</button>
+                    {/* Mobile undo/redo */}
+                    <div className="flex md:hidden items-center gap-2">
+                        <button onClick={undo} disabled={!canUndo} className={canUndo ? 'text-gray-600' : 'text-gray-300 cursor-not-allowed'}><Undo2 className="w-4 h-4" /></button>
+                        <button onClick={redo} disabled={!canRedo} className={canRedo ? 'text-gray-600' : 'text-gray-300 cursor-not-allowed'}><Redo2 className="w-4 h-4" /></button>
                     </div>
-                    <button className="w-9 h-9 flex items-center justify-center bg-[#E5E5DF] rounded-md text-gray-700">
+                </div>
+                <div className="flex items-center gap-1.5 md:gap-3">
+                    <div className="flex bg-gray-100 rounded-md p-1">
+                        <button className="px-3 md:px-6 py-1.5 text-xs md:text-sm font-semibold bg-[#64645C] text-white rounded shadow-sm">Edit</button>
+                        <button className="px-3 md:px-6 py-1.5 text-xs md:text-sm font-semibold text-gray-700 bg-white shadow-sm rounded ml-1">Preview</button>
+                    </div>
+                    <button className="hidden md:flex w-9 h-9 items-center justify-center bg-[#E5E5DF] rounded-md text-gray-700">
                         <Wand2 className="w-4 h-4" />
                     </button>
                     <button
                         onClick={handleOrderClick}
                         disabled={isSaving}
-                        className={`${isSaving ? 'bg-gray-300' : 'bg-[#A1FF4D] hover:bg-[#8ee643] text-[#1B2412]'} font-bold px-8 py-1.5 rounded text-sm uppercase transition-colors ml-2 shadow-sm flex items-center justify-center gap-2`}
+                        className={`${isSaving ? 'bg-gray-300' : 'bg-[#A1FF4D] hover:bg-[#8ee643] text-[#1B2412]'} font-bold px-3 md:px-8 py-1.5 rounded text-xs md:text-sm uppercase transition-colors shadow-sm flex items-center justify-center gap-1.5`}
                     >
                         {isSaving ? (
                             <>
                                 <Loader2 className="w-4 h-4 animate-spin" />
-                                Checking...
+                                <span className="hidden md:inline">Checking...</span>
                             </>
-                        ) : dbOrderId ? 'Update Order' : 'Order'}
+                        ) : dbOrderId ? <><span className="hidden md:inline">Update </span>Order</> : 'Order'}
                     </button>
                     <button
                         onClick={() => {
                             if (!canvas) return;
-                            // Flush current canvas into viewStates before saving template
                             const currentObjects = canvas.toJSON().objects;
                             const freshViewStates = { ...viewStates, [selectedView.id]: { objects: currentObjects } };
-
                             const existing = loadedTemplateId
                                 ? JSON.parse(localStorage.getItem('printora_templates') || '[]').find((t: any) => t.id === loadedTemplateId)
                                 : null;
-
                             const state = {
                                 id: loadedTemplateId || `${selectedProduct.id}-${Date.now()}`,
                                 productTemplateId: selectedProduct.id,
                                 color: selectedColor,
                                 viewStates: freshViewStates,
-                                // Keep original creation name; only set on first save
                                 name: existing?.name || `Template ${new Date().toLocaleTimeString()}`,
                             };
                             const templates = JSON.parse(localStorage.getItem('printora_templates') || '[]');
@@ -1444,17 +1469,17 @@ export default function EditorUI() {
                             setShowTemplatesPanel(true);
                             setActiveLeftTool('templates');
                         }}
-                        className="bg-white border border-gray-300 text-gray-700 font-bold px-4 py-1.5 rounded text-sm uppercase transition-colors ml-2 hover:bg-gray-50 shadow-sm"
+                        className="hidden md:block bg-white border border-gray-300 text-gray-700 font-bold px-4 py-1.5 rounded text-sm uppercase transition-colors hover:bg-gray-50 shadow-sm"
                     >
                         {loadedTemplateId ? 'Update Template' : 'Save Template'}
                     </button>
                 </div>
             </div>
 
-            <div className="flex flex-1 overflow-hidden relative">
+            <div className="flex flex-1 overflow-hidden relative pb-[64px] md:pb-0">
 
-                {/* ═══════════ LEFT TOOLBAR (icons) ═══════════ */}
-                <div className="w-[88px] flex-shrink-0 flex flex-col items-center py-4 bg-white border-r border-gray-200 shadow-sm z-20">
+                {/* ═══════════ LEFT TOOLBAR — desktop only ═══════════ */}
+                <div className="hidden md:flex w-[88px] flex-shrink-0 flex-col items-center py-4 bg-white border-r border-gray-200 shadow-sm z-20">
                     <div className="flex flex-col gap-1 w-full items-center">
                         {leftTools.map(tool => {
                             const isActive = activeLeftTool === tool.id;
@@ -1462,8 +1487,7 @@ export default function EditorUI() {
                                 return (
                                     <label
                                         key={tool.id}
-                                        className={`w-full flex flex-col items-center gap-1.5 cursor-pointer py-3 rounded-lg transition-colors group ${isActive ? 'bg-[#f0f0ec] text-gray-900' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                                            }`}
+                                        className={`w-full flex flex-col items-center gap-1.5 cursor-pointer py-3 rounded-lg transition-colors group ${isActive ? 'bg-[#f0f0ec] text-gray-900' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}`}
                                     >
                                         {tool.icon}
                                         <span className="text-[10px] font-medium">{tool.label}</span>
@@ -1475,8 +1499,7 @@ export default function EditorUI() {
                                 <button
                                     key={tool.id}
                                     onClick={() => handleLeftTool(tool.id)}
-                                    className={`w-full flex flex-col items-center gap-1.5 py-3 rounded-lg transition-colors group ${isActive ? 'bg-[#f0f0ec] text-gray-900' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                                        }`}
+                                    className={`w-full flex flex-col items-center gap-1.5 py-3 rounded-lg transition-colors group ${isActive ? 'bg-[#f0f0ec] text-gray-900' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}`}
                                 >
                                     {tool.icon}
                                     <span className="text-[10px] font-medium text-center leading-tight">{tool.label}</span>
@@ -1638,18 +1661,16 @@ export default function EditorUI() {
 
                 </div>
 
-                {/* ═══════════ RIGHT PANEL: Variants & Layers ═══════════ */}
-                <div className="absolute right-4 top-4 w-[320px] bg-white rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.06)] border border-gray-100 z-30 overflow-hidden flex flex-col">
-                    <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-white">
+                {/* ═══════════ RIGHT PANEL: Variants & Layers — desktop only ═══════════ */}
+                <div className="hidden md:flex absolute right-4 top-4 bottom-4 w-[320px] bg-white rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.06)] border border-gray-100 z-30 overflow-hidden flex-col">
+                    <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-white flex-shrink-0">
                         <h3 className="font-bold text-[15px] text-gray-800">Variants and layers</h3>
                     </div>
-                    <div className="p-5 flex-1 min-h-[150px] bg-white">
+                    <div className="p-5 flex-1 min-h-0 bg-white overflow-y-auto">
                         <h4 className="font-bold text-[13px] text-gray-800 mb-4">Variants</h4>
                         <div className="flex items-center justify-between py-2">
                             <span className="text-gray-600 text-[13px]">Colors</span>
-                            <button className="border border-gray-300 px-3 py-1.5 rounded text-[12px] text-gray-700 hover:bg-gray-50 font-bold">
-                                Select variants
-                            </button>
+                            <button className="border border-gray-300 px-3 py-1.5 rounded text-[12px] text-gray-700 hover:bg-gray-50 font-bold">Select variants</button>
                         </div>
                         <div className="flex flex-wrap gap-2 mt-2">
                             {(supplierColors?.length ? supplierColors : selectedProduct.variants).map((c: any) => {
@@ -1659,10 +1680,7 @@ export default function EditorUI() {
                                     <button
                                         key={hex}
                                         title={name}
-                                        className={`w-7 h-7 rounded-full border-2 transition-all ${selectedColor === hex
-                                            ? 'border-gray-400 shadow-sm'
-                                            : 'border-gray-200 hover:border-gray-300'
-                                            }`}
+                                        className={`w-7 h-7 rounded-full border-2 transition-all ${selectedColor === hex ? 'border-gray-400 shadow-sm' : 'border-gray-200 hover:border-gray-300'}`}
                                         style={{ backgroundColor: hex }}
                                         onClick={() => setSelectedColor(hex)}
                                     />
@@ -1671,9 +1689,72 @@ export default function EditorUI() {
                         </div>
                     </div>
                     {selectedProduct.id === 'ceramic-mug' && (
-                        <div id="mug-3d-preview-portal" />
+                        <div id="mug-3d-preview-portal" className="flex-shrink-0" />
                     )}
                 </div>
+
+                {/* ═══════════ MOBILE BOTTOM TAB BAR ═══════════ */}
+                <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-gray-200 flex items-center justify-around z-50 px-2 shadow-[0_-2px_12px_rgba(0,0,0,0.08)]">
+                    {leftTools.map(tool => {
+                        const isActive = activeLeftTool === tool.id;
+                        if (tool.isLabel) {
+                            return (
+                                <label
+                                    key={tool.id}
+                                    className={`flex flex-col items-center gap-1 flex-1 py-2 rounded-xl cursor-pointer transition-colors ${isActive ? 'text-gray-900 bg-[#f0f0ec]' : 'text-gray-500'}`}
+                                >
+                                    {tool.icon}
+                                    <span className="text-[9px] font-medium leading-tight text-center">{tool.label}</span>
+                                    <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                                </label>
+                            );
+                        }
+                        return (
+                            <button
+                                key={tool.id}
+                                onClick={() => handleLeftTool(tool.id)}
+                                className={`flex flex-col items-center gap-1 flex-1 py-2 rounded-xl transition-colors ${isActive ? 'text-gray-900 bg-[#f0f0ec]' : 'text-gray-500'}`}
+                            >
+                                {React.cloneElement(tool.icon as React.ReactElement, { className: 'w-5 h-5' })}
+                                <span className="text-[9px] font-medium leading-tight text-center">{tool.label}</span>
+                            </button>
+                        );
+                    })}
+                    {/* Variants tab on mobile */}
+                    <button
+                        onClick={() => handleLeftTool('variants')}
+                        className={`flex flex-col items-center gap-1 flex-1 py-2 rounded-xl transition-colors ${activeLeftTool === 'variants' ? 'text-gray-900 bg-[#f0f0ec]' : 'text-gray-500'}`}
+                    >
+                        <Shapes className="w-5 h-5" />
+                        <span className="text-[9px] font-medium">Variants</span>
+                    </button>
+                </div>
+
+                {/* ═══════════ MOBILE VARIANTS PANEL ═══════════ */}
+                {activeLeftTool === 'variants' && (
+                    <div className="md:hidden absolute inset-x-0 bottom-16 bg-white border-t border-gray-200 z-40 rounded-t-2xl shadow-[0_-4px_24px_rgba(0,0,0,0.12)] animate-in slide-in-from-bottom duration-300 p-5">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="font-bold text-[15px] text-gray-800">Variants</h3>
+                            <button onClick={() => { setActiveLeftTool(null); }} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400"><X className="w-4 h-4" /></button>
+                        </div>
+                        <p className="text-[13px] text-gray-500 mb-3">Colors</p>
+                        <div className="flex flex-wrap gap-3">
+                            {(supplierColors?.length ? supplierColors : selectedProduct.variants).map((c: any) => {
+                                const hex = c.hex || c.colorHex;
+                                const name = c.name || c.colorName;
+                                return (
+                                    <button
+                                        key={hex}
+                                        title={name}
+                                        className={`w-9 h-9 rounded-full border-2 transition-all ${selectedColor === hex ? 'border-gray-500 scale-110 shadow-md' : 'border-gray-200'}`}
+                                        style={{ backgroundColor: hex }}
+                                        onClick={() => { setSelectedColor(hex); setActiveLeftTool(null); }}
+                                    />
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
 
             </div>
 
