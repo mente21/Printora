@@ -689,20 +689,12 @@ function SupplierDashboardContent() {
   return (
     <div className="min-h-screen bg-[#fafafa] flex flex-col md:flex-row font-sans">
       
-      {/* Mobile Header (Clear, Logo Only) */}
-      <header className="md:hidden flex items-center p-4 bg-transparent sticky top-0 z-30 shrink-0 pointer-events-none">
-        <img src="/logo.png" alt="Logo" className="h-16 w-auto object-contain pointer-events-auto drop-shadow-md" />
+      {/* Mobile Header (Solid Background, Logo Only) */}
+      <header className="md:hidden flex items-center px-5 py-3 bg-white border-b border-gray-100 sticky top-0 z-30 shrink-0 shadow-sm">
+        <img src="/logo.png" alt="Logo" className="h-14 w-auto object-contain" />
       </header>
 
-      {/* Floating Bold Menu Button */}
-      <button 
-        onClick={() => setMobileMenuOpen(true)}
-        className="md:hidden fixed top-4 right-4 z-[60] bg-[#111] text-[#A1FF4D] p-3 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.3)] transition-transform active:scale-90 flex items-center justify-center border-2 border-[#A1FF4D]"
-      >
-        <Menu size={28} strokeWidth={3} />
-      </button>
 
-      {/* Mobile Backdrop */}
       {mobileMenuOpen && (
         <div 
           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[40] md:hidden"
@@ -841,11 +833,28 @@ function SupplierDashboardContent() {
 
       <main className="flex-1 p-4 sm:p-6 md:p-10 overflow-y-auto">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 md:mb-10">
-          <div>
-            <h1 className="text-3xl font-black text-[#2B3220] uppercase tracking-widest" style={{ fontFamily: 'Impact, sans-serif', wordSpacing: '0.15em' }}>
-              Supplier Dashboard
-            </h1>
-            <p className="text-gray-500 font-medium text-sm">Manage your products and fulfill orders.</p>
+          <div className="flex items-center gap-4">
+            {/* Mobile menu button - inline left of title */}
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="md:hidden flex-shrink-0 flex items-center justify-center w-11 h-11 rounded-2xl transition-all active:scale-90"
+              style={{
+                background: 'linear-gradient(135deg, #A1FF4D 0%, #6be800 100%)',
+                boxShadow: '0 4px 20px rgba(161, 255, 77, 0.5)',
+              }}
+            >
+              <svg width="20" height="15" viewBox="0 0 20 15" fill="none">
+                <rect y="0" width="20" height="2.5" rx="1.25" fill="#1B2412"/>
+                <rect y="6.25" width="14" height="2.5" rx="1.25" fill="#1B2412"/>
+                <rect y="12.5" width="20" height="2.5" rx="1.25" fill="#1B2412"/>
+              </svg>
+            </button>
+            <div>
+              <h1 className="text-3xl font-black text-[#2B3220] uppercase tracking-widest" style={{ fontFamily: 'Impact, sans-serif', wordSpacing: '0.15em' }}>
+                Supplier Dashboard
+              </h1>
+              <p className="text-gray-500 font-medium text-sm">Manage your products and fulfill orders.</p>
+            </div>
           </div>
         </div>
 
