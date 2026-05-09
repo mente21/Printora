@@ -1800,10 +1800,10 @@ export default function EditorUI() {
             {/* Payment / Order Modal */}
             {showPaymentModal && (
                 <div className="fixed inset-0 bg-black/40 z-[999] flex items-center justify-center p-4 lg:p-10 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-white rounded-[2rem] w-full max-w-5xl shadow-2xl flex flex-col lg:flex-row animate-in zoom-in-95 duration-300 overflow-hidden max-h-[95vh]">
+                    <div className="bg-white rounded-[1.5rem] lg:rounded-[2rem] w-full max-w-5xl shadow-2xl flex flex-col lg:flex-row animate-in zoom-in-95 duration-300 overflow-y-auto lg:overflow-hidden max-h-[98vh] lg:max-h-[95vh] relative">
 
                         {/* Left Column: Selections & Payment (Scrollable) */}
-                        <div className="flex-[1.4] flex flex-col p-8 lg:p-12 overflow-y-auto custom-scrollbar border-r border-gray-100">
+                        <div className="flex-none lg:flex-[1.4] flex flex-col p-6 lg:p-12 lg:overflow-y-auto custom-scrollbar border-b lg:border-b-0 lg:border-r border-gray-100">
                             <div className="flex justify-between items-center mb-10">
                                 <h2 className="text-3xl font-black text-gray-900 tracking-tight" style={{ fontFamily: 'Inter, sans-serif' }}>Order Details</h2>
                                 <button onClick={() => setShowPaymentModal(false)} className="lg:hidden text-gray-400 hover:text-gray-900 transition-colors">
@@ -1818,7 +1818,7 @@ export default function EditorUI() {
                                     <h3 className="text-lg font-bold text-gray-900">Choose Size & Quality</h3>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div className="space-y-3">
                                         <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Select Size</label>
                                         <CustomSelect
@@ -1840,7 +1840,7 @@ export default function EditorUI() {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div className="space-y-3 max-w-[200px]">
                                         <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Quantity</label>
                                         <input
@@ -1876,7 +1876,7 @@ export default function EditorUI() {
                                     <h3 className="text-lg font-bold text-gray-900">Select Payment Method</h3>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     {PAYMENT_METHODS.map((method) => (
                                         <button
                                             key={method.id}
@@ -1990,7 +1990,7 @@ export default function EditorUI() {
                         </div>
 
                         {/* Right Column: Order Summary */}
-                        <div className="flex-1 bg-gray-50/80 p-8 lg:p-12 flex flex-col relative overflow-hidden">
+                        <div className="flex-none lg:flex-1 bg-gray-50/80 p-6 lg:p-12 flex flex-col relative overflow-hidden">
                             <button onClick={() => setShowPaymentModal(false)} className="hidden lg:flex absolute top-8 right-8 text-gray-400 hover:text-gray-900 transition-colors p-2 hover:bg-white rounded-full border border-transparent hover:border-gray-200 shadow-sm z-20">
                                 <X size={24} />
                             </button>

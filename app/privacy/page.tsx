@@ -83,7 +83,7 @@ export default function PrivacyPolicy() {
           </div>
 
           {/* Content Wrapper */}
-          <div className="flex flex-col md:flex-row gap-12 lg:gap-20 p-8 md:p-12 lg:p-16">
+          <div className="flex flex-col md:flex-row gap-8 sm:gap-12 lg:gap-20 p-5 sm:p-8 md:p-12 lg:p-16">
             
             {/* Left: Sticky TOC */}
             <aside className="w-full md:w-[260px] shrink-0">

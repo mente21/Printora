@@ -1,15 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { ShoppingBag, LogOut, ChevronDown, User as UserIcon } from "lucide-react";
+import { ShoppingBag, LogOut, ChevronDown, User as UserIcon, Menu, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import MobileNav from "./MobileNav";
 
 export default function Navbar() {
   const [user, setUser] = useState<any>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Get initial session
@@ -39,51 +43,95 @@ export default function Navbar() {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
-    <div className="w-full flex justify-center sticky top-1 lg:top-2 z-50 px-4 lg:px-6">
-      <header className="w-full max-w-7xl bg-white/80 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-200/50 rounded-[2rem] h-[76px] lg:h-[84px] flex items-center px-6 lg:px-10 relative">
-        <div className="flex-1 flex items-center">
-          {/* Logo */}
+    <div className="w-full flex justify-center sticky top-0 md:top-1 lg:top-2 z-50 px-2 sm:px-4 lg:px-6 py-2 sm:py-3">
+      <header className="w-full max-w-7xl bg-white/80 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-200/50 rounded-lg sm:rounded-2xl md:rounded-[2rem] h-16 sm:h-[76px] lg:h-[84px] flex items-center justify-between px-3 sm:px-6 lg:px-10 relative">
+        {/* Logo */}
+        <div className="flex items-center flex-shrink-0">
           {userRole === 'ADMIN' || userRole === 'SUPPLIER' ? (
             <img
               src="/logo.png"
               alt="Stenvo Logo"
-              className="h-[56px] md:h-[68px] w-auto object-contain relative z-10 -ml-1"
+              className="h-10 sm:h-14 md:h-[56px] lg:h-[68px] w-auto object-contain relative z-10 -ml-1"
             />
           ) : (
             <Link href="/">
               <img
                 src="/logo.png"
                 alt="Stenvo Logo"
-                className="h-[56px] md:h-[68px] w-auto cursor-pointer object-contain relative z-10 -ml-1 transition-transform hover:scale-105"
+                className="h-10 sm:h-14 md:h-[56px] lg:h-[68px] w-auto cursor-pointer object-contain relative z-10 -ml-1 transition-transform hover:scale-105"
               />
             </Link>
           )}
         </div>
 
-        {/* Centered Nav - Floating Style */}
-        <nav className="hidden lg:flex items-center gap-4 absolute left-1/2 -translate-x-1/2">
-          <Link 
-            href="/before-you-start" 
-            className="px-6 py-2 text-[16px] font-black text-[#1B2412] rounded-full transition-all duration-300 ease-out hover:bg-[#A1FF4D] hover:-translate-y-1 hover:scale-110 hover:shadow-[0_10px_20px_rgba(161,255,77,0.3)] whitespace-nowrap active:scale-95"
-          >
-            Before You Start
-          </Link>
+        {/* Desktop Centered Nav - Hidden on mobile */}
+        <nav className="hidden md:flex items-center gap-1 lg:gap-4 absolute left-1/2 -translate-x-1/2">
+          {/* Before You Start Dropdown */}
+          <div className="relative group">
+            <button 
+              className="px-4 lg:px-6 py-2 text-sm lg:text-base font-black text-[#1B2412] rounded-full transition-all duration-300 ease-out hover:bg-[#A1FF4D] hover:-translate-y-1 hover:scale-105 hover:shadow-[0_10px_20px_rgba(161,255,77,0.3)] whitespace-nowrap active:scale-95 flex items-center gap-2 group-hover:text-[#1B2412]"
+            >
+              Before You Start
+              <ChevronDown size={16} className="transition-transform duration-300 group-hover:rotate-180" />
+            </button>
+            <div className="absolute left-0 top-full mt-0 pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-out z-40">
+              <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.1)] border border-gray-100 py-2 px-2 min-w-[200px]">
+                <Link href="/before-you-start" className="block px-4 py-3 rounded-lg text-sm font-bold text-[#1B2412] hover:bg-[#A1FF4D]/20 transition-colors duration-200">
+                  Getting Started
+                </Link>
+                <Link href="/help" className="block px-4 py-3 rounded-lg text-sm font-bold text-[#1B2412] hover:bg-[#A1FF4D]/20 transition-colors duration-200">
+                  Help & Support
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Inspiration */}
           <Link 
             href="/inspiration" 
-            className="px-6 py-2 text-[16px] font-black text-[#1B2412] rounded-full transition-all duration-300 ease-out hover:bg-[#A1FF4D] hover:-translate-y-1 hover:scale-110 hover:shadow-[0_10px_20px_rgba(161,255,77,0.3)] whitespace-nowrap active:scale-95"
+            className="px-4 lg:px-6 py-2 text-sm lg:text-base font-black text-[#1B2412] rounded-full transition-all duration-300 ease-out hover:bg-[#A1FF4D] hover:-translate-y-1 hover:scale-105 hover:shadow-[0_10px_20px_rgba(161,255,77,0.3)] whitespace-nowrap active:scale-95"
           >
             Inspiration
           </Link>
-          <Link 
-            href="/how-it-works" 
-            className="px-6 py-2 text-[16px] font-black text-[#1B2412] rounded-full transition-all duration-300 ease-out hover:bg-[#A1FF4D] hover:-translate-y-1 hover:scale-110 hover:shadow-[0_10px_20px_rgba(161,255,77,0.3)] whitespace-nowrap active:scale-95"
-          >
-            How it works
-          </Link>
+
+          {/* How it works Dropdown */}
+          <div className="relative group">
+            <button 
+              className="px-4 lg:px-6 py-2 text-sm lg:text-base font-black text-[#1B2412] rounded-full transition-all duration-300 ease-out hover:bg-[#A1FF4D] hover:-translate-y-1 hover:scale-105 hover:shadow-[0_10px_20px_rgba(161,255,77,0.3)] whitespace-nowrap active:scale-95 flex items-center gap-2 group-hover:text-[#1B2412]"
+            >
+              How it works
+              <ChevronDown size={16} className="transition-transform duration-300 group-hover:rotate-180" />
+            </button>
+            <div className="absolute left-0 top-full mt-0 pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-out z-40">
+              <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.1)] border border-gray-100 py-2 px-2 min-w-[200px]">
+                <Link href="/how-it-works" className="block px-4 py-3 rounded-lg text-sm font-bold text-[#1B2412] hover:bg-[#A1FF4D]/20 transition-colors duration-200">
+                  Process Overview
+                </Link>
+                <Link href="/products" className="block px-4 py-3 rounded-lg text-sm font-bold text-[#1B2412] hover:bg-[#A1FF4D]/20 transition-colors duration-200">
+                  Products
+                </Link>
+                <Link href="/editor" className="block px-4 py-3 rounded-lg text-sm font-bold text-[#1B2412] hover:bg-[#A1FF4D]/20 transition-colors duration-200">
+                  Design Editor
+                </Link>
+              </div>
+            </div>
+          </div>
         </nav>
 
-        <div className="flex-1 flex items-center justify-end gap-3">
+        <div className="flex-1 flex items-center justify-end gap-2 sm:gap-3">
           {user ? (
             // --- LOGGED IN STATE ---
             <div className="relative">
@@ -223,18 +271,19 @@ export default function Navbar() {
           ) : (
             // --- LOGGED OUT STATE ---
             <>
-              <Link href="/login" className="flex items-center justify-center rounded-md px-6 h-11 text-[16px] font-extrabold tracking-wide text-[#1B2412] bg-white border border-[#e5e7eb] hover:border-[#d1d5db] hover:bg-gray-50 transition-colors">
+              <Link href="/login" className="hidden md:flex items-center justify-center rounded-md px-6 h-11 text-[16px] font-extrabold tracking-wide text-[#1B2412] bg-white border border-[#e5e7eb] hover:border-[#d1d5db] hover:bg-gray-50 transition-colors">
                 Log in
               </Link>
               <Link
                 href="/signup"
-                className="flex items-center justify-center rounded-xl px-8 h-12 text-[16px] font-black tracking-tight transition-all duration-300 hover:scale-[1.05] hover:shadow-[0_0_25px_rgba(161,255,77,0.4)] active:scale-95"
+                className="hidden md:flex items-center justify-center rounded-xl px-8 h-12 text-[16px] font-black tracking-tight transition-all duration-300 hover:scale-[1.05] hover:shadow-[0_0_25px_rgba(161,255,77,0.4)] active:scale-95"
                 style={{ backgroundColor: '#A1FF4D', color: '#1B2412' }}
               >
                 Sign up
               </Link>
             </>
           )}
+          <MobileNav activePage="" />
         </div>
       </header>
     </div>
