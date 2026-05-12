@@ -168,6 +168,7 @@ function ProductsPageContent() {
     { name: "Hats", icon: HardHat },
     { name: "Accessories", icon: Watch },
     { name: "Phone Cases", icon: Smartphone },
+    { name: "Banners", icon: Grid },
   ];
 
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % carouselItems.length);
@@ -648,6 +649,42 @@ function ProductsPageContent() {
           {/* Product Grid */}
           {displayedProducts.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 sm:gap-x-8 gap-y-8 sm:gap-y-12">
+
+            {/* ── Featured Banner Editor Card ── */}
+            {(selectedCategories.length === 0 || selectedCategories.includes('Banners')) && (
+              <div className="col-span-2 sm:col-span-2 lg:col-span-3 xl:col-span-4 group">
+                <Link href="/editor?template=banner" className="block">
+                  <div className="relative rounded-3xl overflow-hidden h-[140px] md:h-[170px] flex items-center px-8 md:px-14 gap-6"
+                    style={{ background: 'linear-gradient(135deg, #1C1C1C 0%, #2d2d2d 60%, #1B4DFF22 100%)' }}>
+                    {/* Dashed print-area overlay */}
+                    <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'repeating-linear-gradient(45deg,#fff 0,#fff 1px,transparent 0,transparent 50%)', backgroundSize: '10px 10px' }} />
+                    {/* Left text */}
+                    <div className="relative z-10 flex-1 min-w-0">
+                      <span className="inline-block text-[10px] font-black uppercase tracking-[0.2em] text-[#6DCC5A] bg-[#6DCC5A]/10 px-3 py-1 rounded-full mb-3">New — Banner Studio</span>
+                      <h3 className="text-white font-black text-xl md:text-2xl leading-tight mb-1">Design Your Custom Banner</h3>
+                      <p className="text-white/50 text-[12px] md:text-[13px] font-medium max-w-sm">Set exact dimensions, choose aspect ratio, preview print area & order high-res prints.</p>
+                    </div>
+                    {/* Mini canvas preview */}
+                    <div className="relative flex-shrink-0 hidden sm:flex items-center justify-center">
+                      <div className="w-[180px] md:w-[240px] h-[90px] md:h-[120px] bg-white rounded-xl shadow-2xl flex items-center justify-center border border-white/10 relative overflow-hidden">
+                        <div className="absolute inset-0" style={{ background: 'repeating-linear-gradient(45deg,rgba(100,100,100,0.07) 0,rgba(100,100,100,0.07) 1px,transparent 0,transparent 50%)', backgroundSize: '6px 6px' }} />
+                        <div className="absolute inset-[8%] border border-dashed border-gray-300/50 rounded" />
+                        <span className="text-[10px] font-black tracking-[0.15em] text-gray-300 uppercase">Print Area</span>
+                      </div>
+                      <div className="absolute -bottom-1 right-2 bg-white/90 border border-gray-200 rounded-md px-2 py-0.5 text-[9px] font-bold text-gray-500">Scale 1:5</div>
+                    </div>
+                    {/* CTA */}
+                    <div className="flex-shrink-0 relative z-10">
+                      <span className="inline-flex items-center gap-2 bg-[#6DCC5A] hover:bg-[#5ab84a] text-[#1C1C1C] font-black text-[12px] md:text-[13px] px-5 py-3 rounded-xl shadow-lg transition-all group-hover:scale-105 active:scale-95">
+                        Open Editor
+                        <ChevronRight size={14} />
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              </div>
+            )}
+
             {displayedProducts.map((product) => (
               <div key={product.id} className="flex flex-col group hover:-translate-y-1 transition-transform duration-500">
                 <div className="relative aspect-square rounded-2xl sm:rounded-[2rem] bg-white border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] mb-4 p-[2px] overflow-hidden">
@@ -718,7 +755,11 @@ function ProductsPageContent() {
 
                 <div className="mt-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300 pointer-events-none group-hover:pointer-events-auto h-0 group-hover:h-auto overflow-hidden">
                   <Link
-                    href={`/editor?template=${product.product_type?.toLowerCase() || 'classic-tshirt'}&supplier_product_id=${product.id}`}
+                    href={
+                      (product.product_type || '').toLowerCase().includes('banner')
+                        ? `/editor?template=banner&supplier_product_id=${product.id}`
+                        : `/editor?template=${product.product_type?.toLowerCase() || 'classic-tshirt'}&supplier_product_id=${product.id}`
+                    }
                     className="w-full bg-[#1c211f] text-white py-3 rounded-xl text-[13px] font-bold text-center hover:bg-black transition-all shadow-md active:scale-95"
                   >
                     Customize
