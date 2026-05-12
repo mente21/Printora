@@ -85,9 +85,19 @@ function BannerMockup({ printArea, canvasRef, bannerRealW, bannerRealH }: any) {
     };
 
     return (
-        <div className="relative w-full max-w-[90%] shadow-lg rounded overflow-hidden" style={{ aspectRatio: \`\${cw}/\${ch}\` }}>
+        <div className="relative shadow-lg rounded overflow-hidden mx-auto" style={{ aspectRatio: \`\${cw}/\${ch}\`, width: \`min(90%, calc(65vh * (\${cw} / \${ch})))\`, maxHeight: '100%' }}>
+            <style>{\`
+                .banner-canvas-wrapper .canvas-container {
+                    width: 100% !important;
+                    height: 100% !important;
+                }
+                .banner-canvas-wrapper .canvas-container canvas {
+                    width: 100% !important;
+                    height: 100% !important;
+                }
+            \`}</style>
             <div className="absolute inset-0 bg-white" />
-            <div className="absolute inset-0 z-20 outline-none focus:outline-none">
+            <div className="absolute inset-0 z-20 outline-none focus:outline-none banner-canvas-wrapper">
                 <canvas ref={canvasRef} className="outline-none" />
             </div>
             <div className="absolute inset-0 z-30 pointer-events-none" dangerouslySetInnerHTML={{ __html: \`<svg viewBox="0 0 \${cw} \${ch}" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">\${drawOverlaySvg()}</svg>\` }} />
