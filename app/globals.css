@@ -150,3 +150,10 @@
     scrollbar-width: none;
   }
 }
+
+/* Banner Fabric.js Canvas Scaling */
+.banner-canvas-wrapper .canvas-container,
+.banner-canvas-wrapper .canvas-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+}

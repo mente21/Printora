@@ -756,16 +756,6 @@ function BannerMockup({ printArea, canvasRef, bannerRealW, bannerRealH }: any) {
             width: `min(90%, calc(65vh * (${cw} / ${ch})))`,
             maxHeight: '100%'
         }}>
-            <style>{`
-                .banner-canvas-wrapper .canvas-container {
-                    width: 100% !important;
-                    height: 100% !important;
-                }
-                .banner-canvas-wrapper .canvas-container canvas {
-                    width: 100% !important;
-                    height: 100% !important;
-                }
-            `}</style>
             <div className="absolute inset-0 bg-white" />
             <div className="absolute inset-0 z-20 outline-none focus:outline-none banner-canvas-wrapper">
                 <canvas ref={canvasRef} className="outline-none" />
