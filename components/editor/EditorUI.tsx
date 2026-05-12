@@ -694,64 +694,24 @@ function TemplatesPanel({ onClose, onLoadTemplate }: { onClose: () => void; onLo
 
 // --- BANNER MOCKUP ---
 function BannerMockup({ printArea, canvasRef, bannerRealW, bannerRealH }: any) {
-    const GUTTER = 4;
     const cw = bannerRealW;
     const ch = bannerRealH;
-    
-    // Draw the SVG overlay for the banner
-    const drawOverlaySvg = () => {
-        const gW = (cw * GUTTER) / 100;
-        const gH = (ch * GUTTER) / 100;
-        const pX = gW, pY = gH;
-        const pW = cw - gW * 2;
-        const pH = ch - gH * 2;
-        const labelSize = Math.max(12, Math.min(24, cw * 0.03));
-        const cornerSize = Math.max(8, Math.min(16, gW * 0.5));
 
-        return `
-        <defs>
-          <pattern id="hp" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">
-            <path d="M0 8 L8 0" stroke="rgba(160,160,160,0.28)" stroke-width="1" vector-effect="non-scaling-stroke"/>
-          </pattern>
-        </defs>
-        <rect x="0" y="0" width="${cw}" height="${gH}" fill="rgba(140,140,140,0.06)" vector-effect="non-scaling-stroke"/>
-        <rect x="0" y="${ch - gH}" width="${cw}" height="${gH}" fill="rgba(140,140,140,0.06)" vector-effect="non-scaling-stroke"/>
-        <rect x="0" y="0" width="${gW}" height="${ch}" fill="rgba(140,140,140,0.06)" vector-effect="non-scaling-stroke"/>
-        <rect x="${cw - gW}" y="0" width="${gW}" height="${ch}" fill="rgba(140,140,140,0.06)" vector-effect="non-scaling-stroke"/>
-        <rect x="0" y="0" width="${cw}" height="${gH}" fill="url(#hp)" vector-effect="non-scaling-stroke"/>
-        <rect x="0" y="${ch - gH}" width="${cw}" height="${gH}" fill="url(#hp)" vector-effect="non-scaling-stroke"/>
-        <rect x="0" y="0" width="${gW}" height="${ch}" fill="url(#hp)" vector-effect="non-scaling-stroke"/>
-        <rect x="${cw - gW}" y="0" width="${gW}" height="${ch}" fill="url(#hp)" vector-effect="non-scaling-stroke"/>
-        <rect x="${pX}" y="${pY}" width="${pW}" height="${pH}"
-              fill="none" stroke="rgba(120,120,120,0.25)" stroke-width="2"
+    // SVG overlay: just center cross-hairs + dashed border at edges. No gutter, no shrinking text.
+    const overlaySvg = `
+        <line x1="${cw / 2}" y1="0" x2="${cw / 2}" y2="${ch}"
+              stroke="rgba(100,130,200,0.18)" stroke-width="1.5"
               stroke-dasharray="8 6" vector-effect="non-scaling-stroke"/>
-        <line x1="${cw / 2}" y1="${pY}" x2="${cw / 2}" y2="${pY + pH}"
-              stroke="rgba(100,130,200,0.15)" stroke-width="1.5"
-              stroke-dasharray="6 6" vector-effect="non-scaling-stroke"/>
-        <line x1="${pX}" y1="${ch / 2}" x2="${pX + pW}" y2="${ch / 2}"
-              stroke="rgba(100,130,200,0.15)" stroke-width="1.5"
-              stroke-dasharray="6 6" vector-effect="non-scaling-stroke"/>
-        <text x="${cw / 2}" y="${ch / 2}" text-anchor="middle" dominant-baseline="middle"
-              font-size="${labelSize}" fill="rgba(190,190,190,0.8)"
-              font-family="DM Sans,Inter,sans-serif" letter-spacing="2"
-              vector-effect="non-scaling-stroke">PRINT AREA</text>
-        <text x="${gW / 2}" y="${gH / 2}" text-anchor="middle" dominant-baseline="middle"
-              font-size="${cornerSize}" fill="rgba(150,150,150,0.7)"
-              font-family="DM Sans,Inter,sans-serif" vector-effect="non-scaling-stroke">4%</text>
-        <text x="${cw - gW / 2}" y="${gH / 2}" text-anchor="middle" dominant-baseline="middle"
-              font-size="${cornerSize}" fill="rgba(150,150,150,0.7)"
-              font-family="DM Sans,Inter,sans-serif" vector-effect="non-scaling-stroke">4%</text>
-        <text x="${gW / 2}" y="${ch - gH / 2}" text-anchor="middle" dominant-baseline="middle"
-              font-size="${cornerSize}" fill="rgba(150,150,150,0.7)"
-              font-family="DM Sans,Inter,sans-serif" vector-effect="non-scaling-stroke">4%</text>
-        <text x="${cw - gW / 2}" y="${ch - gH / 2}" text-anchor="middle" dominant-baseline="middle"
-              font-size="${cornerSize}" fill="rgba(150,150,150,0.7)"
-              font-family="DM Sans,Inter,sans-serif" vector-effect="non-scaling-stroke">4%</text>
-        `;
-    };
+        <line x1="0" y1="${ch / 2}" x2="${cw}" y2="${ch / 2}"
+              stroke="rgba(100,130,200,0.18)" stroke-width="1.5"
+              stroke-dasharray="8 6" vector-effect="non-scaling-stroke"/>
+        <rect x="1" y="1" width="${cw - 2}" height="${ch - 2}"
+              fill="none" stroke="rgba(120,120,120,0.22)" stroke-width="2"
+              stroke-dasharray="10 6" vector-effect="non-scaling-stroke"/>
+    `;
 
     return (
-        <div className="relative shadow-lg rounded overflow-hidden mx-auto" style={{ 
+        <div className="relative shadow-lg rounded overflow-hidden mx-auto" style={{
             aspectRatio: `${cw}/${ch}`,
             width: `min(90%, calc(65vh * (${cw} / ${ch})))`,
             maxHeight: '100%'
@@ -760,7 +720,21 @@ function BannerMockup({ printArea, canvasRef, bannerRealW, bannerRealH }: any) {
             <div className="absolute inset-0 z-20 outline-none focus:outline-none banner-canvas-wrapper">
                 <canvas ref={canvasRef} className="outline-none" />
             </div>
-            <div className="absolute inset-0 z-30 pointer-events-none" dangerouslySetInnerHTML={{ __html: `<svg viewBox="0 0 ${cw} ${ch}" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">${drawOverlaySvg()}</svg>` }} />
+            {/* SVG overlay: cross-hairs & border */}
+            <div className="absolute inset-0 z-30 pointer-events-none" dangerouslySetInnerHTML={{ __html: `<svg viewBox="0 0 ${cw} ${ch}" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">${overlaySvg}</svg>` }} />
+            {/* Fixed-size "PRINT AREA" label — HTML so it never shrinks */}
+            <div className="absolute inset-0 z-30 pointer-events-none flex items-center justify-center">
+                <span style={{
+                    fontSize: '11px',
+                    fontFamily: 'DM Sans, Inter, sans-serif',
+                    fontWeight: 600,
+                    letterSpacing: '2px',
+                    color: 'rgba(170,170,170,0.85)',
+                    textTransform: 'uppercase',
+                    userSelect: 'none',
+                    whiteSpace: 'nowrap',
+                }}>PRINT AREA</span>
+            </div>
         </div>
     );
 }
