@@ -721,9 +721,9 @@ function BannerMockup({ printArea, canvasRef, bannerRealW, bannerRealH }: any) {
                 <canvas ref={canvasRef} className="outline-none" />
             </div>
             {/* SVG overlay: cross-hairs & border */}
-            <div className="absolute inset-0 z-30 pointer-events-none" dangerouslySetInnerHTML={{ __html: `<svg viewBox="0 0 ${cw} ${ch}" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">${overlaySvg}</svg>` }} />
+            <div className="absolute inset-0 z-30 pointer-events-none print-area-placeholder" dangerouslySetInnerHTML={{ __html: `<svg viewBox="0 0 ${cw} ${ch}" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">${overlaySvg}</svg>` }} />
             {/* Fixed-size "PRINT AREA" label — HTML so it never shrinks */}
-            <div className="absolute inset-0 z-30 pointer-events-none flex items-center justify-center">
+            <div className="absolute inset-0 z-30 pointer-events-none flex items-center justify-center print-area-placeholder">
                 <span style={{
                     fontSize: '11px',
                     fontFamily: 'DM Sans, Inter, sans-serif',

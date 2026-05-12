@@ -72,8 +72,8 @@ function BannerMockup({ printArea, canvasRef, bannerRealW, bannerRealH }: any) {
             <div className="absolute inset-0 z-20 outline-none focus:outline-none banner-canvas-wrapper">
                 <canvas ref={canvasRef} className="outline-none" />
             </div>
-            <div className="absolute inset-0 z-30 pointer-events-none" dangerouslySetInnerHTML={{ __html: \`<svg viewBox="0 0 \${cw} \${ch}" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">\${overlaySvg}</svg>\` }} />
-            <div className="absolute inset-0 z-30 pointer-events-none flex items-center justify-center">
+            <div className="absolute inset-0 z-30 pointer-events-none print-area-placeholder" dangerouslySetInnerHTML={{ __html: \`<svg viewBox="0 0 \${cw} \${ch}" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">\${overlaySvg}</svg>\` }} />
+            <div className="absolute inset-0 z-30 pointer-events-none flex items-center justify-center print-area-placeholder">
                 <span style={{ fontSize: '11px', fontFamily: 'DM Sans, Inter, sans-serif', fontWeight: 600, letterSpacing: '2px', color: 'rgba(170,170,170,0.85)', textTransform: 'uppercase', userSelect: 'none', whiteSpace: 'nowrap' }}>PRINT AREA</span>
             </div>
         </div>
