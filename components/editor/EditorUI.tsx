@@ -1101,7 +1101,6 @@ export default function EditorUI() {
         try {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) {
-                // Save their work to localStorage so they don't lose it
                 localStorage.setItem('printora_pending_design', JSON.stringify({
                     productTemplateId: selectedProduct.id,
                     color: selectedColor,
@@ -1112,9 +1111,9 @@ export default function EditorUI() {
                 return;
             }
             setShowPaymentModal(true);
-            setIsSaving(false);
         } catch (e) {
             console.error('Auth error', e);
+        } finally {
             setIsSaving(false);
         }
     };
@@ -1307,10 +1306,19 @@ export default function EditorUI() {
                 ...(originalOrder?.variants || {}),
                 color: selectedColor,
                 view: selectedView.name,
-                size: orderSize,
+                size: selectedProduct.id === 'banner' ? `${bannerInputW}x${bannerInputH} ${bannerUnit}` : orderSize,
                 quantity: orderQuantity,
                 quality: orderQuality,
                 receiptDataUrl: receiptDataUrl || originalOrder?.variants?.receiptDataUrl || null,
+                // Banner Specifics
+                ...(selectedProduct.id === 'banner' ? {
+                    bannerWidth: bannerInputW,
+                    bannerHeight: bannerInputH,
+                    bannerUnit: bannerUnit,
+                    bannerDpi: bannerDpi,
+                    bannerRealW,
+                    bannerRealH
+                } : {})
             };
 
             if (dbOrderId) {
@@ -1430,6 +1438,7 @@ export default function EditorUI() {
             case 'crewneck-sweater': return <SweaterMockup {...props} />;
             case 'classic-cap': return <HatMockup {...props} />;
             case 'ceramic-mug': return <MugMockup {...props} />;
+            case 'banner': return <BannerMockup {...props} bannerRealW={bannerRealW} bannerRealH={bannerRealH} />;
             case 'banner': return <BannerMockup {...props} bannerRealW={bannerRealW} bannerRealH={bannerRealH} />;
             default: return <TshirtMockup {...props} />;
         }
@@ -1749,6 +1758,7 @@ export default function EditorUI() {
                 </div>
 
                 {/* ═══════════ RIGHT PANEL: Variants & Layers — desktop only ═══════════ */}
+
 <div className="hidden md:flex absolute right-4 top-4 bottom-4 w-[320px] bg-white rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.06)] border border-gray-100 z-30 overflow-hidden flex-col">
     {selectedProduct.id === 'banner' ? (
         <div className="flex flex-col h-full bg-[#FAFAFA]">
@@ -1968,30 +1978,52 @@ export default function EditorUI() {
                             <div className="space-y-8 mb-12">
                                 <div className="flex items-center gap-3 mb-6">
                                     <div className="w-8 h-8 rounded-full bg-[#ccff00] flex items-center justify-center text-[13px] font-black">1</div>
-                                    <h3 className="text-lg font-bold text-gray-900">Choose Size & Quality</h3>
+                                    <h3 className="text-lg font-bold text-gray-900">{selectedProduct.id === 'banner' ? 'Confirm Dimensions' : 'Choose Size & Quality'}</h3>
                                 </div>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                    <div className="space-y-3">
-                                        <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Select Size</label>
-                                        <CustomSelect
-                                            value={orderSize}
-                                            options={["S", "M", "L", "XL", "XXL"]}
-                                            onChange={(val) => setOrderSize(val)}
-                                            className="custom-editor-select"
-                                        />
+                                
+                                {selectedProduct.id === 'banner' ? (
+                                    <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 grid grid-cols-2 gap-4">
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Width</label>
+                                            <p className="text-lg font-bold text-gray-900">{bannerInputW} <span className="text-sm text-gray-500 uppercase">{bannerUnit}</span></p>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Height</label>
+                                            <p className="text-lg font-bold text-gray-900">{bannerInputH} <span className="text-sm text-gray-500 uppercase">{bannerUnit}</span></p>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Resolution</label>
+                                            <p className="text-lg font-bold text-gray-900">{bannerDpi} <span className="text-sm text-gray-500 uppercase">DPI</span></p>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Print Type</label>
+                                            <p className="text-lg font-bold text-gray-900">High Resolution</p>
+                                        </div>
                                     </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                        <div className="space-y-3">
+                                            <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Select Size</label>
+                                            <CustomSelect
+                                                value={orderSize}
+                                                options={["S", "M", "L", "XL", "XXL"]}
+                                                onChange={(val) => setOrderSize(val)}
+                                                className="custom-editor-select"
+                                            />
+                                        </div>
 
-                                    <div className="space-y-3">
-                                        <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Garment Quality</label>
-                                        <CustomSelect
-                                            value={orderQuality}
-                                            options={["Standard", "Premium"]}
-                                            onChange={(val) => setOrderQuality(val)}
-                                            className="custom-editor-select"
-                                        />
+                                        <div className="space-y-3">
+                                            <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Garment Quality</label>
+                                            <CustomSelect
+                                                value={orderQuality}
+                                                options={["Standard", "Premium"]}
+                                                onChange={(val) => setOrderQuality(val)}
+                                                className="custom-editor-select"
+                                            />
+                                        </div>
                                     </div>
-                                </div>
+                                )}
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div className="space-y-3 max-w-[200px]">
