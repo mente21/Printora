@@ -1731,7 +1731,7 @@ export default function EditorUI() {
                                 pointer-events: none;
                             }
                         `}</style>
-                        <div id="product-capture-area" className={`relative z-10 w-full h-full max-w-2xl flex justify-center items-center drop-shadow-md ${(canvas?.getObjects().length || 0) > 0 ? 'has-design' : ''}`}>
+                        <div id="product-capture-area" className={`relative z-10 w-full h-full max-w-2xl flex justify-center items-center drop-shadow-md ${(viewStates[selectedView.id]?.objects?.length || 0) > 0 ? 'has-design' : ''}`}>
                             <div className="w-full flex justify-center items-center">
                                 {renderMockup()}
                             </div>
