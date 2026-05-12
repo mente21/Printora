@@ -8,10 +8,10 @@ if (!code.includes('const [bannerRealW')) {
     // Banner State
     const [bannerRealW, setBannerRealW] = useState(2000);
     const [bannerRealH, setBannerRealH] = useState(1000);
-    const [bannerUnit, setBannerUnit] = useState('mm');
+    const [bannerUnit, setBannerUnit] = useState('m');
     const [bannerDpi, setBannerDpi] = useState(72);
-    const [bannerInputW, setBannerInputW] = useState('2000');
-    const [bannerInputH, setBannerInputH] = useState('1000');`);
+    const [bannerInputW, setBannerInputW] = useState('2');
+    const [bannerInputH, setBannerInputH] = useState('1');`);
 }
 
 // 2. Adjust canvasSize in useEditorCanvas for banners
