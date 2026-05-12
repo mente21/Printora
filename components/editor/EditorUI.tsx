@@ -849,6 +849,29 @@ export default function EditorUI() {
     const [bannerDpi, setBannerDpi] = useState(72);
     const [bannerInputW, setBannerInputW] = useState('2');
     const [bannerInputH, setBannerInputH] = useState('1');
+
+    // Banner Unit Helpers
+    const unitToMm: Record<string, number> = { mm: 1, cm: 10, m: 1000, in: 25.4 };
+    const bannerFactor = unitToMm[bannerUnit] ?? 1;
+
+    const handleBannerUnitChange = (newUnit: string) => {
+        const newFactor = unitToMm[newUnit] ?? 1;
+        setBannerInputW((bannerRealW / newFactor).toFixed(newUnit === 'mm' ? 0 : newUnit === 'cm' ? 1 : 2));
+        setBannerInputH((bannerRealH / newFactor).toFixed(newUnit === 'mm' ? 0 : newUnit === 'cm' ? 1 : 2));
+        setBannerUnit(newUnit);
+    };
+
+    const handleBannerWChange = (val: string) => {
+        setBannerInputW(val);
+        const px = parseFloat(val) * bannerFactor;
+        if (!isNaN(px) && px > 0) setBannerRealW(Math.round(px));
+    };
+
+    const handleBannerHChange = (val: string) => {
+        setBannerInputH(val);
+        const px = parseFloat(val) * bannerFactor;
+        if (!isNaN(px) && px > 0) setBannerRealH(Math.round(px));
+    };
     // Restore loadedTemplateId from session (survives refresh, not nav-away)
     const [loadedTemplateId, setLoadedTemplateId] = useState<string | null>(() => {
         if (typeof window !== 'undefined') {
@@ -1705,104 +1728,92 @@ export default function EditorUI() {
                             </div>
                         </div>
                     </div>
-
-                    {/* View Pills — scrollable on                {/* ═══════════ RIGHT PANEL: Variants & Layers — desktop only ═══════════ */}
-                
-<div className="hidden md:flex absolute right-4 top-4 bottom-4 w-[320px] bg-white rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.06)] border border-gray-100 z-30 overflow-hidden flex-col">
-    {selectedProduct.id === 'banner' ? (() => {
-        // Conversion: internal unit is mm (1px = 1mm). Convert display ↔ mm.
-        const unitToMm: Record<string, number> = { mm: 1, cm: 10, m: 1000, in: 25.4 };
-        const factor = unitToMm[bannerUnit] ?? 1;
-
-        const handleUnitChange = (newUnit: string) => {
-            const newFactor = unitToMm[newUnit] ?? 1;
-            // Re-express current real dimensions in the new unit
-            setBannerInputW((bannerRealW / newFactor).toFixed(newUnit === 'mm' ? 0 : newUnit === 'cm' ? 1 : 2));
-            setBannerInputH((bannerRealH / newFactor).toFixed(newUnit === 'mm' ? 0 : newUnit === 'cm' ? 1 : 2));
-            setBannerUnit(newUnit);
-        };
-
-        const handleWChange = (val: string) => {
-            setBannerInputW(val);
-            const px = parseFloat(val) * factor;
-            if (!isNaN(px) && px > 0) setBannerRealW(Math.round(px));
-        };
-
-        const handleHChange = (val: string) => {
-            setBannerInputH(val);
-            const px = parseFloat(val) * factor;
-            if (!isNaN(px) && px > 0) setBannerRealH(Math.round(px));
-        };
-
-        // Presets stored in mm internally; display in current unit
-        const PRESETS = [
-            { label: '1:1', w: 1000, h: 1000 },
-            { label: '2:1', w: 2000, h: 1000 },
-            { label: '3:1', w: 3000, h: 1000 },
-            { label: '1:2', w: 1000, h: 2000 },
-            { label: '4:1', w: 4000, h: 1000 },
-            { label: '16:9', w: 1600, h: 900 },
-        ];
-
-        return (
-            <div className="flex flex-col h-full bg-[#FAFAFA]">
-                <div className="p-4 border-b border-gray-100 bg-white shadow-sm z-10 flex-shrink-0">
-                    <h3 className="font-bold text-[15px] text-gray-900 flex items-center gap-2">
-                        <span className="w-6 h-6 rounded bg-[#EAF8E5] text-[#6DCC5A] flex items-center justify-center">📐</span> Dimensions
-                    </h3>
-                </div>
-                <div className="p-5 flex-1 overflow-y-auto space-y-6">
-                    <div>
-                        <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-3 block">Presets</label>
-                        <div className="grid grid-cols-3 gap-2">
-                            {PRESETS.map((p, i) => (
-                                <button key={i} onClick={() => {
-                                    setBannerRealW(p.w);
-                                    setBannerRealH(p.h);
-                                    setBannerInputW((p.w / factor).toFixed(bannerUnit === 'mm' ? 0 : bannerUnit === 'cm' ? 1 : 2));
-                                    setBannerInputH((p.h / factor).toFixed(bannerUnit === 'mm' ? 0 : bannerUnit === 'cm' ? 1 : 2));
-                                }}
-                                    className={`py-2 rounded border ${bannerRealW / bannerRealH === p.w / p.h ? 'border-gray-900 bg-white shadow-sm' : 'border-gray-200 bg-gray-50 text-gray-500 hover:border-gray-300'}`}>
-                                    <div className="text-[13px] font-bold">{p.label}</div>
+                    {/* View Pills — scrollable on mobile */}
+                    <div className="absolute bottom-2 md:bottom-6 left-0 right-0 z-30 flex justify-center">
+                        <div className="flex items-center gap-2 overflow-x-auto px-3 pb-1 max-w-full scrollbar-none" style={{ scrollbarWidth: 'none' }}>
+                            {selectedProduct.views.map(view => (
+                                <button
+                                    key={view.id}
+                                    onClick={() => handleViewChange(view.id)}
+                                    className={`flex-shrink-0 px-3 md:px-5 py-1.5 md:py-2 rounded-full text-[11px] md:text-[13px] font-semibold transition-all shadow-sm whitespace-nowrap ${
+                                        selectedView.id === view.id
+                                            ? 'bg-[#64645A] text-white'
+                                            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                                    }`}
+                                >
+                                    {view.name}
                                 </button>
                             ))}
                         </div>
                     </div>
-                    <div>
-                        <div className="flex items-center justify-between mb-3">
-                            <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Custom Size</label>
-                            <select value={bannerUnit} onChange={e => handleUnitChange(e.target.value)} className="text-[11px] font-bold bg-white border border-gray-200 rounded px-2 py-1 outline-none">
-                                <option value="mm">mm</option>
-                                <option value="cm">cm</option>
-                                <option value="m">m</option>
-                                <option value="in">inch</option>
-                            </select>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <div className="flex-1 relative">
-                                <input type="number" value={bannerInputW} onChange={e => handleWChange(e.target.value)} className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-[14px] font-semibold text-gray-800 outline-none focus:border-gray-400" />
-                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-gray-400 font-bold uppercase">{bannerUnit}</span>
-                            </div>
-                            <span className="text-gray-300 font-bold">×</span>
-                            <div className="flex-1 relative">
-                                <input type="number" value={bannerInputH} onChange={e => handleHChange(e.target.value)} className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-[14px] font-semibold text-gray-800 outline-none focus:border-gray-400" />
-                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-gray-400 font-bold uppercase">{bannerUnit}</span>
-                            </div>
-                        </div>
+                </div>
+
+                {/* ═══════════ RIGHT PANEL: Variants & Layers — desktop only ═══════════ */}
+<div className="hidden md:flex absolute right-4 top-4 bottom-4 w-[320px] bg-white rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.06)] border border-gray-100 z-30 overflow-hidden flex-col">
+    {selectedProduct.id === 'banner' ? (
+        <div className="flex flex-col h-full bg-[#FAFAFA]">
+            <div className="p-4 border-b border-gray-100 bg-white shadow-sm z-10 flex-shrink-0">
+                <h3 className="font-bold text-[15px] text-gray-900 flex items-center gap-2">
+                    <span className="w-6 h-6 rounded bg-[#EAF8E5] text-[#6DCC5A] flex items-center justify-center">📐</span> Dimensions
+                </h3>
+            </div>
+            <div className="p-5 flex-1 overflow-y-auto space-y-6">
+                <div>
+                    <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-3 block">Presets</label>
+                    <div className="grid grid-cols-3 gap-2">
+                        {[
+                            { label: '1:1', w: 1000, h: 1000 },
+                            { label: '2:1', w: 2000, h: 1000 },
+                            { label: '3:1', w: 3000, h: 1000 },
+                            { label: '1:2', w: 1000, h: 2000 },
+                            { label: '4:1', w: 4000, h: 1000 },
+                            { label: '16:9', w: 1600, h: 900 },
+                        ].map((p, i) => (
+                            <button key={i} onClick={() => {
+                                setBannerRealW(p.w);
+                                setBannerRealH(p.h);
+                                setBannerInputW((p.w / bannerFactor).toFixed(bannerUnit === 'mm' ? 0 : bannerUnit === 'cm' ? 1 : 2));
+                                setBannerInputH((p.h / bannerFactor).toFixed(bannerUnit === 'mm' ? 0 : bannerUnit === 'cm' ? 1 : 2));
+                            }}
+                                className={`py-2 rounded border ${bannerRealW / bannerRealH === p.w / p.h ? 'border-gray-900 bg-white shadow-sm' : 'border-gray-200 bg-gray-50 text-gray-500 hover:border-gray-300'}`}>
+                                <div className="text-[13px] font-bold">{p.label}</div>
+                            </button>
+                        ))}
                     </div>
-                    <div>
-                        <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-3 block">Resolution (DPI)</label>
-                        <div className="flex gap-2">
-                            {[72, 150, 300].map(d => (
-                                <button key={d} onClick={() => setBannerDpi(d)} className={`flex-1 py-2 rounded text-[13px] font-bold border ${bannerDpi === d ? 'border-gray-900 bg-white shadow-sm text-gray-900' : 'border-gray-200 bg-gray-50 text-gray-500 hover:border-gray-300'}`}>{d}</button>
-                            ))}
+                </div>
+                <div>
+                    <div className="flex items-center justify-between mb-3">
+                        <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Custom Size</label>
+                        <select value={bannerUnit} onChange={e => handleBannerUnitChange(e.target.value)} className="text-[11px] font-bold bg-white border border-gray-200 rounded px-2 py-1 outline-none">
+                            <option value="mm">mm</option>
+                            <option value="cm">cm</option>
+                            <option value="m">m</option>
+                            <option value="in">inch</option>
+                        </select>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <div className="flex-1 relative">
+                            <input type="number" value={bannerInputW} onChange={e => handleBannerWChange(e.target.value)} className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-[14px] font-semibold text-gray-800 outline-none focus:border-gray-400" />
+                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-gray-400 font-bold uppercase">{bannerUnit}</span>
+                        </div>
+                        <span className="text-gray-300 font-bold">×</span>
+                        <div className="flex-1 relative">
+                            <input type="number" value={bannerInputH} onChange={e => handleBannerHChange(e.target.value)} className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-[14px] font-semibold text-gray-800 outline-none focus:border-gray-400" />
+                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-gray-400 font-bold uppercase">{bannerUnit}</span>
                         </div>
                     </div>
                 </div>
+                <div>
+                    <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-3 block">Resolution (DPI)</label>
+                    <div className="flex gap-2">
+                        {[72, 150, 300].map(d => (
+                            <button key={d} onClick={() => setBannerDpi(d)} className={`flex-1 py-2 rounded text-[13px] font-bold border ${bannerDpi === d ? 'border-gray-900 bg-white shadow-sm text-gray-900' : 'border-gray-200 bg-gray-50 text-gray-500 hover:border-gray-300'}`}>{d}</button>
+                        ))}
+                    </div>
+                </div>
             </div>
-        );
-    })()}
-    {selectedProduct.id !== 'banner' ? (
+        </div>
+    ) : (
         <>
             <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-white flex-shrink-0">
                 <h3 className="font-bold text-[15px] text-gray-800">Variants and layers</h3>
@@ -1833,7 +1844,7 @@ export default function EditorUI() {
                 <div id="mug-3d-preview-portal" className="flex-shrink-0" />
             )}
         </>
-    ) : null}
+    )}
 </div>
 {/* ═══════════ MOBILE BOTTOM TAB BAR ═══════════ */}
                 <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-gray-200 flex items-center justify-around z-50 px-2 shadow-[0_-2px_12px_rgba(0,0,0,0.08)]">

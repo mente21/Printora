@@ -1,21 +1,44 @@
 const fs = require('fs');
 let code = fs.readFileSync('components/editor/EditorUI.tsx', 'utf8');
 
-// 1. Add Banner State inside EditorUI component
+// 1. Add Banner State and Helpers inside EditorUI component
 const stateRegex = /const \[isSaving, setIsSaving\] = useState\(false\);/;
 if (!code.includes('const [bannerRealW')) {
-    code = code.replace(stateRegex, `$&
+    code = code.replace(stateRegex, `const [isSaving, setIsSaving] = useState(false);
     // Banner State
     const [bannerRealW, setBannerRealW] = useState(2000);
     const [bannerRealH, setBannerRealH] = useState(1000);
     const [bannerUnit, setBannerUnit] = useState('m');
     const [bannerDpi, setBannerDpi] = useState(72);
     const [bannerInputW, setBannerInputW] = useState('2');
-    const [bannerInputH, setBannerInputH] = useState('1');`);
+    const [bannerInputH, setBannerInputH] = useState('1');
+
+    // Banner Unit Helpers
+    const unitToMm = { mm: 1, cm: 10, m: 1000, in: 25.4 };
+    const bannerFactor = unitToMm[bannerUnit] ?? 1;
+
+    const handleBannerUnitChange = (newUnit: string) => {
+        const newFactor = unitToMm[newUnit] ?? 1;
+        setBannerInputW((bannerRealW / newFactor).toFixed(newUnit === 'mm' ? 0 : newUnit === 'cm' ? 1 : 2));
+        setBannerInputH((bannerRealH / newFactor).toFixed(newUnit === 'mm' ? 0 : newUnit === 'cm' ? 1 : 2));
+        setBannerUnit(newUnit);
+    };
+
+    const handleBannerWChange = (val: string) => {
+        setBannerInputW(val);
+        const px = parseFloat(val) * bannerFactor;
+        if (!isNaN(px) && px > 0) setBannerRealW(Math.round(px));
+    };
+
+    const handleBannerHChange = (val: string) => {
+        setBannerInputH(val);
+        const px = parseFloat(val) * bannerFactor;
+        if (!isNaN(px) && px > 0) setBannerRealH(Math.round(px));
+    };`);
 }
 
 // 2. Adjust canvasSize in useEditorCanvas for banners
-const canvasSizeRegex = /const canvasSize = selectedProduct\.id === 'ceramic-mug'[\s\S]*?\: \{ width: 500, height: 540 \};/;
+const canvasSizeRegex = /const canvasSize = selectedProduct\.id === 'ceramic-mug'[\s\S]*?\{ width: 500, height: 540 \};/;
 if (code.match(canvasSizeRegex) && !code.includes("selectedProduct.id === 'banner' ? { width: bannerRealW")) {
     code = code.replace(canvasSizeRegex, `const canvasSize = selectedProduct.id === 'ceramic-mug' 
         ? { width: 1024, height: 512 } 
@@ -24,7 +47,7 @@ if (code.match(canvasSizeRegex) && !code.includes("selectedProduct.id === 'banne
         : { width: 500, height: 540 };`);
 }
 
-// 3. Inject BannerMockup and BannerRightPanel before EditorUI
+// 3. Inject BannerMockup before EditorUI
 const bannerComponents = `
 // --- BANNER MOCKUP ---
 function BannerMockup({ printArea, canvasRef, bannerRealW, bannerRealH }: any) {
@@ -85,9 +108,21 @@ const rightPanelReplacement = `
                 <div>
                     <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-3 block">Presets</label>
                     <div className="grid grid-cols-3 gap-2">
-                        {[{ label: '1:1', w: 1000, h: 1000 }, { label: '2:1', w: 2000, h: 1000 }, { label: '3:1', w: 3000, h: 1000 }, { label: '1:2', w: 1000, h: 2000 }, { label: '4:1', w: 4000, h: 1000 }, { label: '16:9', w: 1600, h: 900 }].map((p, i) => (
-                            <button key={i} onClick={() => { setBannerRealW(p.w); setBannerRealH(p.h); setBannerInputW(p.w.toString()); setBannerInputH(p.h.toString()); }}
-                                className={\`py-2 rounded border \${bannerRealW/bannerRealH === p.w/p.h ? 'border-gray-900 bg-white shadow-sm' : 'border-gray-200 bg-gray-50 text-gray-500 hover:border-gray-300'}\`}>
+                        {[
+                            { label: '1:1', w: 1000, h: 1000 },
+                            { label: '2:1', w: 2000, h: 1000 },
+                            { label: '3:1', w: 3000, h: 1000 },
+                            { label: '1:2', w: 1000, h: 2000 },
+                            { label: '4:1', w: 4000, h: 1000 },
+                            { label: '16:9', w: 1600, h: 900 },
+                        ].map((p, i) => (
+                            <button key={i} onClick={() => {
+                                setBannerRealW(p.w);
+                                setBannerRealH(p.h);
+                                setBannerInputW((p.w / bannerFactor).toFixed(bannerUnit === 'mm' ? 0 : bannerUnit === 'cm' ? 1 : 2));
+                                setBannerInputH((p.h / bannerFactor).toFixed(bannerUnit === 'mm' ? 0 : bannerUnit === 'cm' ? 1 : 2));
+                            }}
+                                className={\`py-2 rounded border \${bannerRealW / bannerRealH === p.w / p.h ? 'border-gray-900 bg-white shadow-sm' : 'border-gray-200 bg-gray-50 text-gray-500 hover:border-gray-300'}\`}>
                                 <div className="text-[13px] font-bold">{p.label}</div>
                             </button>
                         ))}
@@ -96,7 +131,7 @@ const rightPanelReplacement = `
                 <div>
                     <div className="flex items-center justify-between mb-3">
                         <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Custom Size</label>
-                        <select value={bannerUnit} onChange={e => setBannerUnit(e.target.value)} className="text-[11px] font-bold bg-white border border-gray-200 rounded px-2 py-1 outline-none">
+                        <select value={bannerUnit} onChange={e => handleBannerUnitChange(e.target.value)} className="text-[11px] font-bold bg-white border border-gray-200 rounded px-2 py-1 outline-none">
                             <option value="mm">mm</option>
                             <option value="cm">cm</option>
                             <option value="m">m</option>
@@ -105,12 +140,12 @@ const rightPanelReplacement = `
                     </div>
                     <div className="flex items-center gap-3">
                         <div className="flex-1 relative">
-                            <input type="number" value={bannerInputW} onChange={e => { setBannerInputW(e.target.value); if(e.target.value) setBannerRealW(parseFloat(e.target.value)); }} className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-[14px] font-semibold text-gray-800 outline-none focus:border-gray-400" />
+                            <input type="number" value={bannerInputW} onChange={e => handleBannerWChange(e.target.value)} className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-[14px] font-semibold text-gray-800 outline-none focus:border-gray-400" />
                             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-gray-400 font-bold uppercase">{bannerUnit}</span>
                         </div>
                         <span className="text-gray-300 font-bold">×</span>
                         <div className="flex-1 relative">
-                            <input type="number" value={bannerInputH} onChange={e => { setBannerInputH(e.target.value); if(e.target.value) setBannerRealH(parseFloat(e.target.value)); }} className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-[14px] font-semibold text-gray-800 outline-none focus:border-gray-400" />
+                            <input type="number" value={bannerInputH} onChange={e => handleBannerHChange(e.target.value)} className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-[14px] font-semibold text-gray-800 outline-none focus:border-gray-400" />
                             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-gray-400 font-bold uppercase">{bannerUnit}</span>
                         </div>
                     </div>
