@@ -132,6 +132,7 @@ export function useEditorCanvas({ printArea, canvasSize, onSelectionChange, init
         fabric.Object.prototype.cornerColor = '#16a34a';
         fabric.Object.prototype.cornerStyle = 'circle';
         fabric.Object.prototype.borderColor = '#16a34a';
+        fabric.Object.prototype.hasRotatingPoint = false;
         fabric.Object.prototype.cornerSize = handleSize;
         fabric.Object.prototype.padding = Math.max(5, handleSize / 2);
 
