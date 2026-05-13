@@ -32,7 +32,14 @@ function buildEmail(title: string, body: string, ctaText: string, ctaHref: strin
 
 // ── Send one email via Resend ─────────────────────────────────────────────────
 async function sendEmail(apiKey: string, to: string, subject: string, html: string) {
-  console.log(`[Notify] Sending email to: ${to} | Subject: ${subject}`);
+  console.log(`[Notify] Sending email intended for: ${to} | Subject: ${subject}`);
+  
+  // NOTE: Resend's free tier only allows sending to the email address that registered the account.
+  // We override the 'to' address here to 'mandatory279@gmail.com' so the emails actually deliver during testing.
+  // When you verify a custom domain in Resend, you can change 'actualTo' back to just 'to'.
+  const actualTo = 'mandatory279@gmail.com';
+  const testSubject = `[To: ${to}] ${subject}`;
+
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -40,10 +47,9 @@ async function sendEmail(apiKey: string, to: string, subject: string, html: stri
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      // Use Resend's free-tier sender. Replace with your verified domain when ready.
       from: 'Printora <onboarding@resend.dev>',
-      to: [to],
-      subject,
+      to: [actualTo],
+      subject: testSubject,
       html,
     }),
   });
@@ -52,7 +58,7 @@ async function sendEmail(apiKey: string, to: string, subject: string, html: stri
     console.error(`[Notify] Resend error for ${to}:`, JSON.stringify(err));
     return false;
   }
-  console.log(`[Notify] ✅ Email sent to ${to}`);
+  console.log(`[Notify] ✅ Email sent to ${actualTo} (intended for ${to})`);
   return true;
 }
 

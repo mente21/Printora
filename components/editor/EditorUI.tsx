@@ -1281,7 +1281,7 @@ export default function EditorUI() {
                     if (newOrder) {
                         setDbOrderId(newOrder.id);
                         // Server looks up all real emails from DB — just pass orderId + productType
-                        notifyNewOrder(newOrder.id, selectedProduct.name);
+                        await notifyNewOrder(newOrder.id, selectedProduct.name);
                     }
                     window.location.href = '/orders?submitted=true';
                 }
