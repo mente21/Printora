@@ -7,6 +7,7 @@ interface TshirtMockupProps {
     selectedColor: string;
     printArea: PrintArea;
     canvasRef: React.RefObject<HTMLCanvasElement>;
+    hasContent?: boolean;
 }
 
 const SW = '1.2';
@@ -172,6 +173,7 @@ export default function TshirtMockup({
     selectedColor,
     printArea,
     canvasRef,
+    hasContent = false,
 }: TshirtMockupProps) {
     const strokeColor = isDarkColor(selectedColor) ? 'rgba(255,255,255,0.45)' : '#222222';
 
@@ -197,17 +199,19 @@ export default function TshirtMockup({
                 <canvas ref={canvasRef} className="outline-none" />
             </div>
 
-            <div 
-                className="print-area-placeholder absolute border border-dashed border-gray-400/40 pointer-events-none z-30 flex items-center justify-center text-[10px] text-black/15 uppercase tracking-widest font-medium"
-                style={{
-                    left:   `${((printArea?.left   ?? 145) / 500) * 100}%`,
-                    top:    `${((printArea?.top    ?? 140) / 540) * 100}%`,
-                    width:  `${((printArea?.width  ?? 210) / 500) * 100}%`,
-                    height: `${((printArea?.height ?? 300) / 540) * 100}%`,
-                }}
-            >
-                PRINT AREA
-            </div>
+            {!hasContent && (
+                <div 
+                    className="print-area-placeholder absolute border border-dashed border-gray-400/40 pointer-events-none z-30 flex items-center justify-center text-[10px] text-black/15 uppercase tracking-widest font-medium"
+                    style={{
+                        left:   `${((printArea?.left   ?? 145) / 500) * 100}%`,
+                        top:    `${((printArea?.top    ?? 140) / 540) * 100}%`,
+                        width:  `${((printArea?.width  ?? 210) / 500) * 100}%`,
+                        height: `${((printArea?.height ?? 300) / 540) * 100}%`,
+                    }}
+                >
+                    PRINT AREA
+                </div>
+            )}
         </div>
     );
 }

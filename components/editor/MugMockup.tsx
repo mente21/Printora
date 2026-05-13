@@ -8,9 +8,10 @@ interface MugMockupProps {
     selectedColor: string;
     printArea: PrintArea;
     canvasRef: React.RefObject<HTMLCanvasElement>;
+    hasContent?: boolean;
 }
 
-export default function MugMockup({ selectedView, selectedColor, printArea, canvasRef }: MugMockupProps) {
+export default function MugMockup({ selectedView, selectedColor, printArea, canvasRef, hasContent = false }: MugMockupProps) {
     const threeCanvasRef = useRef<HTMLCanvasElement>(null);
     const [mounted, setMounted] = useState(false);
 
@@ -191,11 +192,14 @@ export default function MugMockup({ selectedView, selectedColor, printArea, canv
                     <span className="absolute top-[28px] text-[10px] text-gray-400 font-bold uppercase tracking-wide -translate-x-1/2 pointer-events-none z-[5]" style={{ left: '50%' }}>Front</span>
                     <span className="absolute top-[28px] text-[10px] text-gray-400 font-bold uppercase tracking-wide -translate-x-1/2 pointer-events-none z-[5]" style={{ left: '83.33%' }}>Right</span>
 
-                    <div className="absolute pointer-events-none z-[6] bg-green-500/10 border border-dashed border-green-500/40" style={{ left: '35%', width: '30%', top: '22px', bottom: '22px' }} />
-                    <div className="absolute pointer-events-none z-[6] bg-red-500/10 border border-dashed border-red-500/40" style={{ left: '0', width: '10%', top: '22px', bottom: '22px' }} />
-                    <div className="absolute pointer-events-none z-[6] bg-red-500/10 border border-dashed border-red-500/40" style={{ right: '0', width: '10%', top: '22px', bottom: '22px' }} />
-
-                    <span className="absolute bottom-[28px] text-[9px] font-bold tracking-wide uppercase -translate-x-1/2 pointer-events-none z-[7] text-green-700/80" style={{ left: '50%' }}>center zone</span>
+                    {!hasContent && (
+                        <>
+                            <div className="absolute pointer-events-none z-[6] bg-green-500/10 border border-dashed border-green-500/40" style={{ left: '35%', width: '30%', top: '22px', bottom: '22px' }} />
+                            <div className="absolute pointer-events-none z-[6] bg-red-500/10 border border-dashed border-red-500/40" style={{ left: '0', width: '10%', top: '22px', bottom: '22px' }} />
+                            <div className="absolute pointer-events-none z-[6] bg-red-500/10 border border-dashed border-red-500/40" style={{ right: '0', width: '10%', top: '22px', bottom: '22px' }} />
+                            <span className="absolute bottom-[28px] text-[9px] font-bold tracking-wide uppercase -translate-x-1/2 pointer-events-none z-[7] text-green-700/80" style={{ left: '50%' }}>center zone</span>
+                        </>
+                    )}
                 </div>
             </div>
 

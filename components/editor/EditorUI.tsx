@@ -693,7 +693,7 @@ function TemplatesPanel({ onClose, onLoadTemplate }: { onClose: () => void; onLo
 /* ─── Main Editor UI ─────────────────────────────────────────────────────── */
 
 // --- BANNER MOCKUP ---
-function BannerMockup({ printArea, canvasRef, bannerRealW, bannerRealH }: any) {
+function BannerMockup({ printArea, canvasRef, bannerRealW, bannerRealH, hasContent }: any) {
     const cw = bannerRealW;
     const ch = bannerRealH;
 
@@ -721,20 +721,24 @@ function BannerMockup({ printArea, canvasRef, bannerRealW, bannerRealH }: any) {
                 <canvas ref={canvasRef} className="outline-none" />
             </div>
             {/* SVG overlay: cross-hairs & border */}
-            <div className="absolute inset-0 z-30 pointer-events-none print-area-placeholder" dangerouslySetInnerHTML={{ __html: `<svg viewBox="0 0 ${cw} ${ch}" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">${overlaySvg}</svg>` }} />
-            {/* Fixed-size "PRINT AREA" label — HTML so it never shrinks */}
-            <div className="absolute inset-0 z-30 pointer-events-none flex items-center justify-center print-area-placeholder">
-                <span style={{
-                    fontSize: '11px',
-                    fontFamily: 'DM Sans, Inter, sans-serif',
-                    fontWeight: 600,
-                    letterSpacing: '2px',
-                    color: 'rgba(170,170,170,0.85)',
-                    textTransform: 'uppercase',
-                    userSelect: 'none',
-                    whiteSpace: 'nowrap',
-                }}>PRINT AREA</span>
-            </div>
+            {!hasContent && (
+                <>
+                    <div className="absolute inset-0 z-30 pointer-events-none print-area-placeholder" dangerouslySetInnerHTML={{ __html: `<svg viewBox="0 0 ${cw} ${ch}" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">${overlaySvg}</svg>` }} />
+                    {/* Fixed-size "PRINT AREA" label — HTML so it never shrinks */}
+                    <div className="absolute inset-0 z-30 pointer-events-none flex items-center justify-center print-area-placeholder">
+                        <span style={{
+                            fontSize: '11px',
+                            fontFamily: 'DM Sans, Inter, sans-serif',
+                            fontWeight: 600,
+                            letterSpacing: '2px',
+                            color: 'rgba(170,170,170,0.85)',
+                            textTransform: 'uppercase',
+                            userSelect: 'none',
+                            whiteSpace: 'nowrap',
+                        }}>PRINT AREA</span>
+                    </div>
+                </>
+            )}
         </div>
     );
 }
@@ -1097,10 +1101,17 @@ export default function EditorUI() {
 
     // Check if user is logged in before showing the payment modal
     const handleOrderClick = async () => {
+        console.log('Order clicked, checking auth...');
         setIsSaving(true);
         try {
-            const { data: { user } } = await supabase.auth.getUser();
+            // Add a timeout to auth check to prevent infinite "Checking..."
+            const authPromise = supabase.auth.getUser();
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Auth check timed out')), 8000));
+            
+            const { data: { user } } = await Promise.race([authPromise, timeoutPromise]) as any;
+            
             if (!user) {
+                console.log('No user, redirecting to login...');
                 localStorage.setItem('printora_pending_design', JSON.stringify({
                     productTemplateId: selectedProduct.id,
                     color: selectedColor,
@@ -1110,9 +1121,11 @@ export default function EditorUI() {
                 window.location.href = "/login";
                 return;
             }
+            console.log('User authenticated, showing payment modal');
             setShowPaymentModal(true);
         } catch (e) {
-            console.error('Auth error', e);
+            console.error('Auth error or timeout', e);
+            alert('Authentication check failed or timed out. Please refresh and try again.');
         } finally {
             setIsSaving(false);
         }
@@ -1531,7 +1544,7 @@ export default function EditorUI() {
                         {isSaving ? (
                             <>
                                 <Loader2 className="w-4 h-4 animate-spin" />
-                                <span className="hidden md:inline">Checking...</span>
+                                <span className="hidden md:inline">Processing...</span>
                             </>
                         ) : dbOrderId ? <><span className="hidden md:inline">Update </span>Order</> : 'Order'}
                     </button>
