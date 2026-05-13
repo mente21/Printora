@@ -175,7 +175,7 @@ export function useEditorCanvas({ printArea, canvasSize, onSelectionChange, init
         fabric.Object.prototype.controls.mtr = new fabric.Control({
             x: 0,
             y: -0.5,
-            offsetY: -40,
+            offsetY: -65,
             cursorStyle: 'crosshair',
             actionHandler: fabric.controlsUtils.rotationWithSnapping,
             actionName: 'rotate',
@@ -183,6 +183,14 @@ export function useEditorCanvas({ printArea, canvasSize, onSelectionChange, init
                 const size = handleSize * 1.5;
                 ctx.save();
                 ctx.translate(left, top);
+                // Draw connecting line to show the gap
+                ctx.beginPath();
+                ctx.moveTo(0, size/2);
+                ctx.lineTo(0, 25); // Extend line down towards the dot
+                ctx.strokeStyle = '#16a34a';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+                
                 ctx.beginPath();
                 ctx.arc(0, 0, size/2 + 2, 0, 2 * Math.PI);
                 ctx.fillStyle = '#fff';
