@@ -169,6 +169,7 @@ function ProductsPageContent() {
     { name: "Hats", icon: HardHat },
     { name: "Accessories", icon: Watch },
     { name: "Phone Cases", icon: Smartphone },
+    { name: "Banners", icon: Grid },
   ];
 
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % carouselItems.length);
@@ -727,7 +728,11 @@ function ProductsPageContent() {
 
                 <div className="mt-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300 pointer-events-none group-hover:pointer-events-auto h-0 group-hover:h-auto overflow-hidden">
                   <Link
-                    href={`/editor?template=${product.product_type?.toLowerCase() || 'classic-tshirt'}&supplier_product_id=${product.id}`}
+                    href={
+                      (product.product_type || '').toLowerCase().includes('banner')
+                        ? `/editor?template=banner&supplier_product_id=${product.id}`
+                        : `/editor?template=${product.product_type?.toLowerCase() || 'classic-tshirt'}&supplier_product_id=${product.id}`
+                    }
                     className="w-full bg-[#1c211f] text-white py-3 rounded-xl text-[13px] font-bold text-center hover:bg-black transition-all shadow-md active:scale-95"
                   >
                     Customize

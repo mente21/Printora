@@ -7,6 +7,7 @@ interface HatMockupProps {
     selectedColor: string;
     printArea: PrintArea;
     canvasRef: React.RefObject<HTMLCanvasElement>;
+    hasContent?: boolean;
 }
 
 const SW = '1.2';
@@ -73,7 +74,7 @@ function FrontHat({ color, strokeColor }: { color: string, strokeColor: string }
     );
 }
 
-export default function HatMockup({ selectedView, selectedColor, printArea, canvasRef }: HatMockupProps) {
+export default function HatMockup({ selectedView, selectedColor, printArea, canvasRef, hasContent = false }: HatMockupProps) {
     const strokeColor = isDarkColor(selectedColor) ? 'rgba(255,255,255,0.45)' : '#222222';
 
     return (
@@ -88,17 +89,19 @@ export default function HatMockup({ selectedView, selectedColor, printArea, canv
                 <canvas ref={canvasRef} className="outline-none" />
             </div>
 
-            <div
-                className="print-area-placeholder absolute border border-dashed border-gray-400/40 pointer-events-none z-30 flex items-center justify-center text-[10px] text-black/15 uppercase tracking-widest font-medium"
-                style={{
-                    left: printArea?.left ?? 150,
-                    top: printArea?.top ?? 140,
-                    width: printArea?.width ?? 100,
-                    height: printArea?.height ?? 180
-                }}
-            >
-                PRINT AREA
-            </div>
+            {!hasContent && (
+                <div
+                    className="print-area-placeholder absolute border border-dashed border-gray-400/40 pointer-events-none z-30 flex items-center justify-center text-[10px] text-black/15 uppercase tracking-widest font-medium"
+                    style={{
+                        left:   `${((printArea?.left ?? 110) / 500) * 100}%`,
+                        top:    `${((printArea?.top ?? 185) / 540) * 100}%`,
+                        width:  `${((printArea?.width ?? 280) / 500) * 100}%`,
+                        height: `${((printArea?.height ?? 120) / 540) * 100}%`,
+                    }}
+                >
+                    PRINT AREA
+                </div>
+            )}
         </div>
     );
 }

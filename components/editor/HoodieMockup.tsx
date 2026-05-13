@@ -7,6 +7,7 @@ interface HoodieMockupProps {
     selectedColor: string;
     printArea: PrintArea;
     canvasRef: React.RefObject<HTMLCanvasElement>;
+    hasContent?: boolean;
 }
 
 const SW = '1.2';
@@ -269,7 +270,7 @@ function RightHandHoodie({ color, strokeColor }: { color: string, strokeColor: s
     );
 }
 
-export default function HoodieMockup({ selectedView, selectedColor, printArea, canvasRef }: HoodieMockupProps) {
+export default function HoodieMockup({ selectedView, selectedColor, printArea, canvasRef, hasContent = false }: HoodieMockupProps) {
     const strokeColor = isDarkColor(selectedColor) ? 'rgba(255,255,255,0.45)' : '#222222';
 
     const getViewComponent = () => {
@@ -299,17 +300,19 @@ export default function HoodieMockup({ selectedView, selectedColor, printArea, c
                 <canvas ref={canvasRef} className="outline-none" />
             </div>
 
-            <div 
-                className="print-area-placeholder absolute border border-dashed border-gray-400/40 pointer-events-none z-30 flex items-center justify-center text-[10px] text-black/15 uppercase tracking-widest font-medium"
-                style={{
-                    left: printArea?.left ?? 150,
-                    top: printArea?.top ?? 175,
-                    width: printArea?.width ?? 200,
-                    height: printArea?.height ?? 220
-                }}
-            >
-                PRINT AREA
-            </div>
+            {!hasContent && (
+                <div 
+                    className="print-area-placeholder absolute border border-dashed border-gray-400/40 pointer-events-none z-30 flex items-center justify-center text-[10px] text-black/15 uppercase tracking-widest font-medium"
+                    style={{
+                        left:   `${((printArea?.left ?? 150) / 500) * 100}%`,
+                        top:    `${((printArea?.top ?? 175) / 540) * 100}%`,
+                        width:  `${((printArea?.width ?? 200) / 500) * 100}%`,
+                        height: `${((printArea?.height ?? 220) / 540) * 100}%`,
+                    }}
+                >
+                    PRINT AREA
+                </div>
+            )}
         </div>
     );
 }

@@ -18,7 +18,7 @@ import { notifyOrderFulfilled } from "@/lib/email-service";
 import { getPrimaryMockup } from "@/lib/utils";
 import { COUNTRIES, getCountryByName } from "@/lib/countries";
 
-const PRODUCT_TYPES = ["T-Shirts", "Hoodies", "Sweaters", "Mugs", "Hats", "Phone Cases", "Accessories", "Tote Bags", "Posters"];
+const PRODUCT_TYPES = ["T-Shirts", "Hoodies", "Sweaters", "Mugs", "Hats", "Phone Cases", "Accessories", "Tote Bags", "Posters", "Banners"];
 const PRESET_COLORS = [
   { name: "Black", hex: "#111111" },
   { name: "White", hex: "#FFFFFF" },

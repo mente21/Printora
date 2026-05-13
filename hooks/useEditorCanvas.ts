@@ -10,9 +10,10 @@ interface UseEditorCanvasProps {
     onSelectionChange?: (activeObject: fabric.Object | null) => void;
     initialState?: CanvasDesignState;
     viewId?: string;
+    handleSize?: number;
 }
 
-export function useEditorCanvas({ printArea, canvasSize, onSelectionChange, initialState, viewId }: UseEditorCanvasProps) {
+export function useEditorCanvas({ printArea, canvasSize, onSelectionChange, initialState, viewId, handleSize = 10 }: UseEditorCanvasProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [canvas, setCanvas] = useState<fabric.Canvas | null>(null);
     const [canvasRevision, setCanvasRevision] = useState(0);
@@ -131,13 +132,19 @@ export function useEditorCanvas({ printArea, canvasSize, onSelectionChange, init
         fabric.Object.prototype.cornerColor = '#16a34a';
         fabric.Object.prototype.cornerStyle = 'circle';
         fabric.Object.prototype.borderColor = '#16a34a';
-        fabric.Object.prototype.cornerSize = 10;
-        fabric.Object.prototype.padding = 5;
+        fabric.Object.prototype.hasRotatingPoint = true;
+        fabric.Object.prototype.cornerSize = handleSize;
+        fabric.Object.prototype.padding = Math.max(5, handleSize / 2);
 
         // Custom Delete Control
         const deleteIcon = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'%3F%3E%3C!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'%3E%3Csvg version='1.1' id='Ebene_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='595.275px' height='595.275px' viewBox='200 215 230 470' xml:space='preserve'%3E%3Ccircle style='fill:%23ef4444;' cx='299.76' cy='439.067' r='218.516'/%3E%3Cg%3E%3Crect x='267.162' y='307.978' transform='matrix(0.7071 -0.7071 0.7071 0.7071 -222.6202 340.6915)' style='fill:white;' width='65.245' height='262.187'/%3E%3Crect x='266.988' y='308.153' transform='matrix(0.7071 0.7071 -0.7071 0.7071 398.3889 -83.3116)' style='fill:white;' width='65.244' height='262.187'/%3E%3C/g%3E%3C/svg%3E";
-        const img = document.createElement('img');
-        img.src = deleteIcon;
+        const delImg = document.createElement('img');
+        delImg.src = deleteIcon;
+
+        // Custom Rotate Control
+        const rotateIcon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2316a34a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8'/%3E%3Cpolyline points='21 3 21 8 16 8'/%3E%3C/svg%3E";
+        const rotImg = document.createElement('img');
+        rotImg.src = rotateIcon;
 
         fabric.Object.prototype.controls.deleteControl = new fabric.Control({
             x: 0.5,
@@ -156,13 +163,42 @@ export function useEditorCanvas({ printArea, canvasSize, onSelectionChange, init
                 return true;
             },
             render: (ctx: any, left: any, top: any, styleOverride: any, fabricObject: any) => {
-                const size = 20;
+                const size = handleSize * 2;
                 ctx.save();
                 ctx.translate(left, top);
-                ctx.drawImage(img, -size/2, -size/2, size, size);
+                ctx.drawImage(delImg, -size/2, -size/2, size, size);
                 ctx.restore();
             },
-            cornerSize: 20
+            cornerSize: handleSize * 2
+        } as any);
+
+        fabric.Object.prototype.controls.mtr = new fabric.Control({
+            x: 0,
+            y: -0.5,
+            offsetY: -65,
+            cursorStyle: 'crosshair',
+            actionHandler: fabric.controlsUtils.rotationWithSnapping,
+            actionName: 'rotate',
+            render: (ctx: any, left: any, top: any, styleOverride: any, fabricObject: any) => {
+                const size = handleSize * 1.5;
+                ctx.save();
+                ctx.translate(left, top);
+                // Draw connecting line to show the gap
+                ctx.beginPath();
+                ctx.moveTo(0, size/2);
+                ctx.lineTo(0, 25); // Extend line down towards the dot
+                ctx.strokeStyle = '#16a34a';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.arc(0, 0, size/2 + 2, 0, 2 * Math.PI);
+                ctx.fillStyle = '#fff';
+                ctx.fill();
+                ctx.drawImage(rotImg, -size/2, -size/2, size, size);
+                ctx.restore();
+            },
+            cornerSize: handleSize * 2
         } as any);
 
         // Sync liveProps from a fabric object

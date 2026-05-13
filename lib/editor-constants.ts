@@ -258,10 +258,10 @@ export const PRODUCT_TEMPLATES: ProductTemplate[] = [
                 printAreas: [
                     {
                         id: 'front-center',
-                        width: 270,
-                        height: 140,
-                        left: 105,
-                        top: 165
+                        width: 280,
+                        height: 120,
+                        left: 110,
+                        top: 185
                     }
                 ]
             }
@@ -295,4 +295,16 @@ export const PRODUCT_TEMPLATES: ProductTemplate[] = [
             }
         ]
     }
+,
+    {
+        id: 'banner',
+        name: 'Custom Banner',
+        description: 'Print-ready banner — set any size, ratio, and DPI.',
+        category: 'banners',
+        defaultViewId: 'banner-area',
+        defaultColorHex: '#ffffff',
+        variants: [{ id: 'white', colorHex: '#ffffff', colorName: 'White' }],
+        views: [{ id: 'banner-area', name: 'Banner Area', mockupUrl: '', printAreas: [{ id: 'banner-print', width: 1000, height: 500, left: 0, top: 0 }]}]
+    }
 ];
+

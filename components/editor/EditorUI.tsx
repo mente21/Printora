@@ -691,6 +691,111 @@ function TemplatesPanel({ onClose, onLoadTemplate }: { onClose: () => void; onLo
 }
 
 /* ─── Main Editor UI ─────────────────────────────────────────────────────── */
+
+// --- BANNER MOCKUP ---
+function BannerMockup({ printArea, canvasRef, bannerRealW, bannerRealH, hasContent }: any) {
+    const cw = bannerRealW;
+    const ch = bannerRealH;
+
+    // SVG overlay: just center cross-hairs + dashed border at edges. No gutter, no shrinking text.
+    const overlaySvg = `
+        <line x1="${cw / 2}" y1="0" x2="${cw / 2}" y2="${ch}"
+              stroke="rgba(100,130,200,0.18)" stroke-width="1.5"
+              stroke-dasharray="8 6" vector-effect="non-scaling-stroke"/>
+        <line x1="0" y1="${ch / 2}" x2="${cw}" y2="${ch / 2}"
+              stroke="rgba(100,130,200,0.18)" stroke-width="1.5"
+              stroke-dasharray="8 6" vector-effect="non-scaling-stroke"/>
+        <rect x="1" y="1" width="${cw - 2}" height="${ch - 2}"
+              fill="none" stroke="rgba(120,120,120,0.22)" stroke-width="2"
+              stroke-dasharray="10 6" vector-effect="non-scaling-stroke"/>
+    `;
+
+    return (
+        <div className="relative shadow-lg rounded overflow-hidden mx-auto" style={{
+            aspectRatio: `${cw}/${ch}`,
+            width: `min(90%, calc(65vh * (${cw} / ${ch})))`,
+            maxHeight: '100%'
+        }}>
+            <div className="absolute inset-0 bg-white" />
+            <div className="absolute inset-0 z-20 outline-none focus:outline-none banner-canvas-wrapper">
+                <canvas ref={canvasRef} className="outline-none" />
+            </div>
+            {/* SVG overlay: cross-hairs & border */}
+            {!hasContent && (
+                <>
+                    <div className="absolute inset-0 z-30 pointer-events-none print-area-placeholder" dangerouslySetInnerHTML={{ __html: `<svg viewBox="0 0 ${cw} ${ch}" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">${overlaySvg}</svg>` }} />
+                    {/* Fixed-size "PRINT AREA" label — HTML so it never shrinks */}
+                    <div className="absolute inset-0 z-30 pointer-events-none flex items-center justify-center print-area-placeholder">
+                        <span style={{
+                            fontSize: '11px',
+                            fontFamily: 'DM Sans, Inter, sans-serif',
+                            fontWeight: 600,
+                            letterSpacing: '2px',
+                            color: 'rgba(170,170,170,0.85)',
+                            textTransform: 'uppercase',
+                            userSelect: 'none',
+                            whiteSpace: 'nowrap',
+                        }}>PRINT AREA</span>
+                    </div>
+                </>
+            )}
+
+            {/* ═══════════ FULLSCREEN ORDER PROCESSING OVERLAY ═══════════ */}
+            {isSubmittingOrder && (
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center" style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', backgroundColor: 'rgba(14, 14, 16, 0.75)' }}>
+                    <div className="flex flex-col items-center gap-8 select-none">
+                        <div className="relative w-28 h-28">
+                            <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#A1FF4D] border-r-[#A1FF4D]/40 animate-spin" style={{ animationDuration: '1.1s' }} />
+                            <div className="absolute inset-3 rounded-full bg-[#1B2412] flex items-center justify-center animate-pulse" style={{ animationDuration: '2s' }}>
+                                <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+                                    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" stroke="#A1FF4D" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                    <line x1="3" y1="6" x2="21" y2="6" stroke="#A1FF4D" strokeWidth="1.5" strokeLinecap="round" />
+                                    <path d="M16 10a4 4 0 01-8 0" stroke="#A1FF4D" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                            </div>
+                            <div className="absolute inset-0 animate-spin" style={{ animationDuration: '2.2s' }}>
+                                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1 w-3 h-3 rounded-full bg-[#A1FF4D] shadow-[0_0_12px_#A1FF4D]" />
+                            </div>
+                        </div>
+                        <div className="flex flex-col items-center gap-3">
+                            <h2 className="text-white text-2xl font-black tracking-tight" style={{ fontFamily: 'Inter, sans-serif' }}>Processing Your Order</h2>
+                            <p className="text-gray-400 text-sm font-medium text-center max-w-[260px] leading-relaxed">
+                                Generating your design mockup and securing your order. Please don&apos;t close this tab.
+                            </p>
+                        </div>
+                        <div className="flex flex-col gap-3 w-[260px]">
+                            <div className="flex items-center gap-3">
+                                <div className="w-5 h-5 rounded-full bg-[#A1FF4D] flex items-center justify-center flex-shrink-0">
+                                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1B2412" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                                </div>
+                                <span className="text-[#A1FF4D] text-xs font-bold uppercase tracking-wider">Payment verified</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="w-5 h-5 rounded-full border-2 border-white/10 flex-shrink-0" />
+                                <span className="text-white/30 text-xs font-bold uppercase tracking-wider">Saving to your account</span>
+                            </div>
+                        </div>
+                        <div className="w-[260px] h-1 bg-white/10 rounded-full overflow-hidden">
+                            <div className="h-full bg-[#A1FF4D] rounded-full animate-pulse" style={{ width: '65%', animationDuration: '1.5s' }} />
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ═══════════ FULLSCREEN LOADING OVERLAY (For Initial Order Click) ═══════════ */}
+            {isSaving && !isSubmittingOrder && (
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center" style={{ backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', backgroundColor: 'rgba(14, 14, 16, 0.4)' }}>
+                    <div className="flex flex-col items-center gap-4 bg-white p-8 rounded-2xl shadow-2xl">
+                        <Loader2 className="w-10 h-10 animate-spin text-[#1B2412]" />
+                        <h2 className="text-gray-900 text-lg font-bold tracking-tight">Processing...</h2>
+                        <p className="text-gray-500 text-sm">Please wait a moment.</p>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
 export default function EditorUI() {
     const searchParams = useSearchParams();
     const requestedTemplate = searchParams.get('template');
@@ -795,6 +900,36 @@ export default function EditorUI() {
     const [activeLeftTool, setActiveLeftTool] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
+    // Banner State
+    const [bannerRealW, setBannerRealW] = useState(2000);
+    const [bannerRealH, setBannerRealH] = useState(1000);
+    const [bannerUnit, setBannerUnit] = useState('m');
+    const [bannerDpi, setBannerDpi] = useState(72);
+    const [bannerInputW, setBannerInputW] = useState('2');
+    const [bannerInputH, setBannerInputH] = useState('1');
+
+    // Banner Unit Helpers
+    const unitToMm: Record<string, number> = { mm: 1, cm: 10, m: 1000, in: 25.4 };
+    const bannerFactor = unitToMm[bannerUnit] ?? 1;
+
+    const handleBannerUnitChange = (newUnit: string) => {
+        const newFactor = unitToMm[newUnit] ?? 1;
+        setBannerInputW((bannerRealW / newFactor).toFixed(newUnit === 'mm' ? 0 : newUnit === 'cm' ? 1 : 2));
+        setBannerInputH((bannerRealH / newFactor).toFixed(newUnit === 'mm' ? 0 : newUnit === 'cm' ? 1 : 2));
+        setBannerUnit(newUnit);
+    };
+
+    const handleBannerWChange = (val: string) => {
+        setBannerInputW(val);
+        const px = parseFloat(val) * bannerFactor;
+        if (!isNaN(px) && px > 0) setBannerRealW(Math.round(px));
+    };
+
+    const handleBannerHChange = (val: string) => {
+        setBannerInputH(val);
+        const px = parseFloat(val) * bannerFactor;
+        if (!isNaN(px) && px > 0) setBannerRealH(Math.round(px));
+    };
     // Restore loadedTemplateId from session (survives refresh, not nav-away)
     const [loadedTemplateId, setLoadedTemplateId] = useState<string | null>(() => {
         if (typeof window !== 'undefined') {
@@ -879,11 +1014,17 @@ export default function EditorUI() {
         })();
     }, [supplierProductId]);
 
-    const printArea = selectedView.printAreas[0];
+    const printArea = selectedProduct.id === 'banner' ? { id: 'banner-print', width: Math.max(500, bannerRealW), height: Math.max(500, bannerRealH), left: 0, top: 0 } : selectedView.printAreas[0];
 
     const canvasSize = selectedProduct.id === 'ceramic-mug' 
         ? { width: 1024, height: 512 } 
+        : selectedProduct.id === 'banner'
+        ? { width: Math.max(500, bannerRealW), height: Math.max(500, bannerRealH) }
         : { width: 500, height: 540 };
+
+        const handleSize = selectedProduct.id === 'banner' 
+        ? Math.max(12, Math.round(canvasSize.width / 40))
+        : 10;
 
     const {
         canvasRef, canvas, addText, addCurvedText, addShape, addImage, updateActiveObject, canvasRevision, liveProps,
@@ -894,6 +1035,7 @@ export default function EditorUI() {
         onSelectionChange: setActiveObject,
         initialState: viewStates[selectedView.id],
         viewId: selectedView.id,
+        handleSize,
     });
 
     const handleLoadTemplate = (template: any) => {
@@ -1018,11 +1160,17 @@ export default function EditorUI() {
 
     // Check if user is logged in before showing the payment modal
     const handleOrderClick = async () => {
+        console.log('Order clicked, checking auth...');
         setIsSaving(true);
         try {
-            const { data: { user } } = await supabase.auth.getUser();
+            // Add a timeout to auth check to prevent infinite "Checking..."
+            const authPromise = supabase.auth.getUser();
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Auth check timed out')), 8000));
+            
+            const { data: { user } } = await Promise.race([authPromise, timeoutPromise]) as any;
+            
             if (!user) {
-                // Save their work to localStorage so they don't lose it
+                console.log('No user, redirecting to login...');
                 localStorage.setItem('printora_pending_design', JSON.stringify({
                     productTemplateId: selectedProduct.id,
                     color: selectedColor,
@@ -1032,11 +1180,14 @@ export default function EditorUI() {
                 window.location.href = "/login";
                 return;
             }
+            console.log('User authenticated, showing payment modal');
             setShowPaymentModal(true);
-            setIsSaving(false);
         } catch (e) {
-            console.error('Auth error', e);
+            console.error('Auth error or timeout', e);
+            alert('Authentication check failed or timed out. Please refresh and try again.');
+        } finally {
             setIsSaving(false);
+            setIsSubmittingOrder(false);
         }
     };
 
@@ -1228,10 +1379,19 @@ export default function EditorUI() {
                 ...(originalOrder?.variants || {}),
                 color: selectedColor,
                 view: selectedView.name,
-                size: orderSize,
+                size: selectedProduct.id === 'banner' ? `${bannerInputW}x${bannerInputH} ${bannerUnit}` : orderSize,
                 quantity: orderQuantity,
                 quality: orderQuality,
                 receiptDataUrl: receiptDataUrl || originalOrder?.variants?.receiptDataUrl || null,
+                // Banner Specifics
+                ...(selectedProduct.id === 'banner' ? {
+                    bannerWidth: bannerInputW,
+                    bannerHeight: bannerInputH,
+                    bannerUnit: bannerUnit,
+                    bannerDpi: bannerDpi,
+                    bannerRealW,
+                    bannerRealH
+                } : {})
             };
 
             if (dbOrderId) {
@@ -1291,17 +1451,13 @@ export default function EditorUI() {
             alert('An error occurred while saving: ' + e.message);
         } finally {
             setIsSaving(false);
-            setIsSubmittingOrder(false);
         }
     };
-
-    // UseEffect for requestedTemplate was duplicate and handled above, removing the duplicate.
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files?.[0]) return;
         const file = e.target.files[0];
         e.target.value = '';
-        // Try to save to Supabase Storage + library
         try {
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
@@ -1314,8 +1470,7 @@ export default function EditorUI() {
                     return;
                 }
             }
-        } catch { /* fall back to local data URL */ }
-        // Fallback: use local data URL (not logged in or upload failed)
+        } catch { }
         const reader = new FileReader();
         reader.onload = (f) => { const data = f.target?.result as string; if (data) addImage(data); };
         reader.readAsDataURL(file);
@@ -1346,12 +1501,14 @@ export default function EditorUI() {
     };
 
     const renderMockup = () => {
-        const props = { selectedView, selectedColor, printArea, canvasRef };
+        const hasContent = (canvas?.getObjects().length ?? 0) > 0;
+        const props = { selectedView, selectedColor, printArea, canvasRef, hasContent };
         switch (selectedProduct.id) {
             case 'premium-hoodie': return <HoodieMockup {...props} />;
             case 'crewneck-sweater': return <SweaterMockup {...props} />;
             case 'classic-cap': return <HatMockup {...props} />;
             case 'ceramic-mug': return <MugMockup {...props} />;
+            case 'banner': return <BannerMockup {...props} bannerRealW={bannerRealW} bannerRealH={bannerRealH} />;
             default: return <TshirtMockup {...props} />;
         }
     };
@@ -1443,10 +1600,11 @@ export default function EditorUI() {
                         {isSaving ? (
                             <>
                                 <Loader2 className="w-4 h-4 animate-spin" />
-                                <span className="hidden md:inline">Checking...</span>
+                                <span className="hidden md:inline">Processing...</span>
                             </>
                         ) : dbOrderId ? <><span className="hidden md:inline">Update </span>Order</> : 'Order'}
                     </button>
+                    {/* Save Template — icon on mobile, full button on desktop */}
                     <button
                         onClick={() => {
                             if (!canvas) return;
@@ -1471,9 +1629,11 @@ export default function EditorUI() {
                             setShowTemplatesPanel(true);
                             setActiveLeftTool('templates');
                         }}
-                        className="hidden md:block bg-white border border-gray-300 text-gray-700 font-bold px-4 py-1.5 rounded text-sm uppercase transition-colors hover:bg-gray-50 shadow-sm"
+                        title={loadedTemplateId ? 'Update Template' : 'Save Template'}
+                        className="flex items-center justify-center gap-1.5 bg-white border border-gray-300 text-gray-700 font-bold rounded text-sm uppercase transition-colors hover:bg-gray-50 shadow-sm px-2 py-1.5 md:px-4"
                     >
-                        {loadedTemplateId ? 'Update Template' : 'Save Template'}
+                        <LayoutTemplate className="w-4 h-4 flex-shrink-0" />
+                        <span className="hidden md:inline">{loadedTemplateId ? 'Update Template' : 'Save Template'}</span>
                     </button>
                 </div>
             </div>
@@ -1640,64 +1800,132 @@ export default function EditorUI() {
                                 pointer-events: none;
                             }
                         `}</style>
-                        <div id="product-capture-area" className={`relative z-10 w-full h-full max-w-2xl flex justify-center items-center drop-shadow-md ${(canvas?.getObjects().length || 0) > 0 ? 'has-design' : ''}`}>
+                        <div id="product-capture-area" className={`relative z-10 w-full h-full max-w-2xl flex justify-center items-center drop-shadow-md ${(viewStates[selectedView.id]?.objects?.length || 0) > 0 ? 'has-design' : ''}`}>
                             <div className="w-full flex justify-center items-center">
                                 {renderMockup()}
                             </div>
                         </div>
                     </div>
-
-                    {/* View Pills */}
-                    <div className="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-3 z-30">
-                        {selectedProduct.views.map(view => (
-                            <button
-                                key={view.id}
-                                onClick={() => handleViewChange(view.id)}
-                                className={`px-5 py-2 rounded-full text-[13px] font-medium transition-all shadow-sm ${selectedView.id === view.id
-                                    ? 'bg-[#64645A] text-white'
-                                    : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                    {/* View Pills — scrollable on mobile */}
+                    <div className="absolute bottom-2 md:bottom-6 left-0 right-0 z-30 flex justify-center">
+                        <div className="flex items-center gap-2 overflow-x-auto px-3 pb-1 max-w-full scrollbar-none" style={{ scrollbarWidth: 'none' }}>
+                            {selectedProduct.views.map(view => (
+                                <button
+                                    key={view.id}
+                                    onClick={() => handleViewChange(view.id)}
+                                    className={`flex-shrink-0 px-3 md:px-5 py-1.5 md:py-2 rounded-full text-[11px] md:text-[13px] font-semibold transition-all shadow-sm whitespace-nowrap ${
+                                        selectedView.id === view.id
+                                            ? 'bg-[#64645A] text-white'
+                                            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
                                     }`}
-                            >
-                                {view.name}
-                            </button>
-                        ))}
+                                >
+                                    {view.name}
+                                </button>
+                            ))}
+                        </div>
                     </div>
-
                 </div>
 
                 {/* ═══════════ RIGHT PANEL: Variants & Layers — desktop only ═══════════ */}
-                <div className="hidden md:flex absolute right-4 top-4 bottom-4 w-[320px] bg-white rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.06)] border border-gray-100 z-30 overflow-hidden flex-col">
-                    <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-white flex-shrink-0">
-                        <h3 className="font-bold text-[15px] text-gray-800">Variants and layers</h3>
-                    </div>
-                    <div className="p-5 flex-1 min-h-0 bg-white overflow-y-auto">
-                        <h4 className="font-bold text-[13px] text-gray-800 mb-4">Variants</h4>
-                        <div className="flex items-center justify-between py-2">
-                            <span className="text-gray-600 text-[13px]">Colors</span>
-                            <button className="border border-gray-300 px-3 py-1.5 rounded text-[12px] text-gray-700 hover:bg-gray-50 font-bold">Select variants</button>
-                        </div>
-                        <div className="flex flex-wrap gap-2 mt-2">
-                            {(supplierColors?.length ? supplierColors : selectedProduct.variants).map((c: any) => {
-                                const hex = c.hex || c.colorHex;
-                                const name = c.name || c.colorName;
-                                return (
-                                    <button
-                                        key={hex}
-                                        title={name}
-                                        className={`w-7 h-7 rounded-full border-2 transition-all ${selectedColor === hex ? 'border-gray-400 shadow-sm' : 'border-gray-200 hover:border-gray-300'}`}
-                                        style={{ backgroundColor: hex }}
-                                        onClick={() => setSelectedColor(hex)}
-                                    />
-                                );
-                            })}
-                        </div>
-                    </div>
-                    {selectedProduct.id === 'ceramic-mug' && (
-                        <div id="mug-3d-preview-portal" className="flex-shrink-0" />
-                    )}
-                </div>
 
-                {/* ═══════════ MOBILE BOTTOM TAB BAR ═══════════ */}
+<div className="hidden md:flex absolute right-4 top-4 bottom-4 w-[320px] bg-white rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.06)] border border-gray-100 z-30 overflow-hidden flex-col">
+    {selectedProduct.id === 'banner' ? (
+        <div className="flex flex-col h-full bg-[#FAFAFA]">
+            <div className="p-4 border-b border-gray-100 bg-white shadow-sm z-10 flex-shrink-0">
+                <h3 className="font-bold text-[15px] text-gray-900 flex items-center gap-2">
+                    <span className="w-6 h-6 rounded bg-[#EAF8E5] text-[#6DCC5A] flex items-center justify-center">📐</span> Dimensions
+                </h3>
+            </div>
+            <div className="p-5 flex-1 overflow-y-auto space-y-6">
+                <div>
+                    <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-3 block">Presets</label>
+                    <div className="grid grid-cols-3 gap-2">
+                        {[
+                            { label: '1:1', w: 1000, h: 1000 },
+                            { label: '2:1', w: 2000, h: 1000 },
+                            { label: '3:1', w: 3000, h: 1000 },
+                            { label: '1:2', w: 1000, h: 2000 },
+                            { label: '4:1', w: 4000, h: 1000 },
+                            { label: '16:9', w: 1600, h: 900 },
+                        ].map((p, i) => (
+                            <button key={i} onClick={() => {
+                                setBannerRealW(p.w);
+                                setBannerRealH(p.h);
+                                setBannerInputW((p.w / bannerFactor).toFixed(bannerUnit === 'mm' ? 0 : bannerUnit === 'cm' ? 1 : 2));
+                                setBannerInputH((p.h / bannerFactor).toFixed(bannerUnit === 'mm' ? 0 : bannerUnit === 'cm' ? 1 : 2));
+                            }}
+                                className={`py-2 rounded border ${bannerRealW / bannerRealH === p.w / p.h ? 'border-gray-900 bg-white shadow-sm' : 'border-gray-200 bg-gray-50 text-gray-500 hover:border-gray-300'}`}>
+                                <div className="text-[13px] font-bold">{p.label}</div>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+                <div>
+                    <div className="flex items-center justify-between mb-3">
+                        <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Custom Size</label>
+                        <select value={bannerUnit} onChange={e => handleBannerUnitChange(e.target.value)} className="text-[11px] font-bold bg-white border border-gray-200 rounded px-2 py-1 outline-none">
+                            <option value="mm">mm</option>
+                            <option value="cm">cm</option>
+                            <option value="m">m</option>
+                            <option value="in">inch</option>
+                        </select>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <div className="flex-1 relative">
+                            <input type="number" value={bannerInputW} onChange={e => handleBannerWChange(e.target.value)} className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-[14px] font-semibold text-gray-800 outline-none focus:border-gray-400" />
+                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-gray-400 font-bold uppercase">{bannerUnit}</span>
+                        </div>
+                        <span className="text-gray-300 font-bold">×</span>
+                        <div className="flex-1 relative">
+                            <input type="number" value={bannerInputH} onChange={e => handleBannerHChange(e.target.value)} className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-[14px] font-semibold text-gray-800 outline-none focus:border-gray-400" />
+                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-gray-400 font-bold uppercase">{bannerUnit}</span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-3 block">Resolution (DPI)</label>
+                    <div className="flex gap-2">
+                        {[72, 150, 300].map(d => (
+                            <button key={d} onClick={() => setBannerDpi(d)} className={`flex-1 py-2 rounded text-[13px] font-bold border ${bannerDpi === d ? 'border-gray-900 bg-white shadow-sm text-gray-900' : 'border-gray-200 bg-gray-50 text-gray-500 hover:border-gray-300'}`}>{d}</button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+    ) : (
+        <>
+            <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-white flex-shrink-0">
+                <h3 className="font-bold text-[15px] text-gray-800">Variants and layers</h3>
+            </div>
+            <div className="p-5 flex-1 min-h-0 bg-white overflow-y-auto">
+                <h4 className="font-bold text-[13px] text-gray-800 mb-4">Variants</h4>
+                <div className="flex items-center justify-between py-2">
+                    <span className="text-gray-600 text-[13px]">Colors</span>
+                    <button className="border border-gray-300 px-3 py-1.5 rounded text-[12px] text-gray-700 hover:bg-gray-50 font-bold">Select variants</button>
+                </div>
+                <div className="flex flex-wrap gap-2 mt-2">
+                    {(supplierColors?.length ? supplierColors : selectedProduct.variants).map((c: any) => {
+                        const hex = c.hex || c.colorHex;
+                        const name = c.name || c.colorName;
+                        return (
+                            <button
+                                key={hex}
+                                title={name}
+                                className={`w-7 h-7 rounded-full border-2 transition-all ${selectedColor === hex ? 'border-gray-400 shadow-sm' : 'border-gray-200 hover:border-gray-300'}`}
+                                style={{ backgroundColor: hex }}
+                                onClick={() => setSelectedColor(hex)}
+                            />
+                        );
+                    })}
+                </div>
+            </div>
+            {selectedProduct.id === 'ceramic-mug' && (
+                <div id="mug-3d-preview-portal" className="flex-shrink-0" />
+            )}
+        </>
+    )}
+</div>
+{/* ═══════════ MOBILE BOTTOM TAB BAR ═══════════ */}
                 <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-gray-200 flex items-center justify-around z-50 px-2 shadow-[0_-2px_12px_rgba(0,0,0,0.08)]">
                     {leftTools.map(tool => {
                         const isActive = activeLeftTool === tool.id;
@@ -1819,30 +2047,52 @@ export default function EditorUI() {
                             <div className="space-y-8 mb-12">
                                 <div className="flex items-center gap-3 mb-6">
                                     <div className="w-8 h-8 rounded-full bg-[#ccff00] flex items-center justify-center text-[13px] font-black">1</div>
-                                    <h3 className="text-lg font-bold text-gray-900">Choose Size & Quality</h3>
+                                    <h3 className="text-lg font-bold text-gray-900">{selectedProduct.id === 'banner' ? 'Confirm Dimensions' : 'Choose Size & Quality'}</h3>
                                 </div>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                    <div className="space-y-3">
-                                        <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Select Size</label>
-                                        <CustomSelect
-                                            value={orderSize}
-                                            options={["S", "M", "L", "XL", "XXL"]}
-                                            onChange={(val) => setOrderSize(val)}
-                                            className="custom-editor-select"
-                                        />
+                                
+                                {selectedProduct.id === 'banner' ? (
+                                    <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 grid grid-cols-2 gap-4">
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Width</label>
+                                            <p className="text-lg font-bold text-gray-900">{bannerInputW} <span className="text-sm text-gray-500 uppercase">{bannerUnit}</span></p>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Height</label>
+                                            <p className="text-lg font-bold text-gray-900">{bannerInputH} <span className="text-sm text-gray-500 uppercase">{bannerUnit}</span></p>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Resolution</label>
+                                            <p className="text-lg font-bold text-gray-900">{bannerDpi} <span className="text-sm text-gray-500 uppercase">DPI</span></p>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Print Type</label>
+                                            <p className="text-lg font-bold text-gray-900">High Resolution</p>
+                                        </div>
                                     </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                        <div className="space-y-3">
+                                            <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Select Size</label>
+                                            <CustomSelect
+                                                value={orderSize}
+                                                options={["S", "M", "L", "XL", "XXL"]}
+                                                onChange={(val) => setOrderSize(val)}
+                                                className="custom-editor-select"
+                                            />
+                                        </div>
 
-                                    <div className="space-y-3">
-                                        <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Garment Quality</label>
-                                        <CustomSelect
-                                            value={orderQuality}
-                                            options={["Standard", "Premium"]}
-                                            onChange={(val) => setOrderQuality(val)}
-                                            className="custom-editor-select"
-                                        />
+                                        <div className="space-y-3">
+                                            <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Garment Quality</label>
+                                            <CustomSelect
+                                                value={orderQuality}
+                                                options={["Standard", "Premium"]}
+                                                onChange={(val) => setOrderQuality(val)}
+                                                className="custom-editor-select"
+                                            />
+                                        </div>
                                     </div>
-                                </div>
+                                )}
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div className="space-y-3 max-w-[200px]">
@@ -2082,7 +2332,6 @@ export default function EditorUI() {
                                             return;
                                         }
                                         setShowPaymentModal(false);
-                                        setIsSubmittingOrder(true);
                                         handleSaveProduct();
                                     }}
                                     className="w-full bg-[#1B2412] text-white py-6 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl hover:bg-[#A1FF4D] hover:text-[#1B2412] transition-all active:scale-[0.98] flex items-center justify-center gap-3 mt-10 group"
@@ -2097,69 +2346,8 @@ export default function EditorUI() {
                     </div>
                 </div>
             )}
-
-            {/* ═══════════ FULLSCREEN ORDER PROCESSING OVERLAY ═══════════ */}
-            {isSubmittingOrder && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center" style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', backgroundColor: 'rgba(14, 14, 16, 0.75)' }}>
-                    <div className="flex flex-col items-center gap-8 select-none">
-                        {/* Animated logo ring */}
-                        <div className="relative w-28 h-28">
-                            {/* Outer spinning ring */}
-                            <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#A1FF4D] border-r-[#A1FF4D]/40 animate-spin" style={{ animationDuration: '1.1s' }} />
-                            {/* Inner pulsing circle */}
-                            <div className="absolute inset-3 rounded-full bg-[#1B2412] flex items-center justify-center animate-pulse" style={{ animationDuration: '2s' }}>
-                                <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
-                                    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" stroke="#A1FF4D" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                    <line x1="3" y1="6" x2="21" y2="6" stroke="#A1FF4D" strokeWidth="1.5" strokeLinecap="round" />
-                                    <path d="M16 10a4 4 0 01-8 0" stroke="#A1FF4D" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                            </div>
-                            {/* Orbiting dot */}
-                            <div className="absolute inset-0 animate-spin" style={{ animationDuration: '2.2s' }}>
-                                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1 w-3 h-3 rounded-full bg-[#A1FF4D] shadow-[0_0_12px_#A1FF4D]" />
-                            </div>
-                        </div>
-
-                        {/* Text content */}
-                        <div className="flex flex-col items-center gap-3">
-                            <h2 className="text-white text-2xl font-black tracking-tight" style={{ fontFamily: 'Inter, sans-serif' }}>Processing Your Order</h2>
-                            <p className="text-gray-400 text-sm font-medium text-center max-w-[260px] leading-relaxed">
-                                Generating your design mockup and securing your order. Please don&apos;t close this tab.
-                            </p>
-                        </div>
-
-                        {/* Step indicators */}
-                        <div className="flex flex-col gap-3 w-[260px]">
-                            <div className="flex items-center gap-3">
-                                <div className="w-5 h-5 rounded-full bg-[#A1FF4D] flex items-center justify-center flex-shrink-0">
-                                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1B2412" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                                </div>
-                                <span className="text-[#A1FF4D] text-xs font-bold uppercase tracking-wider">Payment verified</span>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <div className="w-5 h-5 rounded-full border-2 border-white/10 flex-shrink-0" />
-                                <span className="text-white/30 text-xs font-bold uppercase tracking-wider">Saving to your account</span>
-                            </div>
-                        </div>
-
-                        {/* Bottom bar */}
-                        <div className="w-[260px] h-1 bg-white/10 rounded-full overflow-hidden">
-                            <div className="h-full bg-[#A1FF4D] rounded-full animate-pulse" style={{ width: '65%', animationDuration: '1.5s' }} />
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* ═══════════ FULLSCREEN LOADING OVERLAY (For Initial Order Click) ═══════════ */}
-            {isSaving && !isSubmittingOrder && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center" style={{ backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', backgroundColor: 'rgba(14, 14, 16, 0.4)' }}>
-                    <div className="flex flex-col items-center gap-4 bg-white p-8 rounded-2xl shadow-2xl animate-in zoom-in-95 duration-200">
-                        <Loader2 className="w-10 h-10 animate-spin text-[#1B2412]" />
-                        <h2 className="text-gray-900 text-lg font-bold tracking-tight">Processing...</h2>
-                        <p className="text-gray-500 text-sm">Please wait a moment.</p>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }
+
+
