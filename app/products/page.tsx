@@ -658,9 +658,6 @@ function ProductsPageContent() {
           {/* Product Grid */}
           {displayedProducts.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 sm:gap-x-8 gap-y-8 sm:gap-y-12">
-
-
-
             {displayedProducts.map((product) => (
               <div key={product.id} className="flex flex-col group hover:-translate-y-1 transition-transform duration-500">
                 <div className="relative aspect-square rounded-2xl sm:rounded-[2rem] bg-white border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] mb-4 p-[2px] overflow-hidden">
