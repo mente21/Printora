@@ -739,6 +739,59 @@ function BannerMockup({ printArea, canvasRef, bannerRealW, bannerRealH, hasConte
                     </div>
                 </>
             )}
+
+            {/* ═══════════ FULLSCREEN ORDER PROCESSING OVERLAY ═══════════ */}
+            {isSubmittingOrder && (
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center" style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', backgroundColor: 'rgba(14, 14, 16, 0.75)' }}>
+                    <div className="flex flex-col items-center gap-8 select-none">
+                        <div className="relative w-28 h-28">
+                            <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#A1FF4D] border-r-[#A1FF4D]/40 animate-spin" style={{ animationDuration: '1.1s' }} />
+                            <div className="absolute inset-3 rounded-full bg-[#1B2412] flex items-center justify-center animate-pulse" style={{ animationDuration: '2s' }}>
+                                <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+                                    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" stroke="#A1FF4D" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                    <line x1="3" y1="6" x2="21" y2="6" stroke="#A1FF4D" strokeWidth="1.5" strokeLinecap="round" />
+                                    <path d="M16 10a4 4 0 01-8 0" stroke="#A1FF4D" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                            </div>
+                            <div className="absolute inset-0 animate-spin" style={{ animationDuration: '2.2s' }}>
+                                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1 w-3 h-3 rounded-full bg-[#A1FF4D] shadow-[0_0_12px_#A1FF4D]" />
+                            </div>
+                        </div>
+                        <div className="flex flex-col items-center gap-3">
+                            <h2 className="text-white text-2xl font-black tracking-tight" style={{ fontFamily: 'Inter, sans-serif' }}>Processing Your Order</h2>
+                            <p className="text-gray-400 text-sm font-medium text-center max-w-[260px] leading-relaxed">
+                                Generating your design mockup and securing your order. Please don&apos;t close this tab.
+                            </p>
+                        </div>
+                        <div className="flex flex-col gap-3 w-[260px]">
+                            <div className="flex items-center gap-3">
+                                <div className="w-5 h-5 rounded-full bg-[#A1FF4D] flex items-center justify-center flex-shrink-0">
+                                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1B2412" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                                </div>
+                                <span className="text-[#A1FF4D] text-xs font-bold uppercase tracking-wider">Payment verified</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="w-5 h-5 rounded-full border-2 border-white/10 flex-shrink-0" />
+                                <span className="text-white/30 text-xs font-bold uppercase tracking-wider">Saving to your account</span>
+                            </div>
+                        </div>
+                        <div className="w-[260px] h-1 bg-white/10 rounded-full overflow-hidden">
+                            <div className="h-full bg-[#A1FF4D] rounded-full animate-pulse" style={{ width: '65%', animationDuration: '1.5s' }} />
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ═══════════ FULLSCREEN LOADING OVERLAY (For Initial Order Click) ═══════════ */}
+            {isSaving && !isSubmittingOrder && (
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center" style={{ backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', backgroundColor: 'rgba(14, 14, 16, 0.4)' }}>
+                    <div className="flex flex-col items-center gap-4 bg-white p-8 rounded-2xl shadow-2xl">
+                        <Loader2 className="w-10 h-10 animate-spin text-[#1B2412]" />
+                        <h2 className="text-gray-900 text-lg font-bold tracking-tight">Processing...</h2>
+                        <p className="text-gray-500 text-sm">Please wait a moment.</p>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
@@ -846,6 +899,7 @@ export default function EditorUI() {
     const [showTemplatesPanel, setShowTemplatesPanel] = useState(false);
     const [activeLeftTool, setActiveLeftTool] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
+    const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
     // Banner State
     const [bannerRealW, setBannerRealW] = useState(2000);
     const [bannerRealH, setBannerRealH] = useState(1000);
@@ -1133,6 +1187,7 @@ export default function EditorUI() {
             alert('Authentication check failed or timed out. Please refresh and try again.');
         } finally {
             setIsSaving(false);
+            setIsSubmittingOrder(false);
         }
     };
 
@@ -1386,7 +1441,7 @@ export default function EditorUI() {
                     if (newOrder) {
                         setDbOrderId(newOrder.id);
                         // Server looks up all real emails from DB — just pass orderId + productType
-                        notifyNewOrder(newOrder.id, selectedProduct.name);
+                        await notifyNewOrder(newOrder.id, selectedProduct.name);
                     }
                     window.location.href = '/orders?submitted=true';
                 }
