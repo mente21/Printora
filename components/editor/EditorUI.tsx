@@ -2137,12 +2137,6 @@ export default function EditorUI() {
                                 <span className="text-[#A1FF4D] text-xs font-bold uppercase tracking-wider">Payment verified</span>
                             </div>
                             <div className="flex items-center gap-3">
-                                <div className="w-5 h-5 rounded-full border-2 border-white/30 flex items-center justify-center flex-shrink-0 animate-pulse">
-                                    <div className="w-2 h-2 rounded-full bg-white/60" />
-                                </div>
-                                <span className="text-white/70 text-xs font-bold uppercase tracking-wider">Compositing design mockup…</span>
-                            </div>
-                            <div className="flex items-center gap-3">
                                 <div className="w-5 h-5 rounded-full border-2 border-white/10 flex-shrink-0" />
                                 <span className="text-white/30 text-xs font-bold uppercase tracking-wider">Saving to your account</span>
                             </div>
