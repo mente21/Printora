@@ -968,6 +968,10 @@ export default function EditorUI() {
         ? { width: Math.max(500, bannerRealW), height: Math.max(500, bannerRealH) }
         : { width: 500, height: 540 };
 
+        const handleSize = selectedProduct.id === 'banner' 
+        ? Math.max(12, Math.round(canvasSize.width / 40))
+        : 10;
+
     const {
         canvasRef, canvas, addText, addCurvedText, addShape, addImage, updateActiveObject, canvasRevision, liveProps,
         undo, redo, canUndo, canRedo
@@ -977,6 +981,7 @@ export default function EditorUI() {
         onSelectionChange: setActiveObject,
         initialState: viewStates[selectedView.id],
         viewId: selectedView.id,
+        handleSize,
     });
 
     const handleLoadTemplate = (template: any) => {
@@ -1394,13 +1399,10 @@ export default function EditorUI() {
         }
     };
 
-    // UseEffect for requestedTemplate was duplicate and handled above, removing the duplicate.
-
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files?.[0]) return;
         const file = e.target.files[0];
         e.target.value = '';
-        // Try to save to Supabase Storage + library
         try {
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
@@ -1413,8 +1415,7 @@ export default function EditorUI() {
                     return;
                 }
             }
-        } catch { /* fall back to local data URL */ }
-        // Fallback: use local data URL (not logged in or upload failed)
+        } catch { }
         const reader = new FileReader();
         reader.onload = (f) => { const data = f.target?.result as string; if (data) addImage(data); };
         reader.readAsDataURL(file);
@@ -1445,13 +1446,13 @@ export default function EditorUI() {
     };
 
     const renderMockup = () => {
-        const props = { selectedView, selectedColor, printArea, canvasRef };
+        const hasContent = (canvas?.getObjects().length ?? 0) > 0;
+        const props = { selectedView, selectedColor, printArea, canvasRef, hasContent };
         switch (selectedProduct.id) {
             case 'premium-hoodie': return <HoodieMockup {...props} />;
             case 'crewneck-sweater': return <SweaterMockup {...props} />;
             case 'classic-cap': return <HatMockup {...props} />;
             case 'ceramic-mug': return <MugMockup {...props} />;
-            case 'banner': return <BannerMockup {...props} bannerRealW={bannerRealW} bannerRealH={bannerRealH} />;
             case 'banner': return <BannerMockup {...props} bannerRealW={bannerRealW} bannerRealH={bannerRealH} />;
             default: return <TshirtMockup {...props} />;
         }
@@ -2293,3 +2294,5 @@ export default function EditorUI() {
         </div>
     );
 }
+
+
