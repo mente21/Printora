@@ -258,10 +258,10 @@ export const PRODUCT_TEMPLATES: ProductTemplate[] = [
                 printAreas: [
                     {
                         id: 'front-center',
-                        width: 280,
-                        height: 120,
-                        left: 110,
-                        top: 185
+                        width: 300,
+                        height: 150,
+                        left: 100,
+                        top: 165
                     }
                 ]
             }
@@ -307,4 +307,6 @@ export const PRODUCT_TEMPLATES: ProductTemplate[] = [
         views: [{ id: 'banner-area', name: 'Banner Area', mockupUrl: '', printAreas: [{ id: 'banner-print', width: 1000, height: 500, left: 0, top: 0 }]}]
     }
 ];
+
+
 
